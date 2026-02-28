@@ -340,7 +340,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 .lang-btn .lname{font-size:9px;text-transform:uppercase;letter-spacing:.5px}
 .lang-btn:hover{border-color:var(--purple);color:var(--purple);background:var(--pdim)}
 .lang-btn.sel{border-color:var(--purple);background:var(--pdim);color:var(--purple)}
-/* ── PIN LOCK SCREEN (no fingerprint) ── */
+/* ── PIN LOCK SCREEN ── */
 #lkscr{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:30px 24px}
 .lklogo{font-family:'Outfit',sans-serif;font-size:26px;font-weight:900;background:var(--gm);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .lksub{font-size:12px;color:var(--txt3);margin-top:-14px}
@@ -380,7 +380,7 @@ input[type=date],input[type=time]{color-scheme:dark}
 <!-- LOCK SCREEN (PIN only) -->
 <div id="lkscr" style="display:none">
   <div class="lklogo">MyKharcha</div>
-  <div class="lksub">🔒 Enter PIN to unlock</div>
+  <div class="lksub">🔒 Enter your PIN</div>
   <div class="lkmeths">
     <div class="pdots"><div class="pd" id="pd0"></div><div class="pd" id="pd1"></div><div class="pd" id="pd2"></div><div class="pd" id="pd3"></div></div>
     <div class="pinerr" id="pinerr"></div>
@@ -612,6 +612,13 @@ input[type=date],input[type=time]{color-scheme:dark}
         </div>
       </div>
 
+      <div class="sgt">Security</div>
+      <div class="si" onclick="openM('pinModal')">
+        <div class="sico" style="background:var(--rdim)"><span class="material-icons-round" style="color:var(--red)">lock</span></div>
+        <div class="sinf"><h4>PIN Lock</h4><p id="pinStTxt">Disabled</p></div>
+        <button class="tgl" id="tglPin" onclick="event.stopPropagation();openM('pinModal')"></button>
+      </div>
+
       <div class="sgt" data-i18n="savings_goals">Savings Goals</div>
       <div id="goalsList"></div>
       <button class="agbtn" onclick="openM('goalModal')"><span class="material-icons-round">add_circle_outline</span><span data-i18n="add_new_goal">New Goal Add Karein</span></button>
@@ -682,6 +689,28 @@ input[type=date],input[type=time]{color-scheme:dark}
       </div>
       <div class="fg"><label class="fl" data-i18n="note_optional">Note (optional)</label><textarea class="fta" id="noteInp" placeholder="Kisliye kharch kiya?"></textarea></div>
       <button class="sbtn" onclick="submitTxn()"><span id="subBtnTxt" data-i18n="add_expense">Kharcha Add Karein</span></button>
+      <div class="mb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PIN LOCK SETTINGS -->
+<div class="ov" id="pinModal">
+  <div class="modal">
+    <div class="mhdl"></div>
+    <div class="mhdr"><h2>🔒 PIN Lock</h2><button class="mcls" onclick="closeM('pinModal')"><span class="material-icons-round">close</span></button></div>
+    <div class="mbody">
+      <div style="background:var(--pdim);border:1px solid var(--purple);border-radius:12px;padding:13px;margin-bottom:16px;display:flex;align-items:center;gap:10px">
+        <span class="material-icons-round" style="color:var(--purple);font-size:24px">lock</span>
+        <div>
+          <div style="font-size:13px;font-weight:700">Protect Your Data</div>
+          <div style="font-size:11px;color:var(--txt3);margin-top:2px">Set a 4-digit PIN to lock the app</div>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">New 4-Digit PIN</label><input type="password" class="fi" id="pinA" maxlength="4" inputmode="numeric" placeholder="••••"></div>
+      <div class="fg"><label class="fl">Confirm PIN</label><input type="password" class="fi" id="pinB" maxlength="4" inputmode="numeric" placeholder="••••"></div>
+      <button class="sbtn" onclick="savePin()">Enable PIN Lock</button>
+      <div id="disablePinDiv" style="display:none;margin-top:10px"><button class="sbtn dng" onclick="disablePin()">Remove PIN Lock</button></div>
       <div class="mb"></div>
     </div>
   </div>
@@ -1080,13 +1109,13 @@ const ECLRS=['#8b7fff','#4db8ff','#4dffb8','#ff5f7e','#ffaa4d','#f472b6','#fb923
 // ═══════════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════════
-let DS={txns:[],goals:[],bills:[],emis:[],settings:{theme:'dark',limitEnabled:false,dailyLimit:0,pinEnabled:false,pin:'',lang:'hi'},budgets:{}};
+let DS={txns:[],goals:[],bills:[],emis:[],settings:{theme:'dark',limitEnabled:false,dailyLimit:0,lang:'en',pinEnabled:false,pin:''},budgets:{}};
 let curType='expense', selCat='food', selPayM='Cash', editId=null;
 let rMonth=new Date().getMonth(), rYear=new Date().getFullYear();
 let bMonth=new Date().getMonth(), bYear=new Date().getFullYear();
 let editBillId=null, editEmiId=null;
 let barC=null, pieC=null, lineC=null, budgetC=null;
-let deferredPrompt=null, pinBuf='';
+let deferredPrompt=null;
 let waType='single', waTxnId=null;
 
 // ═══════════════════════════════════════════════════
@@ -1177,9 +1206,8 @@ function switchPg(pg){
 function openM(id){
   if(id==='addModal'){resetForm();}
   if(id==='pinModal'){
-    document.getElementById('disablePinDiv').style.display=DS.settings.pinEnabled?'':'none';
-    document.getElementById('pinA').value='';document.getElementById('pinB').value='';
-    checkFPSupport();
+    qs('#disablePinDiv').style.display=DS.settings.pinEnabled?'':'none';
+    qs('#pinA').value='';qs('#pinB').value='';
   }
   if(id==='billModal' && !editBillId){
     document.getElementById('billMTitle').textContent=t('add_bill_reminder');
@@ -1203,6 +1231,7 @@ function closeM(id){
   document.body.style.overflow='';
   if(id==='billModal') editBillId=null;
   if(id==='emiModal') editEmiId=null;
+  if(id==='pinModal'){qs('#pinA').value='';qs('#pinB').value='';}
 }
 document.addEventListener('click',function(e){
   if(e.target.classList.contains('ov')) closeM(e.target.id);
@@ -1674,6 +1703,8 @@ function renderSettings(){
   qs('#limitStTxt').textContent=s.limitEnabled&&s.dailyLimit?`₹${rfmt(s.dailyLimit)} active`:t('not_set');
   qs('#limitForm').style.display=s.limitEnabled?'':'none';
   if(s.dailyLimit) qs('#limitInp').value=s.dailyLimit;
+  qs('#tglPin').classList.toggle('on',!!s.pinEnabled);
+  qs('#pinStTxt').textContent=s.pinEnabled?'Enabled – tap to change':'Disabled';
   document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('sel',b.getAttribute('data-lang')===curLang));
   const gl=qs('#goalsList');
   if(!DS.goals.length){gl.innerHTML=`<div style="color:var(--txt3);font-size:12px;padding:3px 2px 9px">No goals yet.</div>`;return;}
@@ -1715,13 +1746,16 @@ function clearAllData(){
   sT();sG();sB();sE();sBg();renderDash();toast('All data cleared','err');
 }
 
+
 // ═══════════════════════════════════════════════════
-//  LOCK SCREEN (PIN only)
+//  PIN LOCK
 // ═══════════════════════════════════════════════════
+let pinBuf='';
 function initLock(){
-  if(!DS.settings.pinEnabled)return;
+  if(!DS.settings.pinEnabled||!DS.settings.pin) return;
   qs('#lkscr').style.display='flex';
-  qs('#numpad').innerHTML=[1,2,3,4,5,6,7,8,9,'','0','⌫'].map(n=>`<button class="nb" onclick="pinTap('${n}')">${n}</button>`).join('');
+  qs('#numpad').innerHTML=[1,2,3,4,5,6,7,8,9,'','0','⌫']
+    .map(n=>`<button class="nb" onclick="pinTap('${n}')">${n}</button>`).join('');
 }
 function pinTap(n){
   if(n==='') return;
@@ -1729,9 +1763,25 @@ function pinTap(n){
   else if(pinBuf.length<4) pinBuf+=n;
   for(let i=0;i<4;i++) qs('#pd'+i).classList.toggle('on',i<pinBuf.length);
   if(pinBuf.length===4){
-    if(pinBuf===DS.settings.pin){qs('#lkscr').style.display='none';pinBuf='';toast('Unlocked! ✓','ok');}
-    else{qs('#pinerr').textContent='Wrong PIN, try again';setTimeout(()=>{pinBuf='';for(let i=0;i<4;i++) qs('#pd'+i).classList.remove('on');qs('#pinerr').textContent='';},700);}
+    if(pinBuf===DS.settings.pin){
+      qs('#lkscr').style.display='none'; pinBuf=''; toast('Unlocked! ✓','ok');
+    } else {
+      qs('#pinerr').textContent='Wrong PIN, try again';
+      setTimeout(()=>{pinBuf='';for(let i=0;i<4;i++) qs('#pd'+i).classList.remove('on');qs('#pinerr').textContent='';},700);
+    }
   }
+}
+function savePin(){
+  const a=qs('#pinA').value, b=qs('#pinB').value;
+  if(a.length!==4||!/^\d+$/.test(a)){toast('PIN must be 4 digits','err');return;}
+  if(a!==b){toast('PINs do not match','err');return;}
+  DS.settings.pin=a; DS.settings.pinEnabled=true; sS();
+  closeM('pinModal'); renderSettings(); toast('PIN lock enabled! ✓','ok');
+}
+function disablePin(){
+  if(!confirm('Remove PIN lock?')) return;
+  DS.settings.pin=''; DS.settings.pinEnabled=false; sS();
+  closeM('pinModal'); renderSettings(); toast('PIN lock removed','ok');
 }
 
 // ═══════════════════════════════════════════════════
@@ -1825,7 +1875,7 @@ function toast(msg,type='ok'){
 //  INIT
 // ═══════════════════════════════════════════════════
 load();
-curLang = DS.settings.lang || 'hi';
+curLang = DS.settings.lang || 'en';
 applyTheme(DS.settings.theme);
 injectManifest();
 regSW();
