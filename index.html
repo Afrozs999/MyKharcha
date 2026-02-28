@@ -66,6 +66,11 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 .hbtn .material-icons-round{font-size:18px}
 .hbtn .dot{position:absolute;top:-3px;right:-3px;width:8px;height:8px;border-radius:50%;background:var(--red);border:2px solid var(--bg);display:none}
 .hbtn .dot.on{display:block}
+/* ── AD SLOTS ── */
+.ad-banner{width:100%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.15);border-bottom:1px solid var(--bdr);padding:4px 0;min-height:58px;overflow:hidden}
+[data-theme=light] .ad-banner{background:rgba(0,0,0,.04)}
+.ad-native{width:100%;padding:10px 14px;background:var(--card);border:1px solid var(--bdr);border-radius:var(--r2);overflow:hidden;margin-bottom:0}
+.ad-label{font-size:8px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
 /* ── PAGES ── */
 .page{display:none;padding-bottom:85px;min-height:calc(100svh - 60px)}
 .page.active{display:block;animation:fadeUp .3s ease}
@@ -328,6 +333,13 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 .wabox{background:#075E54;border-radius:14px;padding:14px;margin-bottom:13px}
 .wahdr{font-size:10px;color:rgba(255,255,255,.6);margin-bottom:7px;text-transform:uppercase;letter-spacing:.5px}
 .wamsg{background:#128C7E;border-radius:10px;padding:11px 13px;font-size:12px;color:#fff;line-height:1.65;white-space:pre-wrap;word-break:break-word}
+/* ── LANGUAGE SELECTOR ── */
+.lang-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px}
+.lang-btn{padding:10px 8px;border-radius:var(--r3);border:1px solid var(--bdr);background:var(--card);color:var(--txt3);font-size:12px;font-weight:700;cursor:pointer;transition:var(--t);text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px}
+.lang-btn .lflag{font-size:18px}
+.lang-btn .lname{font-size:9px;text-transform:uppercase;letter-spacing:.5px}
+.lang-btn:hover{border-color:var(--purple);color:var(--purple);background:var(--pdim)}
+.lang-btn.sel{border-color:var(--purple);background:var(--pdim);color:var(--purple)}
 /* ── LOCK SCREEN ── */
 #lkscr{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:30px 24px}
 .lklogo{font-family:'Outfit',sans-serif;font-size:26px;font-weight:900;background:var(--gm);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
@@ -361,6 +373,12 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 input[type=date],input[type=time]{color-scheme:dark}
 [data-theme=light] input[type=date],[data-theme=light] input[type=time]{color-scheme:light}
 .divider{height:1px;background:var(--bdr);margin:4px 0}
+/* RTL support for Urdu */
+[data-lang=ur] .pg, [data-lang=ur] .mbody, [data-lang=ur] .mhdr h2,
+[data-lang=ur] .hdr-brand, [data-lang=ur] .sinf h4, [data-lang=ur] .sinf p,
+[data-lang=ur] .tbody .tc, [data-lang=ur] .tbody .tn, [data-lang=ur] .binfo .bn {
+  direction: rtl;
+}
 </style>
 </head>
 <body>
@@ -371,13 +389,13 @@ input[type=date],input[type=time]{color-scheme:dark}
 <!-- LOCK SCREEN -->
 <div id="lkscr" style="display:none">
   <div class="lklogo">MyKharcha</div>
-  <div class="lksub">Smart Expense Tracker</div>
+  <div class="lksub" id="lk-sub">Smart Expense Tracker</div>
   <div class="lkmeths">
     <div style="text-align:center">
       <div class="fpbtn" id="fpbtn" onclick="tryFP()"><span class="material-icons-round">fingerprint</span></div>
       <div class="fplbl" id="fplbl" style="margin-top:8px">Fingerprint / Face ID tap karein</div>
     </div>
-    <div class="lkor">ya PIN use karein</div>
+    <div class="lkor" id="lk-or">ya PIN use karein</div>
     <div class="pdots"><div class="pd" id="pd0"></div><div class="pd" id="pd1"></div><div class="pd" id="pd2"></div><div class="pd" id="pd3"></div></div>
     <div class="pinerr" id="pinerr"></div>
     <div class="numpad" id="numpad"></div>
@@ -386,6 +404,21 @@ input[type=date],input[type=time]{color-scheme:dark}
 
 <!-- APP -->
 <div id="app">
+
+  <!-- TOP BANNER AD -->
+  <div class="ad-banner" id="topBannerAd">
+    <!-- Banner 320x50 Ad -->
+    <script>
+      atOptions = {
+        'key' : 'f5788d1192488a743d4d3fc525c70a11',
+        'format' : 'iframe',
+        'height' : 50,
+        'width' : 320,
+        'params' : {}
+      };
+    </script>
+    <script src="https://www.highperformanceformat.com/f5788d1192488a743d4d3fc525c70a11/invoke.js"></script>
+  </div>
 
   <!-- HEADER -->
   <header class="hdr">
@@ -412,21 +445,21 @@ input[type=date],input[type=time]{color-scheme:dark}
     <div class="pg">
       <div id="installBanner" class="ibanner" style="display:none">
         <span class="material-icons-round">install_mobile</span>
-        <div class="ibinfo"><h4>Install MyKharcha</h4><p>Home screen pe add karein</p></div>
-        <button class="ibbtn" onclick="doInstall()">Install</button>
+        <div class="ibinfo"><h4 data-i18n="install_title">Install MyKharcha</h4><p data-i18n="install_sub">Home screen pe add karein</p></div>
+        <button class="ibbtn" onclick="doInstall()" data-i18n="install_btn">Install</button>
       </div>
       <!-- Hero -->
       <div class="hero">
-        <div class="hl">Is Mahine ka Balance</div>
+        <div class="hl" data-i18n="hero_label">Is Mahine ka Balance</div>
         <div class="ha" id="heroAmt">₹0</div>
         <div class="hs" id="heroSub">Amdani − Kharcha</div>
         <div class="hero-row">
-          <div class="hstat"><div class="sl">Aaj</div><div class="sv" id="todayAmt">₹0</div></div>
-          <div class="hstat"><div class="sl">Mahina</div><div class="sv" id="monthAmt">₹0</div></div>
+          <div class="hstat"><div class="sl" data-i18n="today">Aaj</div><div class="sv" id="todayAmt">₹0</div></div>
+          <div class="hstat"><div class="sl" data-i18n="month">Mahina</div><div class="sv" id="monthAmt">₹0</div></div>
           <div class="hstat"><div class="sl">Txns</div><div class="sv" id="txnCnt">0</div></div>
         </div>
         <div class="lstrip" id="lstrip" style="display:none">
-          <div class="lrow"><span>Daily Limit</span><span id="ltxt"></span></div>
+          <div class="lrow"><span data-i18n="daily_limit">Daily Limit</span><span id="ltxt"></span></div>
           <div class="ltrack"><div class="lfill" id="lfill"></div></div>
         </div>
       </div>
@@ -434,26 +467,31 @@ input[type=date],input[type=time]{color-scheme:dark}
       <div class="sgrid">
         <div class="smini inc">
           <div class="ico"><span class="material-icons-round">trending_up</span></div>
-          <div class="lbl">Amdani</div><div class="val" id="incAmt">₹0</div>
+          <div class="lbl" data-i18n="income">Amdani</div><div class="val" id="incAmt">₹0</div>
         </div>
         <div class="smini sav">
           <div class="ico"><span class="material-icons-round">savings</span></div>
-          <div class="lbl">Bachat</div><div class="val" id="savAmt">₹0</div>
+          <div class="lbl" data-i18n="savings">Bachat</div><div class="val" id="savAmt">₹0</div>
         </div>
       </div>
       <!-- Upcoming Bills -->
       <div id="dashBillsWrap" style="display:none">
-        <div class="sh"><h2>📅 Aane Wale Bills</h2><span class="sa" onclick="switchPg('bills')">Sab Dekho →</span></div>
+        <div class="sh"><h2>📅 <span data-i18n="upcoming_bills">Aane Wale Bills</span></h2><span class="sa" onclick="switchPg('bills')" data-i18n="see_all">Sab Dekho →</span></div>
         <div id="dashBillsList"></div>
+      </div>
+      <!-- Native Ad after hero -->
+      <div id="nativeAd1">
+        <script async="async" data-cfasync="false" src="https://pl28816917.effectivegatecpm.com/1f4d23b9eb4fb3a22087dd4b8a3f182a/invoke.js"></script>
+        <div id="container-1f4d23b9eb4fb3a22087dd4b8a3f182a"></div>
       </div>
       <!-- Categories -->
       <div class="card cp">
-        <div class="sh"><h2>Categories</h2><span class="sa" onclick="switchPg('reports')">Report →</span></div>
+        <div class="sh"><h2 data-i18n="categories">Categories</h2><span class="sa" onclick="switchPg('reports')" data-i18n="report_arrow">Report →</span></div>
         <div class="clist" id="catSummary"></div>
       </div>
       <!-- Recent -->
       <div>
-        <div class="sh"><h2>Recent Transactions</h2><span class="sa" onclick="switchPg('history')">Sab Dekho →</span></div>
+        <div class="sh"><h2 data-i18n="recent_txns">Recent Transactions</h2><span class="sa" onclick="switchPg('history')" data-i18n="see_all">Sab Dekho →</span></div>
         <div class="tlist" id="recentTxns"></div>
       </div>
     </div>
@@ -469,7 +507,7 @@ input[type=date],input[type=time]{color-scheme:dark}
       <div class="fscroll" id="catFilters"></div>
       <div class="drow">
         <input type="date" class="fi" id="dateFilter" onchange="renderHistory()">
-        <button class="cbtn" onclick="clearDateFilter()">Clear</button>
+        <button class="cbtn" onclick="clearDateFilter()" data-i18n="clear">Clear</button>
       </div>
       <div id="histContent"></div>
     </div>
@@ -479,15 +517,15 @@ input[type=date],input[type=time]{color-scheme:dark}
   <div id="pg-reports" class="page">
     <div class="pg">
       <div class="mnav">
-        <button class="mbtn" onclick="chgMonth(-1)">‹ Pichla</button>
+        <button class="mbtn" onclick="chgMonth(-1)" data-i18n="prev_month">‹ Pichla</button>
         <div class="mtit" id="rMonthTitle"></div>
-        <button class="mbtn" onclick="chgMonth(1)">Agla ›</button>
+        <button class="mbtn" onclick="chgMonth(1)" data-i18n="next_month">Agla ›</button>
       </div>
-      <div class="ccard"><h3>📊 6 Mahine ka Kharcha</h3><div class="cbox"><canvas id="barChart"></canvas></div></div>
-      <div class="ccard"><h3>🍩 Category Breakdown</h3><div class="cbox"><canvas id="pieChart"></canvas></div></div>
-      <div class="ccard"><h3>📈 Daily Trend</h3><div class="cbox"><canvas id="lineChart"></canvas></div></div>
+      <div class="ccard"><h3>📊 <span data-i18n="six_month">6 Mahine ka Kharcha</span></h3><div class="cbox"><canvas id="barChart"></canvas></div></div>
+      <div class="ccard"><h3>🍩 <span data-i18n="cat_breakdown">Category Breakdown</span></h3><div class="cbox"><canvas id="pieChart"></canvas></div></div>
+      <div class="ccard"><h3>📈 <span data-i18n="daily_trend">Daily Trend</span></h3><div class="cbox"><canvas id="lineChart"></canvas></div></div>
       <div class="card cp">
-        <div class="sh"><h2>Export & Backup</h2></div>
+        <div class="sh"><h2 data-i18n="export_backup">Export & Backup</h2></div>
         <div class="egrid">
           <button class="ebtn" onclick="exportPDF()"><span class="material-icons-round">picture_as_pdf</span>PDF Export</button>
           <button class="ebtn" onclick="exportXLSX()"><span class="material-icons-round">table_chart</span>Excel Export</button>
@@ -502,17 +540,17 @@ input[type=date],input[type=time]{color-scheme:dark}
   <!-- ═══ BILLS ═══ -->
   <div id="pg-bills" class="page">
     <div class="pg">
-      <div class="sh"><h2>📅 Bill Reminders</h2><span class="sa" onclick="openM('billModal')">+ Add Bill</span></div>
+      <div class="sh"><h2>📅 <span data-i18n="bill_reminders">Bill Reminders</span></h2><span class="sa" onclick="openM('billModal')" data-i18n="add_bill">+ Add Bill</span></div>
       <div class="fscroll" id="billFilters">
-        <div class="fc on" data-bf="all" onclick="setBF(this)">Sab</div>
-        <div class="fc" data-bf="today" onclick="setBF(this)">🔴 Aaj Due</div>
-        <div class="fc" data-bf="week" onclick="setBF(this)">🟠 Is Hafte</div>
-        <div class="fc" data-bf="unpaid" onclick="setBF(this)">⏳ Unpaid</div>
-        <div class="fc" data-bf="paid" onclick="setBF(this)">✅ Paid</div>
+        <div class="fc on" data-bf="all" onclick="setBF(this)" data-i18n="all">Sab</div>
+        <div class="fc" data-bf="today" onclick="setBF(this)">🔴 <span data-i18n="today_due">Aaj Due</span></div>
+        <div class="fc" data-bf="week" onclick="setBF(this)">🟠 <span data-i18n="this_week">Is Hafte</span></div>
+        <div class="fc" data-bf="unpaid" onclick="setBF(this)">⏳ <span data-i18n="unpaid">Unpaid</span></div>
+        <div class="fc" data-bf="paid" onclick="setBF(this)">✅ <span data-i18n="paid">Paid</span></div>
       </div>
       <div id="billsList"></div>
       <div class="divider"></div>
-      <div class="sh"><h2>💳 EMI / Loan Tracker</h2><span class="sa" onclick="openM('emiModal')">+ Add EMI</span></div>
+      <div class="sh"><h2>💳 <span data-i18n="emi_tracker">EMI / Loan Tracker</span></h2><span class="sa" onclick="openM('emiModal')" data-i18n="add_emi">+ Add EMI</span></div>
       <div id="emiList"></div>
     </div>
   </div>
@@ -521,67 +559,93 @@ input[type=date],input[type=time]{color-scheme:dark}
   <div id="pg-budget" class="page">
     <div class="pg">
       <div class="mnav">
-        <button class="mbtn" onclick="chgBMonth(-1)">‹ Pichla</button>
+        <button class="mbtn" onclick="chgBMonth(-1)" data-i18n="prev_month">‹ Pichla</button>
         <div class="mtit" id="budgetMonthTitle"></div>
-        <button class="mbtn" onclick="chgBMonth(1)">Agla ›</button>
+        <button class="mbtn" onclick="chgBMonth(1)" data-i18n="next_month">Agla ›</button>
       </div>
       <div class="bhero">
-        <div class="bhl">Monthly Budget Overview</div>
+        <div class="bhl" data-i18n="monthly_budget">Monthly Budget Overview</div>
         <div class="bha" id="budgetTotal">₹0</div>
         <div class="bhs" id="budgetSub">Koi budget set nahi</div>
         <div class="bhrow">
-          <div class="bhitem"><div class="bi">Kharca</div><div class="bv" id="budgetSpent">₹0</div></div>
-          <div class="bhitem"><div class="bi">Baki</div><div class="bv" id="budgetLeft">₹0</div></div>
-          <div class="bhitem"><div class="bi">Upyog</div><div class="bv" id="budgetPct">0%</div></div>
+          <div class="bhitem"><div class="bi" data-i18n="spent">Kharca</div><div class="bv" id="budgetSpent">₹0</div></div>
+          <div class="bhitem"><div class="bi" data-i18n="left">Baki</div><div class="bv" id="budgetLeft">₹0</div></div>
+          <div class="bhitem"><div class="bi" data-i18n="usage">Upyog</div><div class="bv" id="budgetPct">0%</div></div>
         </div>
       </div>
       <div class="card cp">
-        <div class="sh"><h2>Category Budgets</h2><span class="sa" onclick="openM('budgetEditModal')">Edit Budgets</span></div>
+        <div class="sh"><h2 data-i18n="cat_budgets">Category Budgets</h2><span class="sa" onclick="openM('budgetEditModal')" data-i18n="edit_budgets">Edit Budgets</span></div>
         <div class="bclist" id="budgetCatList"></div>
       </div>
-      <div class="ccard"><h3>📊 Budget vs Actual</h3><div class="cbox"><canvas id="budgetChart"></canvas></div></div>
+      <div class="ccard"><h3>📊 <span data-i18n="budget_vs_actual">Budget vs Actual</span></h3><div class="cbox"><canvas id="budgetChart"></canvas></div></div>
     </div>
   </div>
 
   <!-- ═══ SETTINGS ═══ -->
   <div id="pg-settings" class="page">
     <div class="pg">
-      <div class="sgt">Preferences</div>
+
+      <!-- LANGUAGE SELECTOR -->
+      <div class="sgt" data-i18n="language">Language / भाषा</div>
+      <div class="lang-grid">
+        <button class="lang-btn" data-lang="en" onclick="setLang('en')">
+          <span class="lflag">🇬🇧</span>
+          <span class="lname">English</span>
+        </button>
+        <button class="lang-btn" data-lang="hi" onclick="setLang('hi')">
+          <span class="lflag">🇮🇳</span>
+          <span class="lname">हिंदी</span>
+        </button>
+        <button class="lang-btn" data-lang="mr" onclick="setLang('mr')">
+          <span class="lflag">🇮🇳</span>
+          <span class="lname">मराठी</span>
+        </button>
+        <button class="lang-btn" data-lang="ur" onclick="setLang('ur')">
+          <span class="lflag">🇵🇰</span>
+          <span class="lname">اردو</span>
+        </button>
+        <button class="lang-btn" data-lang="ta" onclick="setLang('ta')">
+          <span class="lflag">🇮🇳</span>
+          <span class="lname">தமிழ்</span>
+        </button>
+      </div>
+
+      <div class="sgt" data-i18n="preferences">Preferences</div>
       <div class="si" onclick="toggleTheme()">
         <div class="sico" style="background:rgba(139,127,255,.12)"><span class="material-icons-round" style="color:var(--purple)">palette</span></div>
-        <div class="sinf"><h4>Dark / Light Mode</h4><p>App ka theme badlein</p></div>
+        <div class="sinf"><h4 data-i18n="dark_light">Dark / Light Mode</h4><p data-i18n="change_theme">App ka theme badlein</p></div>
         <button class="tgl" id="tglTheme" onclick="event.stopPropagation();toggleTheme()"></button>
       </div>
 
-      <div class="sgt">Daily Spending Limit</div>
+      <div class="sgt" data-i18n="daily_limit_setting">Daily Spending Limit</div>
       <div class="si" onclick="tglLimit()">
         <div class="sico" style="background:var(--odim)"><span class="material-icons-round" style="color:var(--orange)">notifications_active</span></div>
-        <div class="sinf"><h4>Daily Limit Alert</h4><p id="limitStTxt">Set nahi hua</p></div>
+        <div class="sinf"><h4 data-i18n="daily_limit_alert">Daily Limit Alert</h4><p id="limitStTxt" data-i18n="not_set">Set nahi hua</p></div>
         <button class="tgl" id="tglLimit" onclick="event.stopPropagation();tglLimit()"></button>
       </div>
       <div class="lform" id="limitForm" style="display:none">
-        <label class="fl">Daily Limit (₹)</label>
+        <label class="fl" data-i18n="daily_limit_rs">Daily Limit (₹)</label>
         <div class="linrow">
           <input class="linp" id="limitInp" type="number" min="1" placeholder="e.g. 500">
-          <button class="svbtn" onclick="saveLimit()">Save</button>
+          <button class="svbtn" onclick="saveLimit()" data-i18n="save">Save</button>
         </div>
       </div>
 
-      <div class="sgt">Security</div>
+      <div class="sgt" data-i18n="security">Security</div>
       <div class="si" onclick="openM('pinModal')">
         <div class="sico" style="background:var(--rdim)"><span class="material-icons-round" style="color:var(--red)">fingerprint</span></div>
-        <div class="sinf"><h4>Fingerprint / PIN Lock</h4><p id="pinStTxt">Disabled</p></div>
+        <div class="sinf"><h4 data-i18n="pin_lock">Fingerprint / PIN Lock</h4><p id="pinStTxt">Disabled</p></div>
         <button class="tgl" id="tglPin" onclick="event.stopPropagation();openM('pinModal')"></button>
       </div>
 
-      <div class="sgt">Savings Goals</div>
+      <div class="sgt" data-i18n="savings_goals">Savings Goals</div>
       <div id="goalsList"></div>
-      <button class="agbtn" onclick="openM('goalModal')"><span class="material-icons-round">add_circle_outline</span>New Goal Add Karein</button>
+      <button class="agbtn" onclick="openM('goalModal')"><span class="material-icons-round">add_circle_outline</span><span data-i18n="add_new_goal">New Goal Add Karein</span></button>
 
-      <div class="sgt" style="margin-top:14px">Data Management</div>
+      <div class="sgt" style="margin-top:14px" data-i18n="data_mgmt">Data Management</div>
       <div class="si" onclick="clearAllData()">
         <div class="sico" style="background:var(--rdim)"><span class="material-icons-round" style="color:var(--red)">delete_forever</span></div>
-        <div class="sinf"><h4>Sab Data Delete Karein</h4><p>Permanently remove karta hai</p></div>
+        <div class="sinf"><h4 data-i18n="delete_all">Sab Data Delete Karein</h4><p data-i18n="delete_warning">Permanently remove karta hai</p></div>
         <span class="material-icons-round" style="color:var(--txt3);font-size:18px">chevron_right</span>
       </div>
     </div>
@@ -590,20 +654,20 @@ input[type=date],input[type=time]{color-scheme:dark}
   <!-- BOTTOM NAV -->
   <nav class="bnav">
     <button class="nbtn on" id="nb-dash" onclick="switchPg('dash')">
-      <div class="niw"><span class="material-icons-round">home</span></div>Home
+      <div class="niw"><span class="material-icons-round">home</span></div><span data-i18n="nav_home">Home</span>
     </button>
     <button class="nbtn" id="nb-history" onclick="switchPg('history')">
-      <div class="niw"><span class="material-icons-round">history</span></div>History
+      <div class="niw"><span class="material-icons-round">history</span></div><span data-i18n="nav_history">History</span>
     </button>
     <button class="nbtn" id="nb-bills" onclick="switchPg('bills')">
-      <div class="niw"><span class="material-icons-round">event_note</span></div>Bills
+      <div class="niw"><span class="material-icons-round">event_note</span></div><span data-i18n="nav_bills">Bills</span>
       <div class="rdot" id="billsDot"></div>
     </button>
     <button class="nbtn" id="nb-budget" onclick="switchPg('budget')">
-      <div class="niw"><span class="material-icons-round">account_balance_wallet</span></div>Budget
+      <div class="niw"><span class="material-icons-round">account_balance_wallet</span></div><span data-i18n="nav_budget">Budget</span>
     </button>
     <button class="nbtn" id="nb-settings" onclick="switchPg('settings')">
-      <div class="niw"><span class="material-icons-round">tune</span></div>Settings
+      <div class="niw"><span class="material-icons-round">tune</span></div><span data-i18n="nav_settings">Settings</span>
     </button>
   </nav>
 </div>
@@ -618,32 +682,32 @@ input[type=date],input[type=time]{color-scheme:dark}
   <div class="modal">
     <div class="mhdl"></div>
     <div class="mhdr">
-      <h2 id="addMTitle">Transaction Add Karein</h2>
+      <h2 id="addMTitle" data-i18n="add_transaction">Transaction Add Karein</h2>
       <button class="mcls" onclick="closeM('addModal')"><span class="material-icons-round">close</span></button>
     </div>
     <div class="mbody">
       <div class="tg">
-        <button class="tbtn ae" id="ttExp" onclick="setType('expense')"><span class="material-icons-round">arrow_upward</span>Kharcha</button>
-        <button class="tbtn" id="ttInc" onclick="setType('income')"><span class="material-icons-round">arrow_downward</span>Amdani</button>
+        <button class="tbtn ae" id="ttExp" onclick="setType('expense')"><span class="material-icons-round">arrow_upward</span><span data-i18n="expense">Kharcha</span></button>
+        <button class="tbtn" id="ttInc" onclick="setType('income')"><span class="material-icons-round">arrow_downward</span><span data-i18n="income">Amdani</span></button>
       </div>
       <div class="fg">
         <div class="awrap"><span class="apfx">₹</span><input class="afi" id="amtInp" type="number" inputmode="decimal" min="0" placeholder="0"></div>
       </div>
-      <div class="fg"><label class="fl">Category</label><div class="cwrap" id="catChips"></div></div>
+      <div class="fg"><label class="fl" data-i18n="category">Category</label><div class="cwrap" id="catChips"></div></div>
       <div class="fr">
-        <div class="fg"><label class="fl">Tarikh</label><input type="date" class="fi" id="dateInp"></div>
-        <div class="fg"><label class="fl">Samay</label><input type="time" class="fi" id="timeInp"></div>
+        <div class="fg"><label class="fl" data-i18n="date">Tarikh</label><input type="date" class="fi" id="dateInp"></div>
+        <div class="fg"><label class="fl" data-i18n="time">Samay</label><input type="time" class="fi" id="timeInp"></div>
       </div>
       <div class="fg" id="payGrp">
-        <label class="fl">Payment Method</label>
+        <label class="fl" data-i18n="payment_method">Payment Method</label>
         <div class="pwrap">
           <div class="pc sel" data-p="Cash" onclick="selPay(this)">💵 Cash</div>
           <div class="pc" data-p="UPI" onclick="selPay(this)">📱 UPI</div>
           <div class="pc" data-p="Card" onclick="selPay(this)">💳 Card</div>
         </div>
       </div>
-      <div class="fg"><label class="fl">Note (optional)</label><textarea class="fta" id="noteInp" placeholder="Kisliye kharch kiya?"></textarea></div>
-      <button class="sbtn" onclick="submitTxn()"><span id="subBtnTxt">Kharcha Add Karein</span></button>
+      <div class="fg"><label class="fl" data-i18n="note_optional">Note (optional)</label><textarea class="fta" id="noteInp" placeholder="Kisliye kharch kiya?"></textarea></div>
+      <button class="sbtn" onclick="submitTxn()"><span id="subBtnTxt" data-i18n="add_expense">Kharcha Add Karein</span></button>
       <div class="mb"></div>
     </div>
   </div>
@@ -653,16 +717,16 @@ input[type=date],input[type=time]{color-scheme:dark}
 <div class="ov" id="pinModal">
   <div class="modal">
     <div class="mhdl"></div>
-    <div class="mhdr"><h2>App Lock</h2><button class="mcls" onclick="closeM('pinModal')"><span class="material-icons-round">close</span></button></div>
+    <div class="mhdr"><h2 data-i18n="app_lock">App Lock</h2><button class="mcls" onclick="closeM('pinModal')"><span class="material-icons-round">close</span></button></div>
     <div class="mbody">
       <div style="background:var(--pdim);border:1px solid var(--purple);border-radius:12px;padding:12px;margin-bottom:14px;display:flex;align-items:center;gap:10px">
         <span class="material-icons-round" style="color:var(--purple);font-size:22px">fingerprint</span>
-        <div><div style="font-size:13px;font-weight:700">Fingerprint / Face ID</div><div style="font-size:11px;color:var(--txt3);margin-top:2px" id="fpSupTxt">Check ho raha hai...</div></div>
+        <div><div style="font-size:13px;font-weight:700" data-i18n="fp_face">Fingerprint / Face ID</div><div style="font-size:11px;color:var(--txt3);margin-top:2px" id="fpSupTxt">Check ho raha hai...</div></div>
       </div>
-      <div class="fg"><label class="fl">Naya 4-Digit PIN</label><input type="password" class="fi" id="pinA" maxlength="4" inputmode="numeric" placeholder="••••"></div>
-      <div class="fg"><label class="fl">PIN Confirm Karein</label><input type="password" class="fi" id="pinB" maxlength="4" inputmode="numeric" placeholder="••••"></div>
-      <button class="sbtn" onclick="savePin()">Lock Enable Karein</button>
-      <div id="disablePinDiv" style="display:none;margin-top:10px"><button class="sbtn dng" onclick="disablePin()">Lock Disable Karein</button></div>
+      <div class="fg"><label class="fl" data-i18n="new_pin">Naya 4-Digit PIN</label><input type="password" class="fi" id="pinA" maxlength="4" inputmode="numeric" placeholder="••••"></div>
+      <div class="fg"><label class="fl" data-i18n="confirm_pin">PIN Confirm Karein</label><input type="password" class="fi" id="pinB" maxlength="4" inputmode="numeric" placeholder="••••"></div>
+      <button class="sbtn" onclick="savePin()" data-i18n="enable_lock">Lock Enable Karein</button>
+      <div id="disablePinDiv" style="display:none;margin-top:10px"><button class="sbtn dng" onclick="disablePin()" data-i18n="disable_lock">Lock Disable Karein</button></div>
       <div class="mb"></div>
     </div>
   </div>
@@ -672,12 +736,12 @@ input[type=date],input[type=time]{color-scheme:dark}
 <div class="ov" id="goalModal">
   <div class="modal">
     <div class="mhdl"></div>
-    <div class="mhdr"><h2>Savings Goal Add Karein</h2><button class="mcls" onclick="closeM('goalModal')"><span class="material-icons-round">close</span></button></div>
+    <div class="mhdr"><h2 data-i18n="add_savings_goal">Savings Goal Add Karein</h2><button class="mcls" onclick="closeM('goalModal')"><span class="material-icons-round">close</span></button></div>
     <div class="mbody">
-      <div class="fg"><label class="fl">Goal ka Naam</label><input class="fi" id="gNameInp" placeholder="e.g. iPhone, Vacation, Bike"></div>
-      <div class="fg"><label class="fl">Target Amount (₹)</label><input type="number" class="fi" id="gTargetInp" placeholder="50000"></div>
-      <div class="fg"><label class="fl">Abhi Tak Bachaya (₹)</label><input type="number" class="fi" id="gSavedInp" placeholder="0"></div>
-      <button class="sbtn" onclick="saveGoal()">Goal Add Karein</button>
+      <div class="fg"><label class="fl" data-i18n="goal_name">Goal ka Naam</label><input class="fi" id="gNameInp" placeholder="e.g. iPhone, Vacation, Bike"></div>
+      <div class="fg"><label class="fl" data-i18n="target_amount">Target Amount (₹)</label><input type="number" class="fi" id="gTargetInp" placeholder="50000"></div>
+      <div class="fg"><label class="fl" data-i18n="saved_so_far">Abhi Tak Bachaya (₹)</label><input type="number" class="fi" id="gSavedInp" placeholder="0"></div>
+      <button class="sbtn" onclick="saveGoal()" data-i18n="add_goal">Goal Add Karein</button>
       <div class="mb"></div>
     </div>
   </div>
@@ -687,13 +751,13 @@ input[type=date],input[type=time]{color-scheme:dark}
 <div class="ov" id="billModal">
   <div class="modal">
     <div class="mhdl"></div>
-    <div class="mhdr"><h2 id="billMTitle">Bill Reminder Add Karein</h2><button class="mcls" onclick="closeM('billModal')"><span class="material-icons-round">close</span></button></div>
+    <div class="mhdr"><h2 id="billMTitle" data-i18n="add_bill_reminder">Bill Reminder Add Karein</h2><button class="mcls" onclick="closeM('billModal')"><span class="material-icons-round">close</span></button></div>
     <div class="mbody">
-      <div class="fg"><label class="fl">Bill ka Naam</label><input class="fi" id="bNameInp" placeholder="e.g. Electricity, Netflix, WiFi"></div>
-      <div class="fg"><label class="fl">Amount (₹)</label><input type="number" class="fi" id="bAmtInp" placeholder="500"></div>
+      <div class="fg"><label class="fl" data-i18n="bill_name">Bill ka Naam</label><input class="fi" id="bNameInp" placeholder="e.g. Electricity, Netflix, WiFi"></div>
+      <div class="fg"><label class="fl" data-i18n="amount">Amount (₹)</label><input type="number" class="fi" id="bAmtInp" placeholder="500"></div>
       <div class="fr">
-        <div class="fg"><label class="fl">Due Date</label><input type="date" class="fi" id="bDueInp"></div>
-        <div class="fg"><label class="fl">Category</label>
+        <div class="fg"><label class="fl" data-i18n="due_date">Due Date</label><input type="date" class="fi" id="bDueInp"></div>
+        <div class="fg"><label class="fl" data-i18n="category">Category</label>
           <select class="fs" id="bCatInp">
             <option value="bills">Bills</option><option value="recharge">Recharge</option>
             <option value="rent">Rent</option><option value="food">Food</option>
@@ -701,14 +765,14 @@ input[type=date],input[type=time]{color-scheme:dark}
           </select>
         </div>
       </div>
-      <div class="fg"><label class="fl">Repeat</label>
+      <div class="fg"><label class="fl" data-i18n="repeat">Repeat</label>
         <select class="fs" id="bRepeatInp">
-          <option value="none">Ek Baar</option><option value="monthly">Har Mahine</option>
-          <option value="weekly">Har Hafte</option><option value="yearly">Har Saal</option>
+          <option value="none" data-i18n="one_time">Ek Baar</option><option value="monthly" data-i18n="monthly">Har Mahine</option>
+          <option value="weekly" data-i18n="weekly">Har Hafte</option><option value="yearly" data-i18n="yearly">Har Saal</option>
         </select>
       </div>
-      <div class="fg"><label class="fl">Note (optional)</label><input class="fi" id="bNoteInp" placeholder="Account number, provider..."></div>
-      <button class="sbtn" id="billSubmitBtn" onclick="saveBill()">Bill Reminder Add Karein</button>
+      <div class="fg"><label class="fl" data-i18n="note_optional">Note (optional)</label><input class="fi" id="bNoteInp" placeholder="Account number, provider..."></div>
+      <button class="sbtn" id="billSubmitBtn" onclick="saveBill()" data-i18n="add_bill_btn">Bill Reminder Add Karein</button>
       <div class="mb"></div>
     </div>
   </div>
@@ -718,24 +782,24 @@ input[type=date],input[type=time]{color-scheme:dark}
 <div class="ov" id="emiModal">
   <div class="modal">
     <div class="mhdl"></div>
-    <div class="mhdr"><h2 id="emiMTitle">EMI / Loan Add Karein</h2><button class="mcls" onclick="closeM('emiModal')"><span class="material-icons-round">close</span></button></div>
+    <div class="mhdr"><h2 id="emiMTitle" data-i18n="add_emi_loan">EMI / Loan Add Karein</h2><button class="mcls" onclick="closeM('emiModal')"><span class="material-icons-round">close</span></button></div>
     <div class="mbody">
-      <div class="fg"><label class="fl">Loan / EMI ka Naam</label><input class="fi" id="eNameInp" placeholder="e.g. Home Loan, Car EMI"></div>
-      <div class="fg"><label class="fl">Bank / Lender</label><input class="fi" id="eBankInp" placeholder="e.g. SBI, HDFC, ICICI"></div>
+      <div class="fg"><label class="fl" data-i18n="emi_name">Loan / EMI ka Naam</label><input class="fi" id="eNameInp" placeholder="e.g. Home Loan, Car EMI"></div>
+      <div class="fg"><label class="fl" data-i18n="bank_lender">Bank / Lender</label><input class="fi" id="eBankInp" placeholder="e.g. SBI, HDFC, ICICI"></div>
       <div class="fr">
-        <div class="fg"><label class="fl">Total Amount (₹)</label><input type="number" class="fi" id="eTotalInp" placeholder="500000"></div>
-        <div class="fg"><label class="fl">EMI/Month (₹)</label><input type="number" class="fi" id="eEmiInp" placeholder="15000"></div>
+        <div class="fg"><label class="fl" data-i18n="total_amount">Total Amount (₹)</label><input type="number" class="fi" id="eTotalInp" placeholder="500000"></div>
+        <div class="fg"><label class="fl" data-i18n="emi_month">EMI/Month (₹)</label><input type="number" class="fi" id="eEmiInp" placeholder="15000"></div>
       </div>
       <div class="fr">
-        <div class="fg"><label class="fl">Kul EMIs</label><input type="number" class="fi" id="eTotalEmiInp" placeholder="48"></div>
-        <div class="fg"><label class="fl">EMIs Paid</label><input type="number" class="fi" id="ePaidInp" placeholder="12"></div>
+        <div class="fg"><label class="fl" data-i18n="total_emis">Kul EMIs</label><input type="number" class="fi" id="eTotalEmiInp" placeholder="48"></div>
+        <div class="fg"><label class="fl" data-i18n="emis_paid">EMIs Paid</label><input type="number" class="fi" id="ePaidInp" placeholder="12"></div>
       </div>
       <div class="fr">
-        <div class="fg"><label class="fl">Start Date</label><input type="date" class="fi" id="eStartInp"></div>
-        <div class="fg"><label class="fl">Due Day (1-28)</label><input type="number" class="fi" id="eDayInp" min="1" max="28" placeholder="5"></div>
+        <div class="fg"><label class="fl" data-i18n="start_date">Start Date</label><input type="date" class="fi" id="eStartInp"></div>
+        <div class="fg"><label class="fl" data-i18n="due_day">Due Day (1-28)</label><input type="number" class="fi" id="eDayInp" min="1" max="28" placeholder="5"></div>
       </div>
-      <div class="fg"><label class="fl">Interest Rate (% p.a.)</label><input type="number" class="fi" id="eRateInp" placeholder="8.5" step="0.1"></div>
-      <button class="sbtn" id="emiSubmitBtn" onclick="saveEmi()">EMI Add Karein</button>
+      <div class="fg"><label class="fl" data-i18n="interest_rate">Interest Rate (% p.a.)</label><input type="number" class="fi" id="eRateInp" placeholder="8.5" step="0.1"></div>
+      <button class="sbtn" id="emiSubmitBtn" onclick="saveEmi()" data-i18n="add_emi_btn">EMI Add Karein</button>
       <div class="mb"></div>
     </div>
   </div>
@@ -745,18 +809,18 @@ input[type=date],input[type=time]{color-scheme:dark}
 <div class="ov" id="waModal">
   <div class="modal">
     <div class="mhdl"></div>
-    <div class="mhdr"><h2>WhatsApp Share</h2><button class="mcls" onclick="closeM('waModal')"><span class="material-icons-round">close</span></button></div>
+    <div class="mhdr"><h2 data-i18n="wa_share">WhatsApp Share</h2><button class="mcls" onclick="closeM('waModal')"><span class="material-icons-round">close</span></button></div>
     <div class="mbody">
       <div class="fg">
-        <label class="fl">Share Type</label>
+        <label class="fl" data-i18n="share_type">Share Type</label>
         <div class="cwrap">
-          <div class="cc sel" data-wt="single" onclick="setWaType(this)">Single Entry</div>
-          <div class="cc" data-wt="today" onclick="setWaType(this)">Aaj ka Summary</div>
-          <div class="cc" data-wt="month" onclick="setWaType(this)">Month Report</div>
+          <div class="cc sel" data-wt="single" onclick="setWaType(this)" data-i18n="single_entry">Single Entry</div>
+          <div class="cc" data-wt="today" onclick="setWaType(this)" data-i18n="today_summary">Aaj ka Summary</div>
+          <div class="cc" data-wt="month" onclick="setWaType(this)" data-i18n="month_report">Month Report</div>
         </div>
       </div>
-      <div class="wabox"><div class="wahdr">Message Preview</div><div class="wamsg" id="waPreview"></div></div>
-      <button class="sbtn grn" onclick="doWaShare()"><span class="material-icons-round" style="vertical-align:middle;font-size:18px;margin-right:5px">send</span>WhatsApp pe Share Karein</button>
+      <div class="wabox"><div class="wahdr" data-i18n="msg_preview">Message Preview</div><div class="wamsg" id="waPreview"></div></div>
+      <button class="sbtn grn" onclick="doWaShare()"><span class="material-icons-round" style="vertical-align:middle;font-size:18px;margin-right:5px">send</span><span data-i18n="share_wa">WhatsApp pe Share Karein</span></button>
       <div class="mb"></div>
     </div>
   </div>
@@ -766,17 +830,274 @@ input[type=date],input[type=time]{color-scheme:dark}
 <div class="ov" id="budgetEditModal">
   <div class="modal">
     <div class="mhdl"></div>
-    <div class="mhdr"><h2>Category Budgets Set Karein</h2><button class="mcls" onclick="closeM('budgetEditModal')"><span class="material-icons-round">close</span></button></div>
+    <div class="mhdr"><h2 data-i18n="set_cat_budgets">Category Budgets Set Karein</h2><button class="mcls" onclick="closeM('budgetEditModal')"><span class="material-icons-round">close</span></button></div>
     <div class="mbody">
-      <div style="font-size:12px;color:var(--txt3);margin-bottom:13px">Har category ke liye monthly budget set karein (0 = koi limit nahi)</div>
+      <div style="font-size:12px;color:var(--txt3);margin-bottom:13px" data-i18n="budget_hint">Har category ke liye monthly budget set karein (0 = koi limit nahi)</div>
       <div id="budgetInpsList"></div>
-      <button class="sbtn" onclick="saveBudgets()">Budgets Save Karein</button>
+      <button class="sbtn" onclick="saveBudgets()" data-i18n="save_budgets">Budgets Save Karein</button>
       <div class="mb"></div>
     </div>
   </div>
 </div>
 
 <script>
+// ═══════════════════════════════════════════════════
+//  MULTILANGUAGE STRINGS
+// ═══════════════════════════════════════════════════
+const LANGS = {
+  en: {
+    hero_label:'This Month Balance', today:'Today', month:'Month',
+    daily_limit:'Daily Limit', income:'Income', savings:'Savings',
+    upcoming_bills:'Upcoming Bills', see_all:'See All →', categories:'Categories',
+    report_arrow:'Report →', recent_txns:'Recent Transactions',
+    prev_month:'‹ Prev', next_month:'Next ›', six_month:'6 Month Expenses',
+    cat_breakdown:'Category Breakdown', daily_trend:'Daily Trend',
+    export_backup:'Export & Backup', bill_reminders:'Bill Reminders',
+    add_bill:'+ Add Bill', all:'All', today_due:'Today Due', this_week:'This Week',
+    unpaid:'Unpaid', paid:'Paid', emi_tracker:'EMI / Loan Tracker', add_emi:'+ Add EMI',
+    monthly_budget:'Monthly Budget Overview', spent:'Spent', left:'Remaining', usage:'Usage',
+    cat_budgets:'Category Budgets', edit_budgets:'Edit Budgets', budget_vs_actual:'Budget vs Actual',
+    language:'Language', preferences:'Preferences', dark_light:'Dark / Light Mode',
+    change_theme:'Toggle app theme', daily_limit_setting:'Daily Spending Limit',
+    daily_limit_alert:'Daily Limit Alert', not_set:'Not set', daily_limit_rs:'Daily Limit (₹)',
+    save:'Save', security:'Security', pin_lock:'Fingerprint / PIN Lock',
+    savings_goals:'Savings Goals', add_new_goal:'Add New Goal', data_mgmt:'Data Management',
+    delete_all:'Delete All Data', delete_warning:'Permanently removes everything',
+    add_transaction:'Add Transaction', expense:'Expense', add_expense:'Add Expense',
+    add_income:'Add Income', category:'Category', date:'Date', time:'Time',
+    payment_method:'Payment Method', note_optional:'Note (optional)',
+    app_lock:'App Lock', fp_face:'Fingerprint / Face ID', new_pin:'New 4-Digit PIN',
+    confirm_pin:'Confirm PIN', enable_lock:'Enable Lock', disable_lock:'Disable Lock',
+    add_savings_goal:'Add Savings Goal', goal_name:'Goal Name', target_amount:'Target Amount (₹)',
+    saved_so_far:'Saved So Far (₹)', add_goal:'Add Goal',
+    add_bill_reminder:'Add Bill Reminder', bill_name:'Bill Name', amount:'Amount (₹)',
+    due_date:'Due Date', repeat:'Repeat', one_time:'One Time', monthly:'Monthly',
+    weekly:'Weekly', yearly:'Yearly', add_bill_btn:'Add Bill Reminder',
+    add_emi_loan:'Add EMI / Loan', emi_name:'Loan / EMI Name', bank_lender:'Bank / Lender',
+    total_amount:'Total Amount (₹)', emi_month:'EMI/Month (₹)', total_emis:'Total EMIs',
+    emis_paid:'EMIs Paid', start_date:'Start Date', due_day:'Due Day (1-28)',
+    interest_rate:'Interest Rate (% p.a.)', add_emi_btn:'Add EMI',
+    wa_share:'WhatsApp Share', share_type:'Share Type', single_entry:'Single Entry',
+    today_summary:"Today's Summary", month_report:'Month Report', msg_preview:'Message Preview',
+    share_wa:'Share on WhatsApp', set_cat_budgets:'Set Category Budgets',
+    budget_hint:'Set monthly budget for each category (0 = no limit)',
+    save_budgets:'Save Budgets', install_title:'Install MyKharcha',
+    install_sub:'Add to home screen', install_btn:'Install',
+    nav_home:'Home', nav_history:'History', nav_bills:'Bills',
+    nav_budget:'Budget', nav_settings:'Settings', clear:'Clear',
+    no_txn_title:'No Transactions', no_txn_sub:'Tap + to add your first entry',
+    surplus_label:'▲ Monthly surplus', deficit_label:'▼ Monthly deficit',
+    no_data:'No Data This Month',
+  },
+  hi: {
+    hero_label:'इस महीने का बैलेंस', today:'आज', month:'महीना',
+    daily_limit:'दैनिक सीमा', income:'आमदनी', savings:'बचत',
+    upcoming_bills:'आने वाले बिल', see_all:'सब देखो →', categories:'श्रेणियाँ',
+    report_arrow:'रिपोर्ट →', recent_txns:'हालिया लेनदेन',
+    prev_month:'‹ पिछला', next_month:'अगला ›', six_month:'6 महीने का खर्चा',
+    cat_breakdown:'श्रेणी विश्लेषण', daily_trend:'दैनिक ट्रेंड',
+    export_backup:'एक्सपोर्ट और बैकअप', bill_reminders:'बिल रिमाइंडर',
+    add_bill:'+ बिल जोड़ें', all:'सब', today_due:'आज देय', this_week:'इस हफ्ते',
+    unpaid:'अनपेड', paid:'पेड', emi_tracker:'EMI / लोन ट्रैकर', add_emi:'+ EMI जोड़ें',
+    monthly_budget:'मासिक बजट', spent:'खर्च', left:'बाकी', usage:'उपयोग',
+    cat_budgets:'श्रेणी बजट', edit_budgets:'बजट संपादित करें', budget_vs_actual:'बजट बनाम वास्तविक',
+    language:'भाषा', preferences:'प्राथमिकताएं', dark_light:'डार्क / लाइट मोड',
+    change_theme:'ऐप थीम बदलें', daily_limit_setting:'दैनिक खर्च सीमा',
+    daily_limit_alert:'दैनिक सीमा अलर्ट', not_set:'सेट नहीं', daily_limit_rs:'दैनिक सीमा (₹)',
+    save:'सेव करें', security:'सुरक्षा', pin_lock:'फिंगरप्रिंट / PIN लॉक',
+    savings_goals:'बचत लक्ष्य', add_new_goal:'नया लक्ष्य जोड़ें', data_mgmt:'डेटा प्रबंधन',
+    delete_all:'सारा डेटा हटाएं', delete_warning:'स्थायी रूप से हटाता है',
+    add_transaction:'लेनदेन जोड़ें', expense:'खर्चा', add_expense:'खर्चा जोड़ें',
+    add_income:'आमदनी जोड़ें', category:'श्रेणी', date:'तारीख', time:'समय',
+    payment_method:'भुगतान विधि', note_optional:'नोट (वैकल्पिक)',
+    app_lock:'ऐप लॉक', fp_face:'फिंगरप्रिंट / फेस ID', new_pin:'नया 4-अंक PIN',
+    confirm_pin:'PIN की पुष्टि करें', enable_lock:'लॉक सक्रिय करें', disable_lock:'लॉक बंद करें',
+    add_savings_goal:'बचत लक्ष्य जोड़ें', goal_name:'लक्ष्य का नाम', target_amount:'लक्ष्य राशि (₹)',
+    saved_so_far:'अभी तक बचाया (₹)', add_goal:'लक्ष्य जोड़ें',
+    add_bill_reminder:'बिल रिमाइंडर जोड़ें', bill_name:'बिल का नाम', amount:'राशि (₹)',
+    due_date:'देय तारीख', repeat:'दोहराएं', one_time:'एक बार', monthly:'हर महीने',
+    weekly:'हर हफ्ते', yearly:'हर साल', add_bill_btn:'बिल रिमाइंडर जोड़ें',
+    add_emi_loan:'EMI / लोन जोड़ें', emi_name:'लोन / EMI का नाम', bank_lender:'बैंक / ऋणदाता',
+    total_amount:'कुल राशि (₹)', emi_month:'EMI/माह (₹)', total_emis:'कुल EMI',
+    emis_paid:'भुगतान की EMI', start_date:'शुरुआत की तारीख', due_day:'देय दिन (1-28)',
+    interest_rate:'ब्याज दर (% प्रति वर्ष)', add_emi_btn:'EMI जोड़ें',
+    wa_share:'WhatsApp शेयर', share_type:'शेयर प्रकार', single_entry:'एकल प्रविष्टि',
+    today_summary:'आज का सारांश', month_report:'मासिक रिपोर्ट', msg_preview:'संदेश पूर्वावलोकन',
+    share_wa:'WhatsApp पर शेयर करें', set_cat_budgets:'श्रेणी बजट सेट करें',
+    budget_hint:'हर श्रेणी के लिए मासिक बजट सेट करें (0 = कोई सीमा नहीं)',
+    save_budgets:'बजट सेव करें', install_title:'MyKharcha इंस्टॉल करें',
+    install_sub:'होम स्क्रीन पर जोड़ें', install_btn:'इंस्टॉल',
+    nav_home:'होम', nav_history:'इतिहास', nav_bills:'बिल',
+    nav_budget:'बजट', nav_settings:'सेटिंग्स', clear:'साफ करें',
+    no_txn_title:'कोई लेनदेन नहीं', no_txn_sub:'+ दबाएं पहला जोड़ने के लिए',
+    surplus_label:'▲ इस महीने का अधिशेष', deficit_label:'▼ इस महीने का घाटा',
+    no_data:'इस महीने कोई डेटा नहीं',
+  },
+  mr: {
+    hero_label:'या महिन्याचे बॅलेन्स', today:'आज', month:'महिना',
+    daily_limit:'दैनिक मर्यादा', income:'उत्पन्न', savings:'बचत',
+    upcoming_bills:'येणारे बिल', see_all:'सर्व पहा →', categories:'श्रेणी',
+    report_arrow:'अहवाल →', recent_txns:'अलीकडील व्यवहार',
+    prev_month:'‹ मागील', next_month:'पुढील ›', six_month:'६ महिन्यांचा खर्च',
+    cat_breakdown:'श्रेणी विश्लेषण', daily_trend:'दैनिक ट्रेंड',
+    export_backup:'एक्सपोर्ट आणि बॅकअप', bill_reminders:'बिल रिमाइंडर',
+    add_bill:'+ बिल जोडा', all:'सर्व', today_due:'आज देय', this_week:'या आठवड्यात',
+    unpaid:'न भरलेले', paid:'भरलेले', emi_tracker:'EMI / कर्ज ट्रॅकर', add_emi:'+ EMI जोडा',
+    monthly_budget:'मासिक बजेट', spent:'खर्च', left:'शिल्लक', usage:'वापर',
+    cat_budgets:'श्रेणी बजेट', edit_budgets:'बजेट संपादित करा', budget_vs_actual:'बजेट वि. प्रत्यक्ष',
+    language:'भाषा', preferences:'प्राधान्ये', dark_light:'डार्क / लाइट मोड',
+    change_theme:'अ‍ॅप थीम बदला', daily_limit_setting:'दैनिक खर्च मर्यादा',
+    daily_limit_alert:'दैनिक मर्यादा सतर्कता', not_set:'सेट नाही', daily_limit_rs:'दैनिक मर्यादा (₹)',
+    save:'जतन करा', security:'सुरक्षा', pin_lock:'फिंगरप्रिंट / PIN लॉक',
+    savings_goals:'बचत उद्दिष्टे', add_new_goal:'नवीन उद्दिष्ट जोडा', data_mgmt:'डेटा व्यवस्थापन',
+    delete_all:'सर्व डेटा हटवा', delete_warning:'कायमचे काढून टाकते',
+    add_transaction:'व्यवहार जोडा', expense:'खर्च', add_expense:'खर्च जोडा',
+    add_income:'उत्पन्न जोडा', category:'श्रेणी', date:'तारीख', time:'वेळ',
+    payment_method:'पेमेंट पद्धत', note_optional:'नोंद (पर्यायी)',
+    app_lock:'अ‍ॅप लॉक', fp_face:'फिंगरप्रिंट / फेस ID', new_pin:'नवीन ४-अंकी PIN',
+    confirm_pin:'PIN पुष्टी करा', enable_lock:'लॉक सुरू करा', disable_lock:'लॉक बंद करा',
+    add_savings_goal:'बचत उद्दिष्ट जोडा', goal_name:'उद्दिष्टाचे नाव', target_amount:'लक्ष्य रक्कम (₹)',
+    saved_so_far:'आतापर्यंत बचत (₹)', add_goal:'उद्दिष्ट जोडा',
+    add_bill_reminder:'बिल रिमाइंडर जोडा', bill_name:'बिलाचे नाव', amount:'रक्कम (₹)',
+    due_date:'देय तारीख', repeat:'पुनरावृत्ती', one_time:'एकदा', monthly:'दर महिना',
+    weekly:'दर आठवडा', yearly:'दर वर्षी', add_bill_btn:'बिल रिमाइंडर जोडा',
+    add_emi_loan:'EMI / कर्ज जोडा', emi_name:'कर्ज / EMI चे नाव', bank_lender:'बँक / कर्जदाता',
+    total_amount:'एकूण रक्कम (₹)', emi_month:'EMI/महिना (₹)', total_emis:'एकूण EMI',
+    emis_paid:'भरलेल्या EMI', start_date:'सुरुवात तारीख', due_day:'देय दिवस (1-28)',
+    interest_rate:'व्याज दर (% वार्षिक)', add_emi_btn:'EMI जोडा',
+    wa_share:'WhatsApp शेअर', share_type:'शेअर प्रकार', single_entry:'एकल नोंद',
+    today_summary:'आजचा सारांश', month_report:'मासिक अहवाल', msg_preview:'संदेश पूर्वावलोकन',
+    share_wa:'WhatsApp वर शेअर करा', set_cat_budgets:'श्रेणी बजेट सेट करा',
+    budget_hint:'प्रत्येक श्रेणीसाठी मासिक बजेट सेट करा (0 = कोणतीही मर्यादा नाही)',
+    save_budgets:'बजेट जतन करा', install_title:'MyKharcha इंस्टॉल करा',
+    install_sub:'होम स्क्रीनवर जोडा', install_btn:'इंस्टॉल',
+    nav_home:'होम', nav_history:'इतिहास', nav_bills:'बिल',
+    nav_budget:'बजेट', nav_settings:'सेटिंग्ज', clear:'साफ करा',
+    no_txn_title:'कोणतेही व्यवहार नाही', no_txn_sub:'+ दाबा पहिला जोडण्यासाठी',
+    surplus_label:'▲ या महिन्याचे अतिरिक्त', deficit_label:'▼ या महिन्याची तूट',
+    no_data:'या महिन्यात कोणताही डेटा नाही',
+  },
+  ur: {
+    hero_label:'اس مہینے کا بیلنس', today:'آج', month:'مہینہ',
+    daily_limit:'روزانہ حد', income:'آمدنی', savings:'بچت',
+    upcoming_bills:'آنے والے بل', see_all:'سب دیکھو ←', categories:'اقسام',
+    report_arrow:'رپورٹ ←', recent_txns:'حالیہ لین دین',
+    prev_month:'پچھلا ›', next_month:'‹ اگلا', six_month:'۶ ماہ کا خرچ',
+    cat_breakdown:'زمرہ تجزیہ', daily_trend:'روزانہ رجحان',
+    export_backup:'ایکسپورٹ اور بیک اپ', bill_reminders:'بل یاددہانی',
+    add_bill:'+ بل شامل کریں', all:'سب', today_due:'آج واجب', this_week:'اس ہفتے',
+    unpaid:'ادائیگی نہیں', paid:'ادا شدہ', emi_tracker:'EMI / قرض ٹریکر', add_emi:'+ EMI شامل کریں',
+    monthly_budget:'ماہانہ بجٹ', spent:'خرچ', left:'باقی', usage:'استعمال',
+    cat_budgets:'زمرہ بجٹ', edit_budgets:'بجٹ ترمیم کریں', budget_vs_actual:'بجٹ بمقابلہ اصل',
+    language:'زبان', preferences:'ترجیحات', dark_light:'ڈارک / لائٹ موڈ',
+    change_theme:'ایپ تھیم بدلیں', daily_limit_setting:'روزانہ خرچ کی حد',
+    daily_limit_alert:'روزانہ حد الرٹ', not_set:'سیٹ نہیں', daily_limit_rs:'روزانہ حد (₹)',
+    save:'محفوظ کریں', security:'سیکیورٹی', pin_lock:'فنگر پرنٹ / PIN لاک',
+    savings_goals:'بچت اہداف', add_new_goal:'نیا ہدف شامل کریں', data_mgmt:'ڈیٹا انتظام',
+    delete_all:'سارا ڈیٹا حذف کریں', delete_warning:'مستقل طور پر ہٹاتا ہے',
+    add_transaction:'لین دین شامل کریں', expense:'خرچ', add_expense:'خرچ شامل کریں',
+    add_income:'آمدنی شامل کریں', category:'زمرہ', date:'تاریخ', time:'وقت',
+    payment_method:'ادائیگی کا طریقہ', note_optional:'نوٹ (اختیاری)',
+    app_lock:'ایپ لاک', fp_face:'فنگر پرنٹ / فیس ID', new_pin:'نیا 4 ہندسہ PIN',
+    confirm_pin:'PIN تصدیق کریں', enable_lock:'لاک فعال کریں', disable_lock:'لاک غیر فعال کریں',
+    add_savings_goal:'بچت ہدف شامل کریں', goal_name:'ہدف کا نام', target_amount:'ہدف رقم (₹)',
+    saved_so_far:'ابھی تک بچایا (₹)', add_goal:'ہدف شامل کریں',
+    add_bill_reminder:'بل یاددہانی شامل کریں', bill_name:'بل کا نام', amount:'رقم (₹)',
+    due_date:'واجب تاریخ', repeat:'دہرائیں', one_time:'ایک بار', monthly:'ہر مہینے',
+    weekly:'ہر ہفتے', yearly:'ہر سال', add_bill_btn:'بل یاددہانی شامل کریں',
+    add_emi_loan:'EMI / قرض شامل کریں', emi_name:'قرض / EMI کا نام', bank_lender:'بینک / قرض دہندہ',
+    total_amount:'کل رقم (₹)', emi_month:'EMI/ماہ (₹)', total_emis:'کل EMI',
+    emis_paid:'ادا شدہ EMI', start_date:'شروع تاریخ', due_day:'واجب دن (1-28)',
+    interest_rate:'سود کی شرح (% سالانہ)', add_emi_btn:'EMI شامل کریں',
+    wa_share:'WhatsApp شیئر', share_type:'شیئر قسم', single_entry:'واحد اندراج',
+    today_summary:'آج کا خلاصہ', month_report:'ماہانہ رپورٹ', msg_preview:'پیغام پیش نظارہ',
+    share_wa:'WhatsApp پر شیئر کریں', set_cat_budgets:'زمرہ بجٹ سیٹ کریں',
+    budget_hint:'ہر زمرے کے لیے ماہانہ بجٹ سیٹ کریں (0 = کوئی حد نہیں)',
+    save_budgets:'بجٹ محفوظ کریں', install_title:'MyKharcha انسٹال کریں',
+    install_sub:'ہوم اسکرین پر شامل کریں', install_btn:'انسٹال',
+    nav_home:'ہوم', nav_history:'تاریخ', nav_bills:'بل',
+    nav_budget:'بجٹ', nav_settings:'ترتیبات', clear:'صاف کریں',
+    no_txn_title:'کوئی لین دین نہیں', no_txn_sub:'+ دبائیں پہلا شامل کرنے کے لیے',
+    surplus_label:'▲ اس مہینے کا فاضل', deficit_label:'▼ اس مہینے کا خسارہ',
+    no_data:'اس مہینے کوئی ڈیٹا نہیں',
+  },
+  ta: {
+    hero_label:'இந்த மாத இருப்பு', today:'இன்று', month:'மாதம்',
+    daily_limit:'தினசரி வரம்பு', income:'வருமானம்', savings:'சேமிப்பு',
+    upcoming_bills:'வரவிருக்கும் பில்கள்', see_all:'அனைத்தும் →', categories:'வகைகள்',
+    report_arrow:'அறிக்கை →', recent_txns:'சமீபத்திய பரிவர்த்தனைகள்',
+    prev_month:'‹ முந்தைய', next_month:'அடுத்த ›', six_month:'6 மாத செலவு',
+    cat_breakdown:'வகை பகுப்பாய்வு', daily_trend:'தினசரி போக்கு',
+    export_backup:'ஏற்றுமதி & காப்புப்பிரதி', bill_reminders:'பில் நினைவூட்டல்கள்',
+    add_bill:'+ பில் சேர்', all:'அனைத்தும்', today_due:'இன்று நிலுவை', this_week:'இந்த வாரம்',
+    unpaid:'செலுத்தப்படாத', paid:'செலுத்தப்பட்ட', emi_tracker:'EMI / கடன் கண்காணிப்பு', add_emi:'+ EMI சேர்',
+    monthly_budget:'மாதாந்திர பட்ஜெட்', spent:'செலவு', left:'மீதம்', usage:'பயன்பாடு',
+    cat_budgets:'வகை பட்ஜெட்கள்', edit_budgets:'பட்ஜெட் திருத்து', budget_vs_actual:'பட்ஜெட் vs உண்மை',
+    language:'மொழி', preferences:'விருப்பங்கள்', dark_light:'இருண்ட / ஒளிரும் முறை',
+    change_theme:'பயன்பாட்டு கருப்பொருள் மாற்று', daily_limit_setting:'தினசரி செலவு வரம்பு',
+    daily_limit_alert:'தினசரி வரம்பு எச்சரிக்கை', not_set:'அமைக்கப்படவில்லை', daily_limit_rs:'தினசரி வரம்பு (₹)',
+    save:'சேமி', security:'பாதுகாப்பு', pin_lock:'கைரேகை / PIN பூட்டு',
+    savings_goals:'சேமிப்பு இலக்குகள்', add_new_goal:'புதிய இலக்கு சேர்', data_mgmt:'தரவு மேலாண்மை',
+    delete_all:'அனைத்து தரவையும் நீக்கு', delete_warning:'நிரந்தரமாக அகற்றுகிறது',
+    add_transaction:'பரிவர்த்தனை சேர்', expense:'செலவு', add_expense:'செலவு சேர்',
+    add_income:'வருமானம் சேர்', category:'வகை', date:'தேதி', time:'நேரம்',
+    payment_method:'கட்டண முறை', note_optional:'குறிப்பு (விருப்பத்திற்கு)',
+    app_lock:'பயன்பாட்டு பூட்டு', fp_face:'கைரேகை / முக ID', new_pin:'புதிய 4 இலக்க PIN',
+    confirm_pin:'PIN உறுதிப்படுத்து', enable_lock:'பூட்டு இயக்கு', disable_lock:'பூட்டு முடக்கு',
+    add_savings_goal:'சேமிப்பு இலக்கு சேர்', goal_name:'இலக்கு பெயர்', target_amount:'இலக்கு தொகை (₹)',
+    saved_so_far:'இதுவரை சேமித்தது (₹)', add_goal:'இலக்கு சேர்',
+    add_bill_reminder:'பில் நினைவூட்டல் சேர்', bill_name:'பில் பெயர்', amount:'தொகை (₹)',
+    due_date:'நிலுவை தேதி', repeat:'மீண்டும்', one_time:'ஒரு முறை', monthly:'மாதந்தோறும்',
+    weekly:'வாரந்தோறும்', yearly:'ஆண்டுதோறும்', add_bill_btn:'பில் நினைவூட்டல் சேர்',
+    add_emi_loan:'EMI / கடன் சேர்', emi_name:'கடன் / EMI பெயர்', bank_lender:'வங்கி / கடன் வழங்குவோர்',
+    total_amount:'மொத்த தொகை (₹)', emi_month:'EMI/மாதம் (₹)', total_emis:'மொத்த EMI',
+    emis_paid:'செலுத்திய EMI', start_date:'தொடக்க தேதி', due_day:'நிலுவை நாள் (1-28)',
+    interest_rate:'வட்டி விகிதம் (% ஆண்டுக்கு)', add_emi_btn:'EMI சேர்',
+    wa_share:'WhatsApp பகிர்வு', share_type:'பகிர்வு வகை', single_entry:'ஒற்றை உள்ளீடு',
+    today_summary:'இன்றைய சுருக்கம்', month_report:'மாத அறிக்கை', msg_preview:'செய்தி முன்னோட்டம்',
+    share_wa:'WhatsApp இல் பகிர்', set_cat_budgets:'வகை பட்ஜெட்கள் அமை',
+    budget_hint:'ஒவ்வொரு வகைக்கும் மாதாந்திர பட்ஜெட் அமை (0 = வரம்பில்லை)',
+    save_budgets:'பட்ஜெட்கள் சேமி', install_title:'MyKharcha நிறுவு',
+    install_sub:'முகப்பு திரையில் சேர்', install_btn:'நிறுவு',
+    nav_home:'முகப்பு', nav_history:'வரலாறு', nav_bills:'பில்கள்',
+    nav_budget:'பட்ஜெட்', nav_settings:'அமைப்புகள்', clear:'அழி',
+    no_txn_title:'பரிவர்த்தனைகள் இல்லை', no_txn_sub:'+ அழுத்தி முதலாவதை சேர்க்கவும்',
+    surplus_label:'▲ இந்த மாத உபரி', deficit_label:'▼ இந்த மாத பற்றாக்குறை',
+    no_data:'இந்த மாதம் தரவு இல்லை',
+  }
+};
+
+let curLang = 'hi'; // Default Hindi
+
+function t(key) {
+  return (LANGS[curLang] && LANGS[curLang][key]) || (LANGS['hi'] && LANGS['hi'][key]) || key;
+}
+
+function applyLang() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    el.textContent = t(key);
+  });
+  // RTL for Urdu
+  document.body.setAttribute('data-lang', curLang);
+  // Update lang buttons
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.classList.toggle('sel', b.getAttribute('data-lang') === curLang);
+  });
+  // Update search placeholder
+  const si = document.getElementById('searchInp');
+  if(si) si.placeholder = curLang==='en' ? 'Search by note...' : curLang==='hi' ? 'नोट से खोजें...' : curLang==='mr' ? 'नोटद्वारे शोधा...' : curLang==='ur' ? 'نوٹ سے تلاش کریں...' : 'குறிப்பால் தேடு...';
+}
+
+function setLang(lang) {
+  curLang = lang;
+  DS.settings.lang = lang;
+  sS();
+  applyLang();
+  renderDash();
+  toast(curLang==='hi'?'भाषा बदली! ✓':curLang==='mr'?'भाषा बदलली! ✓':curLang==='ur'?'زبان تبدیل! ✓':curLang==='ta'?'மொழி மாற்றப்பட்டது! ✓':'Language changed! ✓', 'ok');
+}
+
 // ═══════════════════════════════════════════════════
 //  CONSTANTS
 // ═══════════════════════════════════════════════════
@@ -804,7 +1125,7 @@ const ECLRS=['#8b7fff','#4db8ff','#4dffb8','#ff5f7e','#ffaa4d','#f472b6','#fb923
 // ═══════════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════════
-let DS={txns:[],goals:[],bills:[],emis:[],settings:{theme:'dark',limitEnabled:false,dailyLimit:0,pinEnabled:false,pin:''},budgets:{}};
+let DS={txns:[],goals:[],bills:[],emis:[],settings:{theme:'dark',limitEnabled:false,dailyLimit:0,pinEnabled:false,pin:'',lang:'hi'},budgets:{}};
 let curType='expense', selCat='food', selPayM='Cash', editId=null;
 let rMonth=new Date().getMonth(), rYear=new Date().getFullYear();
 let bMonth=new Date().getMonth(), bYear=new Date().getFullYear();
@@ -906,16 +1227,15 @@ function openM(id){
     checkFPSupport();
   }
   if(id==='billModal' && !editBillId){
-    // reset bill form
-    document.getElementById('billMTitle').textContent='Bill Reminder Add Karein';
-    document.getElementById('billSubmitBtn').textContent='Bill Reminder Add Karein';
+    document.getElementById('billMTitle').textContent=t('add_bill_reminder');
+    document.getElementById('billSubmitBtn').textContent=t('add_bill_btn');
     document.getElementById('bNameInp').value='';document.getElementById('bAmtInp').value='';
     document.getElementById('bDueInp').value=toDS(new Date());document.getElementById('bNoteInp').value='';
     document.getElementById('bCatInp').value='bills';document.getElementById('bRepeatInp').value='none';
   }
   if(id==='emiModal' && !editEmiId){
-    document.getElementById('emiMTitle').textContent='EMI / Loan Add Karein';
-    document.getElementById('emiSubmitBtn').textContent='EMI Add Karein';
+    document.getElementById('emiMTitle').textContent=t('add_emi_loan');
+    document.getElementById('emiSubmitBtn').textContent=t('add_emi_btn');
     ['eNameInp','eBankInp','eTotalInp','eEmiInp','eTotalEmiInp','ePaidInp','eRateInp','eDayInp'].forEach(x=>document.getElementById(x).value='');
     document.getElementById('eStartInp').value=toDS(new Date());
   }
@@ -929,7 +1249,6 @@ function closeM(id){
   if(id==='billModal') editBillId=null;
   if(id==='emiModal') editEmiId=null;
 }
-// close on overlay click
 document.addEventListener('click',function(e){
   if(e.target.classList.contains('ov')) closeM(e.target.id);
 });
@@ -939,8 +1258,8 @@ document.addEventListener('click',function(e){
 // ═══════════════════════════════════════════════════
 function resetForm(){
   editId=null;
-  document.getElementById('addMTitle').textContent='Transaction Add Karein';
-  document.getElementById('subBtnTxt').textContent='Kharcha Add Karein';
+  document.getElementById('addMTitle').textContent=t('add_transaction');
+  document.getElementById('subBtnTxt').textContent=t('add_expense');
   document.getElementById('amtInp').value='';
   document.getElementById('noteInp').value='';
   const now=new Date();
@@ -950,13 +1269,13 @@ function resetForm(){
   setType('expense');
   document.querySelectorAll('.pc').forEach(c=>c.classList.toggle('sel',c.dataset.p==='Cash'));
 }
-function setType(t){
-  curType=t;
-  document.getElementById('ttExp').className='tbtn'+(t==='expense'?' ae':'');
-  document.getElementById('ttInc').className='tbtn'+(t==='income'?' ai':'');
-  document.getElementById('payGrp').style.display=t==='expense'?'':'none';
-  selCat=t==='expense'?'food':'salary';
-  if(!editId) document.getElementById('subBtnTxt').textContent=t==='expense'?'Kharcha Add Karein':'Amdani Add Karein';
+function setType(t2){
+  curType=t2;
+  document.getElementById('ttExp').className='tbtn'+(t2==='expense'?' ae':'');
+  document.getElementById('ttInc').className='tbtn'+(t2==='income'?' ai':'');
+  document.getElementById('payGrp').style.display=t2==='expense'?'':'none';
+  selCat=t2==='expense'?'food':'salary';
+  if(!editId) document.getElementById('subBtnTxt').textContent=t2==='expense'?t('add_expense'):t('add_income');
   buildCatChips();
 }
 function buildCatChips(){
@@ -970,7 +1289,7 @@ function selPay(el){document.querySelectorAll('.pc').forEach(c=>c.classList.remo
 
 function submitTxn(){
   const amt=parseFloat(document.getElementById('amtInp').value);
-  if(!amt||amt<=0){toast('Valid amount darj karein','err');return;}
+  if(!amt||amt<=0){toast(t('valid_amount')||'Valid amount darj karein','err');return;}
   const d=document.getElementById('dateInp').value;
   const ti=document.getElementById('timeInp').value;
   if(!d){toast('Tarikh select karein','err');return;}
@@ -982,43 +1301,43 @@ function submitTxn(){
     pay:curType==='expense'?selPayM:'N/A'
   };
   if(editId){
-    const i=DS.txns.findIndex(t=>t.id===editId);
+    const i=DS.txns.findIndex(x=>x.id===editId);
     if(i>-1) DS.txns[i]=txn;
-    toast('Transaction update hua! ✓','ok');
+    toast('Updated! ✓','ok');
   } else {
     DS.txns.unshift(txn);
-    toast((curType==='expense'?'Kharcha':'Amdani')+' add hua! ✓','ok');
+    toast((curType==='expense'?t('expense'):t('income'))+' added! ✓','ok');
     chkLimit(txn);
   }
   sT();closeM('addModal');renderDash();
   if(document.getElementById('pg-history').classList.contains('active')) renderHistory();
 }
 function editTxn(id){
-  const t=DS.txns.find(x=>x.id===id);if(!t)return;
+  const tx=DS.txns.find(x=>x.id===id);if(!tx)return;
   editId=id;
-  setType(t.type);
-  document.getElementById('amtInp').value=t.amount;
-  document.getElementById('dateInp').value=t.date;
-  document.getElementById('timeInp').value=t.time;
-  document.getElementById('noteInp').value=t.note||'';
-  selCat=t.cat; selPayM=t.pay||'Cash';
+  setType(tx.type);
+  document.getElementById('amtInp').value=tx.amount;
+  document.getElementById('dateInp').value=tx.date;
+  document.getElementById('timeInp').value=tx.time;
+  document.getElementById('noteInp').value=tx.note||'';
+  selCat=tx.cat; selPayM=tx.pay||'Cash';
   buildCatChips();
   document.querySelectorAll('.pc').forEach(c=>c.classList.toggle('sel',c.dataset.p===selPayM));
-  document.getElementById('addMTitle').textContent='Transaction Edit Karein';
-  document.getElementById('subBtnTxt').textContent='Update Karein';
+  document.getElementById('addMTitle').textContent='Edit Transaction';
+  document.getElementById('subBtnTxt').textContent='Update';
   openM('addModal');
 }
 function delTxn(id){
-  if(!confirm('Is transaction ko delete karein?'))return;
-  DS.txns=DS.txns.filter(t=>t.id!==id);
+  if(!confirm('Delete this transaction?'))return;
+  DS.txns=DS.txns.filter(tx=>tx.id!==id);
   sT();renderDash();
   if(document.getElementById('pg-history').classList.contains('active')) renderHistory();
-  toast('Delete hua ✓','err');
+  toast('Deleted ✓','err');
 }
 function chkLimit(txn){
   if(!DS.settings.limitEnabled||!DS.settings.dailyLimit||txn.type!=='expense')return;
-  const spent=DS.txns.filter(t=>t.type==='expense'&&t.date===toDS(new Date())).reduce((s,t)=>s+t.amount,0);
-  if(spent>DS.settings.dailyLimit) toast(`⚠️ Daily limit ₹${rfmt(DS.settings.dailyLimit)} exceed!`,'warn');
+  const spent=DS.txns.filter(tx=>tx.type==='expense'&&tx.date===toDS(new Date())).reduce((s,tx)=>s+tx.amount,0);
+  if(spent>DS.settings.dailyLimit) toast(`⚠️ Daily limit ₹${rfmt(DS.settings.dailyLimit)} exceeded!`,'warn');
 }
 
 // ═══════════════════════════════════════════════════
@@ -1026,18 +1345,17 @@ function chkLimit(txn){
 // ═══════════════════════════════════════════════════
 function renderDash(){
   const today=toDS(new Date()), now=new Date(), cm=now.getMonth(), cy=now.getFullYear();
-  const tE=DS.txns.filter(t=>t.type==='expense'&&t.date===today);
-  const mE=DS.txns.filter(t=>t.type==='expense'&&smth(t.date,cm,cy));
-  const mI=DS.txns.filter(t=>t.type==='income'&&smth(t.date,cm,cy));
+  const tE=DS.txns.filter(tx=>tx.type==='expense'&&tx.date===today);
+  const mE=DS.txns.filter(tx=>tx.type==='expense'&&smth(tx.date,cm,cy));
+  const mI=DS.txns.filter(tx=>tx.type==='income'&&smth(tx.date,cm,cy));
   const tT=sm(tE), mT=sm(mE), iT=sm(mI), bal=iT-mT;
   qs('#heroAmt').textContent=r(Math.abs(bal));
-  qs('#heroSub').textContent=bal>=0?'▲ Is mahine ka surplus':'▼ Is mahine ka deficit';
+  qs('#heroSub').textContent=bal>=0?t('surplus_label'):t('deficit_label');
   qs('#todayAmt').textContent=r(tT);
   qs('#monthAmt').textContent=r(mT);
   qs('#txnCnt').textContent=mE.length+mI.length;
   qs('#incAmt').textContent=r(iT);
   qs('#savAmt').textContent=r(Math.max(0,bal));
-  // Limit bar
   const ls=DS.settings;
   if(ls.limitEnabled&&ls.dailyLimit){
     const pct=Math.min(100,(tT/ls.dailyLimit)*100);
@@ -1046,20 +1364,17 @@ function renderDash(){
     qs('#lfill').classList.toggle('over',pct>=100);
     qs('#ltxt').textContent=`${r(tT)} / ${r(ls.dailyLimit)}`;
   } else qs('#lstrip').style.display='none';
-  // Categories
   const ct={};ECATS.forEach(c=>{ct[c.id]=0;});
-  mE.forEach(t=>{if(ct[t.cat]!==undefined) ct[t.cat]+=t.amount;});
+  mE.forEach(tx=>{if(ct[tx.cat]!==undefined) ct[tx.cat]+=tx.amount;});
   const sorted=ECATS.filter(c=>ct[c.id]>0).sort((a,b)=>ct[b.id]-ct[a.id]);
   const cs=qs('#catSummary');
   cs.innerHTML=sorted.length?sorted.slice(0,6).map(c=>{
     const pct=mT>0?((ct[c.id]/mT)*100).toFixed(0):0;
     return`<div class="crow"><div class="ci" style="background:${c.c}18"><span class="material-icons-round" style="color:${c.c}">${c.ico}</span></div><div class="cm"><div class="cn">${c.n}</div><div class="cpbar"><div class="cpfill" style="width:${pct}%;background:${c.c}"></div></div></div><div class="cp2">${pct}%</div><div class="ca" style="color:${c.c}">${r(ct[c.id])}</div></div>`;
-  }).join(''):'<div class="empty"><span class="material-icons-round">pie_chart</span><p>Is mahine koi kharcha nahi</p></div>';
-  // Recent
+  }).join(''):`<div class="empty"><span class="material-icons-round">pie_chart</span><p>${t('no_data')}</p></div>`;
   const rt=qs('#recentTxns');
   const rec=DS.txns.slice(0,5);
-  rt.innerHTML=rec.length?rec.map(t=>txnRow(t,false)).join(''):`<div class="empty"><span class="material-icons-round">receipt_long</span><h3>Koi transaction nahi</h3><p>+ dabao pehla kharcha add karne ke liye</p></div>`;
-  // Dashboard bills
+  rt.innerHTML=rec.length?rec.map(tx=>txnRow(tx,false)).join(''):`<div class="empty"><span class="material-icons-round">receipt_long</span><h3>${t('no_txn_title')}</h3><p>${t('no_txn_sub')}</p></div>`;
   const due=DS.bills.filter(b=>!b.paid&&dUntil(b.dueDate)<=3).sort((a,b)=>dUntil(a.dueDate)-dUntil(b.dueDate)).slice(0,3);
   const dbw=qs('#dashBillsWrap');
   if(due.length){dbw.style.display='';qs('#dashBillsList').innerHTML=due.map(b=>billRow(b,false)).join('');}
@@ -1067,24 +1382,24 @@ function renderDash(){
   updNotif();
 }
 
-function txnRow(t,acts){
-  const cats=t.type==='expense'?ECATS:ICATS;
-  const cat=cats.find(c=>c.id===t.cat)||{n:t.cat,ico:'paid',c:'#888'};
-  const pt=t.type==='expense'?`<span class="tag ${(t.pay||'').toLowerCase()}">${t.pay||''}</span>`:`<span class="tag income-tag">Amdani</span>`;
+function txnRow(tx,acts){
+  const cats=tx.type==='expense'?ECATS:ICATS;
+  const cat=cats.find(c=>c.id===tx.cat)||{n:tx.cat,ico:'paid',c:'#888'};
+  const pt=tx.type==='expense'?`<span class="tag ${(tx.pay||'').toLowerCase()}">${tx.pay||''}</span>`:`<span class="tag income-tag">${t('income')}</span>`;
   const ab=acts?`<div class="tacts">
-    <button class="tabtn ed" onclick="event.stopPropagation();editTxn('${t.id}')" title="Edit"><span class="material-icons-round">edit</span></button>
-    <button class="tabtn wa" onclick="event.stopPropagation();openWa('${t.id}')" title="WhatsApp Share"><span class="material-icons-round">share</span></button>
-    <button class="tabtn dl" onclick="event.stopPropagation();delTxn('${t.id}')" title="Delete"><span class="material-icons-round">delete</span></button>
+    <button class="tabtn ed" onclick="event.stopPropagation();editTxn('${tx.id}')" title="Edit"><span class="material-icons-round">edit</span></button>
+    <button class="tabtn wa" onclick="event.stopPropagation();openWa('${tx.id}')" title="WhatsApp Share"><span class="material-icons-round">share</span></button>
+    <button class="tabtn dl" onclick="event.stopPropagation();delTxn('${tx.id}')" title="Delete"><span class="material-icons-round">delete</span></button>
   </div>`:'';
-  return`<div class="txn ${t.type==='expense'?'ex':'in'}">
+  return`<div class="txn ${tx.type==='expense'?'ex':'in'}">
     <div class="tico" style="background:${cat.c}18"><span class="material-icons-round" style="color:${cat.c}">${cat.ico}</span></div>
     <div class="tbody">
       <div class="tc">${cat.n} ${pt}</div>
-      <div class="tn">${t.note||'Note nahi'}</div>
-      <div class="tt">${fmtDate(t.date)} · ${t.time||''}</div>
+      <div class="tn">${tx.note||'—'}</div>
+      <div class="tt">${fmtDate(tx.date)} · ${tx.time||''}</div>
     </div>
     <div class="tright">
-      <div class="tamt ${t.type==='expense'?'ex':'in'}">${t.type==='expense'?'-':'+'}${r(t.amount)}</div>
+      <div class="tamt ${tx.type==='expense'?'ex':'in'}">${tx.type==='expense'?'-':'+'}${r(tx.amount)}</div>
       ${ab}
     </div>
   </div>`;
@@ -1096,7 +1411,7 @@ function txnRow(t,acts){
 function renderHistory(){
   const fr=qs('#catFilters');
   if(!fr.children.length){
-    fr.innerHTML=`<div class="fc on" data-c="all" onclick="setCF(this)">Sab</div>`
+    fr.innerHTML=`<div class="fc on" data-c="all" onclick="setCF(this)">${t('all')}</div>`
       +ECATS.map(c=>`<div class="fc" data-c="${c.id}" onclick="setCF(this)">${c.n}</div>`).join('')
       +ICATS.map(c=>`<div class="fc" data-c="${c.id}" onclick="setCF(this)">${c.n}</div>`).join('');
   }
@@ -1104,18 +1419,18 @@ function renderHistory(){
   const sq=(qs('#searchInp').value||'').toLowerCase();
   const fd=qs('#dateFilter').value;
   let txns=[...DS.txns];
-  if(ac!=='all') txns=txns.filter(t=>t.cat===ac);
-  if(sq) txns=txns.filter(t=>(t.note||'').toLowerCase().includes(sq)||(t.cat||'').toLowerCase().includes(sq));
-  if(fd) txns=txns.filter(t=>t.date===fd);
+  if(ac!=='all') txns=txns.filter(tx=>tx.cat===ac);
+  if(sq) txns=txns.filter(tx=>(tx.note||'').toLowerCase().includes(sq)||(tx.cat||'').toLowerCase().includes(sq));
+  if(fd) txns=txns.filter(tx=>tx.date===fd);
   const hc=qs('#histContent');
-  if(!txns.length){hc.innerHTML=`<div class="empty"><span class="material-icons-round">search_off</span><h3>Kuch nahi mila</h3><p>Alag filter try karein</p></div>`;return;}
+  if(!txns.length){hc.innerHTML=`<div class="empty"><span class="material-icons-round">search_off</span><h3>${t('no_txn_title')}</h3><p>${t('no_txn_sub')}</p></div>`;return;}
   const grps={};
-  txns.forEach(t=>{(grps[t.date]=grps[t.date]||[]).push(t);});
+  txns.forEach(tx=>{(grps[tx.date]=grps[tx.date]||[]).push(tx);});
   const days=Object.keys(grps).sort((a,b)=>new Date(b)-new Date(a));
   hc.innerHTML=days.map(d=>{
     const items=grps[d];
-    const dt=items.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
-    return`<div class="dgrp"><div class="dlbl"><span class="dl">${fmtDate(d)}</span><span class="dr">-${r(dt)}</span></div><div class="tlist">${items.map(t=>txnRow(t,true)).join('')}</div></div>`;
+    const dt=items.filter(tx=>tx.type==='expense').reduce((s,tx)=>s+tx.amount,0);
+    return`<div class="dgrp"><div class="dlbl"><span class="dl">${fmtDate(d)}</span><span class="dr">-${r(dt)}</span></div><div class="tlist">${items.map(tx=>txnRow(tx,true)).join('')}</div></div>`;
   }).join('');
 }
 function setCF(el){qs('#catFilters .fc.on').classList.remove('on');el.classList.add('on');renderHistory();}
@@ -1129,49 +1444,49 @@ function renderReports(){
   buildBar();buildPie();buildLine();
 }
 function chgMonth(d){rMonth+=d;if(rMonth<0){rMonth=11;rYear--;}if(rMonth>11){rMonth=0;rYear++;}renderReports();}
-const cO=()=>({g:document.documentElement.getAttribute('data-theme')==='light'?'rgba(0,0,0,.06)':'rgba(255,255,255,.06)',t:document.documentElement.getAttribute('data-theme')==='light'?'#555':'#888aaa'});
+const cO=()=>({g:document.documentElement.getAttribute('data-theme')==='light'?'rgba(0,0,0,.06)':'rgba(255,255,255,.06)',tx:document.documentElement.getAttribute('data-theme')==='light'?'#555':'#888aaa'});
 
 function buildBar(){
   if(barC){barC.destroy();barC=null;}
   const labels=[],data=[];
-  for(let i=5;i>=0;i--){let m=rMonth-i,y=rYear;if(m<0){m+=12;y--;}labels.push(new Date(y,m).toLocaleDateString('en-IN',{month:'short'}));data.push(DS.txns.filter(t=>t.type==='expense'&&smth(t.date,m,y)).reduce((s,t)=>s+t.amount,0));}
+  for(let i=5;i>=0;i--){let m=rMonth-i,y=rYear;if(m<0){m+=12;y--;}labels.push(new Date(y,m).toLocaleDateString('en-IN',{month:'short'}));data.push(DS.txns.filter(tx=>tx.type==='expense'&&smth(tx.date,m,y)).reduce((s,tx)=>s+tx.amount,0));}
   const o=cO();
-  barC=new Chart(qs('#barChart'),{type:'bar',data:{labels,datasets:[{data,backgroundColor:'rgba(139,127,255,.75)',borderRadius:8,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:o.g},ticks:{color:o.t}},y:{grid:{color:o.g},ticks:{color:o.t,callback:v=>'₹'+v.toLocaleString('en-IN')}}}}});
+  barC=new Chart(qs('#barChart'),{type:'bar',data:{labels,datasets:[{data,backgroundColor:'rgba(139,127,255,.75)',borderRadius:8,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:o.g},ticks:{color:o.tx}},y:{grid:{color:o.g},ticks:{color:o.tx,callback:v=>'₹'+v.toLocaleString('en-IN')}}}}});
 }
 function buildPie(){
   if(pieC){pieC.destroy();pieC=null;}
   const lbs=[],data=[],clrs=[];
-  ECATS.forEach(c=>{const tot=DS.txns.filter(t=>t.type==='expense'&&smth(t.date,rMonth,rYear)&&t.cat===c.id).reduce((s,t)=>s+t.amount,0);if(tot>0){lbs.push(c.n);data.push(tot);clrs.push(c.c);}});
-  if(!data.length){lbs.push('Koi Data Nahi');data.push(1);clrs.push('#333');}
+  ECATS.forEach(c=>{const tot=DS.txns.filter(tx=>tx.type==='expense'&&smth(tx.date,rMonth,rYear)&&tx.cat===c.id).reduce((s,tx)=>s+tx.amount,0);if(tot>0){lbs.push(c.n);data.push(tot);clrs.push(c.c);}});
+  if(!data.length){lbs.push(t('no_data'));data.push(1);clrs.push('#333');}
   const o=cO();
-  pieC=new Chart(qs('#pieChart'),{type:'doughnut',data:{labels:lbs,datasets:[{data,backgroundColor:clrs,borderWidth:0,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom',labels:{color:o.t,padding:10,font:{size:10}}}}}});
+  pieC=new Chart(qs('#pieChart'),{type:'doughnut',data:{labels:lbs,datasets:[{data,backgroundColor:clrs,borderWidth:0,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom',labels:{color:o.tx,padding:10,font:{size:10}}}}}});
 }
 function buildLine(){
   if(lineC){lineC.destroy();lineC=null;}
   const days=new Date(rYear,rMonth+1,0).getDate();
   const lbs=[],data=[];
-  for(let d=1;d<=days;d++){const ds=`${rYear}-${String(rMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;lbs.push(d);data.push(DS.txns.filter(t=>t.type==='expense'&&t.date===ds).reduce((s,t)=>s+t.amount,0));}
+  for(let d=1;d<=days;d++){const ds=`${rYear}-${String(rMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;lbs.push(d);data.push(DS.txns.filter(tx=>tx.type==='expense'&&tx.date===ds).reduce((s,tx)=>s+tx.amount,0));}
   const o=cO();
-  lineC=new Chart(qs('#lineChart'),{type:'line',data:{labels:lbs,datasets:[{data,borderColor:'#4db8ff',backgroundColor:'rgba(77,184,255,.1)',tension:.4,fill:true,pointRadius:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:o.g},ticks:{color:o.t}},y:{grid:{color:o.g},ticks:{color:o.t,callback:v=>'₹'+v.toLocaleString('en-IN')}}}}});
+  lineC=new Chart(qs('#lineChart'),{type:'line',data:{labels:lbs,datasets:[{data,borderColor:'#4db8ff',backgroundColor:'rgba(77,184,255,.1)',tension:.4,fill:true,pointRadius:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:o.g},ticks:{color:o.tx}},y:{grid:{color:o.g},ticks:{color:o.tx,callback:v=>'₹'+v.toLocaleString('en-IN')}}}}});
 }
 
 // ═══════════════════════════════════════════════════
 //  BILLS
 // ═══════════════════════════════════════════════════
-function dUntil(ds){const d=new Date(ds+'T00:00:00');const t=new Date();t.setHours(0,0,0,0);return Math.ceil((d-t)/86400000);}
+function dUntil(ds){const d=new Date(ds+'T00:00:00');const tx=new Date();tx.setHours(0,0,0,0);return Math.ceil((d-tx)/86400000);}
 
 function billRow(b,acts){
   const days=dUntil(b.dueDate);
   const cat=ECATS.find(c=>c.id===b.cat)||{c:'#818cf8'};
   const ico=BICO[b.cat]||'payments';
-  let sc='ok',st='Aane wala',cc='uc';
-  if(b.paid){sc='pd';st='Paid';cc='';}
+  let sc='ok',st=`${days}d`,cc='uc';
+  if(b.paid){sc='pd';st=t('paid');cc='';}
   else if(days<0){sc='tod';st=`${Math.abs(days)}d overdue`;cc='dt';}
-  else if(days===0){sc='tod';st='Aaj Due';cc='dt';}
-  else if(days<=3){sc='sn';st=`${days}d baki`;cc='ds';}
-  else st=`${days}d baki`;
+  else if(days===0){sc='tod';st=t('today_due');cc='dt';}
+  else if(days<=3){sc='sn';st=`${days}d ${t('left')}`;cc='ds';}
+  else st=`${days}d ${t('left')}`;
   const ab=acts?`<div class="bacts">
-    ${!b.paid?`<button class="tabtn" style="color:var(--green);border-color:var(--green)" onclick="markPaid('${b.id}')" title="Paid mark karein"><span class="material-icons-round" style="font-size:13px">check</span></button>`:''}
+    ${!b.paid?`<button class="tabtn" style="color:var(--green);border-color:var(--green)" onclick="markPaid('${b.id}')" title="Paid"><span class="material-icons-round" style="font-size:13px">check</span></button>`:''}
     <button class="tabtn ed" onclick="editBill('${b.id}')" title="Edit"><span class="material-icons-round">edit</span></button>
     <button class="tabtn dl" onclick="delBill('${b.id}')" title="Delete"><span class="material-icons-round">delete</span></button>
   </div>`:'';
@@ -1179,7 +1494,7 @@ function billRow(b,acts){
     <div class="bico" style="background:${cat.c}18"><span class="material-icons-round" style="color:${cat.c}">${ico}</span></div>
     <div class="binfo">
       <div class="bn">${b.name}</div>
-      <div class="bd">${b.repeat!=='none'?'🔄 '+{monthly:'Har Mahine',weekly:'Har Hafte',yearly:'Har Saal'}[b.repeat]+' · ':''} Due: ${b.dueDate}</div>
+      <div class="bd">${b.repeat!=='none'?'🔄 '+{monthly:t('monthly'),weekly:t('weekly'),yearly:t('yearly')}[b.repeat]+' · ':''} ${t('due_date')}: ${b.dueDate}</div>
       ${b.note?`<div class="bd">${b.note}</div>`:''}
     </div>
     <div class="bright">
@@ -1194,53 +1509,38 @@ function saveBill(){
   const name=(qs('#bNameInp').value||'').trim();
   const amt=parseFloat(qs('#bAmtInp').value);
   const due=qs('#bDueInp').value;
-  if(!name){toast('Bill ka naam darj karein','err');return;}
-  if(!amt||amt<=0){toast('Valid amount darj karein','err');return;}
-  if(!due){toast('Due date select karein','err');return;}
-  const bill={
-    id:editBillId||Date.now().toString(),
-    name, amount:amt, dueDate:due,
-    cat:qs('#bCatInp').value,
-    repeat:qs('#bRepeatInp').value,
-    note:(qs('#bNoteInp').value||'').trim(),
-    paid:false
-  };
-  if(editBillId){
-    const i=DS.bills.findIndex(b=>b.id===editBillId);
-    if(i>-1) DS.bills[i]={...DS.bills[i],...bill};
-    toast('Bill update hua! ✓','ok');
-  } else {
-    DS.bills.push(bill);
-    toast('Bill reminder add hua! ✓','ok');
-  }
+  if(!name){toast('Bill name required','err');return;}
+  if(!amt||amt<=0){toast('Valid amount required','err');return;}
+  if(!due){toast('Due date required','err');return;}
+  const bill={id:editBillId||Date.now().toString(),name,amount:amt,dueDate:due,cat:qs('#bCatInp').value,repeat:qs('#bRepeatInp').value,note:(qs('#bNoteInp').value||'').trim(),paid:false};
+  if(editBillId){const i=DS.bills.findIndex(b=>b.id===editBillId);if(i>-1) DS.bills[i]={...DS.bills[i],...bill};toast('Bill updated! ✓','ok');}
+  else{DS.bills.push(bill);toast('Bill added! ✓','ok');}
   sB();closeM('billModal');renderBills();renderDash();
 }
 function editBill(id){
   const b=DS.bills.find(x=>x.id===id);if(!b)return;
   editBillId=id;
-  qs('#billMTitle').textContent='Bill Edit Karein';
-  qs('#billSubmitBtn').textContent='Bill Update Karein';
+  qs('#billMTitle').textContent='Edit Bill';
+  qs('#billSubmitBtn').textContent='Update Bill';
   qs('#bNameInp').value=b.name;qs('#bAmtInp').value=b.amount;
   qs('#bDueInp').value=b.dueDate;qs('#bCatInp').value=b.cat;
   qs('#bRepeatInp').value=b.repeat;qs('#bNoteInp').value=b.note||'';
   openM('billModal');
 }
 function delBill(id){
-  if(!confirm('Bill delete karein?'))return;
+  if(!confirm('Delete bill?'))return;
   DS.bills=DS.bills.filter(b=>b.id!==id);
-  sB();renderBills();renderDash();updNotif();toast('Bill delete hua','err');
+  sB();renderBills();renderDash();updNotif();toast('Deleted','err');
 }
 function markPaid(id){
   const b=DS.bills.find(x=>x.id===id);if(!b)return;
-  // Add as expense
   DS.txns.unshift({id:Date.now().toString(),type:'expense',amount:b.amount,cat:b.cat,date:toDS(new Date()),time:new Date().toTimeString().slice(0,5),note:'Bill paid: '+b.name,pay:'UPI'});
   sT();
-  // Handle repeat
   if(b.repeat==='monthly'){const nd=new Date(b.dueDate);nd.setMonth(nd.getMonth()+1);b.dueDate=toDS(nd);}
   else if(b.repeat==='weekly'){const nd=new Date(b.dueDate);nd.setDate(nd.getDate()+7);b.dueDate=toDS(nd);}
   else if(b.repeat==='yearly'){const nd=new Date(b.dueDate);nd.setFullYear(nd.getFullYear()+1);b.dueDate=toDS(nd);}
   else b.paid=true;
-  sB();renderBills();renderDash();updNotif();toast('Bill paid! Kharche mein add hua ✓','ok');
+  sB();renderBills();renderDash();updNotif();toast('Bill paid! ✓','ok');
 }
 function setBF(el){qs('#billFilters .fc.on').classList.remove('on');el.classList.add('on');renderBills();}
 function renderBills(){
@@ -1251,9 +1551,8 @@ function renderBills(){
   else if(af==='paid') bills=bills.filter(b=>b.paid);
   else if(af==='unpaid') bills=bills.filter(b=>!b.paid);
   const bl=qs('#billsList');
-  bl.innerHTML=bills.length?bills.map(b=>billRow(b,true)).join(''):`<div class="empty"><span class="material-icons-round">event_available</span><h3>Koi bill nahi</h3><p>+ Add Bill dabao</p></div>`;
-  renderEmis();
-  updNotif();
+  bl.innerHTML=bills.length?bills.map(b=>billRow(b,true)).join(''):`<div class="empty"><span class="material-icons-round">event_available</span><h3>${t('no_txn_title')}</h3></div>`;
+  renderEmis();updNotif();
 }
 function updNotif(){
   const cnt=DS.bills.filter(b=>!b.paid&&dUntil(b.dueDate)<=1).length;
@@ -1270,18 +1569,17 @@ function saveEmi(){
   const emi=parseFloat(qs('#eEmiInp').value);
   const totalE=parseInt(qs('#eTotalEmiInp').value);
   const paid=parseInt(qs('#ePaidInp').value)||0;
-  if(!name){toast('EMI ka naam darj karein','err');return;}
-  if(!total||!emi||!totalE){toast('Sabhi fields bharen','err');return;}
+  if(!name||!total||!emi||!totalE){toast('All fields required','err');return;}
   const obj={id:editEmiId||Date.now().toString(),name,bank:(qs('#eBankInp').value||'').trim(),total,emi,totalEmis:totalE,paid,startDate:qs('#eStartInp').value,dueDay:parseInt(qs('#eDayInp').value)||5,rate:parseFloat(qs('#eRateInp').value)||0};
-  if(editEmiId){const i=DS.emis.findIndex(e=>e.id===editEmiId);if(i>-1) DS.emis[i]=obj;toast('EMI update hua! ✓','ok');}
-  else{DS.emis.push(obj);toast('EMI add hua! ✓','ok');}
+  if(editEmiId){const i=DS.emis.findIndex(e=>e.id===editEmiId);if(i>-1) DS.emis[i]=obj;toast('EMI updated! ✓','ok');}
+  else{DS.emis.push(obj);toast('EMI added! ✓','ok');}
   sE();closeM('emiModal');renderEmis();
 }
 function editEmiItem(id){
   const e=DS.emis.find(x=>x.id===id);if(!e)return;
   editEmiId=id;
-  qs('#emiMTitle').textContent='EMI Edit Karein';
-  qs('#emiSubmitBtn').textContent='EMI Update Karein';
+  qs('#emiMTitle').textContent='Edit EMI';
+  qs('#emiSubmitBtn').textContent='Update EMI';
   qs('#eNameInp').value=e.name;qs('#eBankInp').value=e.bank||'';
   qs('#eTotalInp').value=e.total;qs('#eEmiInp').value=e.emi;
   qs('#eTotalEmiInp').value=e.totalEmis;qs('#ePaidInp').value=e.paid;
@@ -1290,12 +1588,12 @@ function editEmiItem(id){
   openM('emiModal');
 }
 function delEmi(id){
-  if(!confirm('EMI delete karein?'))return;
-  DS.emis=DS.emis.filter(e=>e.id!==id);sE();renderEmis();toast('EMI delete hua','err');
+  if(!confirm('Delete EMI?'))return;
+  DS.emis=DS.emis.filter(e=>e.id!==id);sE();renderEmis();toast('Deleted','err');
 }
 function renderEmis(){
   const el=qs('#emiList');
-  if(!DS.emis.length){el.innerHTML=`<div class="empty"><span class="material-icons-round">credit_card</span><h3>Koi EMI nahi</h3><p>+ Add EMI dabao loan track karne ke liye</p></div>`;return;}
+  if(!DS.emis.length){el.innerHTML=`<div class="empty"><span class="material-icons-round">credit_card</span><h3>${t('no_txn_title')}</h3></div>`;return;}
   el.innerHTML=DS.emis.map((e,idx)=>{
     const rem=e.totalEmis-e.paid, pct=Math.min(100,(e.paid/e.totalEmis)*100).toFixed(1);
     const remAmt=rem*e.emi, clr=ECLRS[idx%ECLRS.length];
@@ -1304,8 +1602,8 @@ function renderEmis(){
         <div class="eico" style="background:${clr}"><span class="material-icons-round">credit_card</span></div>
         <div class="etit">
           <div class="en">${e.name}${e.bank?' · '+e.bank:''}</div>
-          <div class="eb">Due day: ${e.dueDay} · Rate: ${e.rate}% p.a.</div>
-          <div class="ea">${r(e.emi)}/mahine</div>
+          <div class="eb">${t('due_day')}: ${e.dueDay} · ${t('interest_rate')}: ${e.rate}%</div>
+          <div class="ea">${r(e.emi)}/${t('month')}</div>
         </div>
         <div style="display:flex;gap:3px">
           <button class="tabtn ed" onclick="editEmiItem('${e.id}')" title="Edit"><span class="material-icons-round">edit</span></button>
@@ -1313,11 +1611,11 @@ function renderEmis(){
         </div>
       </div>
       <div class="epbar"><div class="epfill" style="width:${pct}%;background:${clr}"></div></div>
-      <div class="eplbl"><span>${e.paid}/${e.totalEmis} paid (${pct}%)</span><span>${rem} baki</span></div>
+      <div class="eplbl"><span>${e.paid}/${e.totalEmis} ${t('paid')} (${pct}%)</span><span>${rem} ${t('left')}</span></div>
       <div class="etags">
-        <div class="etag">Total: ${r(e.total)}</div>
-        <div class="etag">Baki: ${r(remAmt)}</div>
-        <div class="etag" style="color:${clr}">Paid: ${r(e.paid*e.emi)}</div>
+        <div class="etag">${t('total_amount')}: ${r(e.total)}</div>
+        <div class="etag">${t('left')}: ${r(remAmt)}</div>
+        <div class="etag" style="color:${clr}">${t('paid')}: ${r(e.paid*e.emi)}</div>
       </div>
     </div>`;
   }).join('');
@@ -1329,46 +1627,37 @@ function renderEmis(){
 function openWa(txnId){
   waTxnId=txnId; waType='single';
   document.querySelectorAll('[data-wt]').forEach(c=>c.classList.toggle('sel',c.dataset.wt==='single'));
-  updateWaPreview();
-  openM('waModal');
+  updateWaPreview();openM('waModal');
 }
 function setWaType(el){
   document.querySelectorAll('[data-wt]').forEach(c=>c.classList.remove('sel'));
-  el.classList.add('sel'); waType=el.dataset.wt;
-  updateWaPreview();
+  el.classList.add('sel'); waType=el.dataset.wt;updateWaPreview();
 }
 function updateWaPreview(){
-  const app='📊 *MyKharcha*';
-  let msg='';
+  const app='📊 *MyKharcha*';let msg='';
   if(waType==='single'&&waTxnId){
-    const t=DS.txns.find(x=>x.id===waTxnId);
-    if(t){
-      const cats=t.type==='expense'?ECATS:ICATS;
-      const cat=cats.find(c=>c.id===t.cat)||{n:t.cat};
-      msg=`${app}\n\n${t.type==='expense'?'💸 Kharcha':'💰 Amdani'} Record\n\n💰 Amount: *${r(t.amount)}*\n📂 Category: ${cat.n}\n📅 Date: ${t.date} ${t.time||''}\n${t.type==='expense'?`💳 Payment: ${t.pay}\n`:''}\n📝 Note: ${t.note||'—'}\n\n_MyKharcha se share kiya_`;
-    }
+    const tx=DS.txns.find(x=>x.id===waTxnId);
+    if(tx){const cats=tx.type==='expense'?ECATS:ICATS;const cat=cats.find(c=>c.id===tx.cat)||{n:tx.cat};
+      msg=`${app}\n\n${tx.type==='expense'?'💸 '+t('expense'):'💰 '+t('income')}\n\n💰 Amount: *${r(tx.amount)}*\n📂 ${t('category')}: ${cat.n}\n📅 ${t('date')}: ${tx.date} ${tx.time||''}\n${tx.type==='expense'?`💳 ${t('payment_method')}: ${tx.pay}\n`:''}\n📝 ${t('note_optional')}: ${tx.note||'—'}\n\n_Shared via MyKharcha_`;}
   } else if(waType==='today'){
-    const today=toDS(new Date());
-    const tt=DS.txns.filter(t=>t.date===today);
-    const ex=tt.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
-    const inc=tt.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
-    msg=`${app}\n\n📅 *Aaj ka Summary* (${today})\n\n💸 Kharcha: *${r(ex)}*\n💰 Amdani: *${r(inc)}*\n💚 Balance: *${r(inc-ex)}*\n📊 Transactions: ${tt.length}\n\n_MyKharcha se share kiya_`;
+    const today=toDS(new Date());const tt=DS.txns.filter(tx=>tx.date===today);
+    const ex=tt.filter(tx=>tx.type==='expense').reduce((s,tx)=>s+tx.amount,0);
+    const inc=tt.filter(tx=>tx.type==='income').reduce((s,tx)=>s+tx.amount,0);
+    msg=`${app}\n\n📅 *${t('today_summary')}* (${today})\n\n💸 ${t('expense')}: *${r(ex)}*\n💰 ${t('income')}: *${r(inc)}*\n💚 Balance: *${r(inc-ex)}*\n📊 Txns: ${tt.length}\n\n_Shared via MyKharcha_`;
   } else if(waType==='month'){
     const now=new Date(),m=now.getMonth(),y=now.getFullYear();
-    const mE=DS.txns.filter(t=>t.type==='expense'&&smth(t.date,m,y));
-    const mI=DS.txns.filter(t=>t.type==='income'&&smth(t.date,m,y));
-    const eT=sm(mE),iT=sm(mI);
-    const mn=now.toLocaleDateString('en-IN',{month:'long',year:'numeric'});
-    const topC=ECATS.map(c=>({...c,t:mE.filter(x=>x.cat===c.id).reduce((s,x)=>s+x.amount,0)})).sort((a,b)=>b.t-a.t)[0];
-    msg=`${app}\n\n📅 *${mn} Report*\n\n💸 Kharcha: *${r(eT)}*\n💰 Amdani: *${r(iT)}*\n💚 Bachat: *${r(Math.max(0,iT-eT))}*\n📊 Transactions: ${mE.length+mI.length}\n${topC&&topC.t>0?`🏆 Top: ${topC.n} (${r(topC.t)})\n`:''}\n_MyKharcha se share kiya_`;
+    const mE=DS.txns.filter(tx=>tx.type==='expense'&&smth(tx.date,m,y));
+    const mI=DS.txns.filter(tx=>tx.type==='income'&&smth(tx.date,m,y));
+    const eT=sm(mE),iT=sm(mI);const mn=now.toLocaleDateString('en-IN',{month:'long',year:'numeric'});
+    msg=`${app}\n\n📅 *${mn} ${t('month_report')}*\n\n💸 ${t('expense')}: *${r(eT)}*\n💰 ${t('income')}: *${r(iT)}*\n💚 ${t('savings')}: *${r(Math.max(0,iT-eT))}*\n📊 Txns: ${mE.length+mI.length}\n\n_Shared via MyKharcha_`;
   }
-  qs('#waPreview').textContent=msg||'Share type select karein';
+  qs('#waPreview').textContent=msg||'Select share type';
 }
 function doWaShare(){
   const msg=qs('#waPreview').textContent;
-  if(!msg||msg==='Share type select karein'){toast('Pehle type select karein','err');return;}
+  if(!msg||msg==='Select share type'){toast('Select type first','err');return;}
   window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
-  closeM('waModal');toast('WhatsApp khul raha hai! ✓','ok');
+  closeM('waModal');toast('Opening WhatsApp! ✓','ok');
 }
 
 // ═══════════════════════════════════════════════════
@@ -1380,35 +1669,35 @@ function buildBudgetInps(){
     <div class="fg">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
         <span class="material-icons-round" style="color:${c.c};font-size:16px">${c.ico}</span>
-        <label class="fl" style="margin-bottom:0">${c.n} Budget (₹)</label>
+        <label class="fl" style="margin-bottom:0">${c.n} (₹)</label>
       </div>
-      <input type="number" class="fi" id="bg_${c.id}" placeholder="0 = koi limit nahi" value="${DS.budgets[c.id]||''}">
+      <input type="number" class="fi" id="bg_${c.id}" placeholder="0 = ${t('no_limit')||'no limit'}" value="${DS.budgets[c.id]||''}">
     </div>`).join('');
 }
 function saveBudgets(){
   ECATS.forEach(c=>{const v=parseFloat(qs('#bg_'+c.id).value)||0;if(v>0) DS.budgets[c.id]=v;else delete DS.budgets[c.id];});
-  sBg();closeM('budgetEditModal');renderBudget();toast('Budgets save hua! ✓','ok');
+  sBg();closeM('budgetEditModal');renderBudget();toast(t('save')+' ✓','ok');
 }
 function renderBudget(){
   qs('#budgetMonthTitle').textContent=new Date(bYear,bMonth).toLocaleDateString('en-IN',{month:'long',year:'numeric'});
-  const mE=DS.txns.filter(t=>t.type==='expense'&&smth(t.date,bMonth,bYear));
+  const mE=DS.txns.filter(tx=>tx.type==='expense'&&smth(tx.date,bMonth,bYear));
   const totalB=Object.values(DS.budgets).reduce((s,v)=>s+v,0);
   const totalS=sm(mE), rem=Math.max(0,totalB-totalS);
   const pct=totalB>0?Math.min(100,(totalS/totalB)*100).toFixed(0):0;
   qs('#budgetTotal').textContent=r(totalB);
-  qs('#budgetSub').textContent=totalB>0?`Is mahine ka total budget`:'Abhi koi budget set nahi — "Edit Budgets" dabao';
+  qs('#budgetSub').textContent=totalB>0?t('monthly_budget'):'No budget set – tap "Edit Budgets"';
   qs('#budgetSpent').textContent=r(totalS);
   qs('#budgetLeft').textContent=r(rem);
   qs('#budgetPct').textContent=pct+'%';
   const bcl=qs('#budgetCatList');
-  const cd=ECATS.map(c=>{const sp=mE.filter(t=>t.cat===c.id).reduce((s,t)=>s+t.amount,0);const bg=DS.budgets[c.id]||0;return{...c,sp,bg};}).filter(c=>c.sp>0||c.bg>0).sort((a,b)=>b.sp-a.sp);
-  if(!cd.length){bcl.innerHTML='<div class="empty" style="padding:20px 0"><p>Is mahine koi kharcha ya budget nahi</p></div>';return;}
+  const cd=ECATS.map(c=>{const sp=mE.filter(tx=>tx.cat===c.id).reduce((s,tx)=>s+tx.amount,0);const bg=DS.budgets[c.id]||0;return{...c,sp,bg};}).filter(c=>c.sp>0||c.bg>0).sort((a,b)=>b.sp-a.sp);
+  if(!cd.length){bcl.innerHTML=`<div class="empty" style="padding:20px 0"><p>${t('no_data')}</p></div>`;return;}
   bcl.innerHTML=cd.map(c=>{
     const p2=c.bg>0?Math.min(100,(c.sp/c.bg)*100).toFixed(0):(c.sp>0?100:0);
     const fc=c.bg>0?(c.sp/c.bg>1?'ov':c.sp/c.bg>0.8?'wn':'sf'):'sf';
     return`<div class="bcitem">
       <div class="bctop"><div class="bcico" style="background:${c.c}18"><span class="material-icons-round" style="color:${c.c}">${c.ico}</span></div><div class="bcn">${c.n}</div><div class="bcp">${p2}%</div></div>
-      <div class="bcamts"><span class="bcsp" style="color:${c.c}">${r(c.sp)} kharch</span><span class="bcbg">${c.bg>0?r(c.bg)+' budget':'Limit nahi'}</span></div>
+      <div class="bcamts"><span class="bcsp" style="color:${c.c}">${r(c.sp)} ${t('spent')}</span><span class="bcbg">${c.bg>0?r(c.bg)+' budget':'No limit'}</span></div>
       <div class="bcbar"><div class="bcfill ${fc}" style="width:${p2}%;background:${c.c}"></div></div>
     </div>`;
   }).join('');
@@ -1417,7 +1706,7 @@ function renderBudget(){
 function buildBudgetChart(cd){
   if(budgetC){budgetC.destroy();budgetC=null;}
   const o=cO();
-  budgetC=new Chart(qs('#budgetChart'),{type:'bar',data:{labels:cd.map(c=>c.n),datasets:[{label:'Kharch',data:cd.map(c=>c.sp),backgroundColor:'rgba(255,95,126,.75)',borderRadius:6,borderSkipped:false},{label:'Budget',data:cd.map(c=>c.bg),backgroundColor:'rgba(139,127,255,.35)',borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{color:o.t,font:{size:10}}}},scales:{x:{grid:{color:o.g},ticks:{color:o.t,font:{size:9}}},y:{grid:{color:o.g},ticks:{color:o.t,callback:v=>'₹'+v.toLocaleString('en-IN')}}}}});
+  budgetC=new Chart(qs('#budgetChart'),{type:'bar',data:{labels:cd.map(c=>c.n),datasets:[{label:t('spent'),data:cd.map(c=>c.sp),backgroundColor:'rgba(255,95,126,.75)',borderRadius:6,borderSkipped:false},{label:'Budget',data:cd.map(c=>c.bg),backgroundColor:'rgba(139,127,255,.35)',borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{color:o.tx,font:{size:10}}}},scales:{x:{grid:{color:o.g},ticks:{color:o.tx,font:{size:9}}},y:{grid:{color:o.g},ticks:{color:o.tx,callback:v=>'₹'+v.toLocaleString('en-IN')}}}}});
 }
 
 // ═══════════════════════════════════════════════════
@@ -1427,14 +1716,14 @@ function renderSettings(){
   const s=DS.settings;
   qs('#tglTheme').classList.toggle('on',s.theme==='light');
   qs('#tglLimit').classList.toggle('on',!!s.limitEnabled);
-  qs('#limitStTxt').textContent=s.limitEnabled&&s.dailyLimit?`₹${rfmt(s.dailyLimit)}/din active`:'Set nahi hua';
+  qs('#limitStTxt').textContent=s.limitEnabled&&s.dailyLimit?`₹${rfmt(s.dailyLimit)} active`:t('not_set');
   qs('#limitForm').style.display=s.limitEnabled?'':'none';
   if(s.dailyLimit) qs('#limitInp').value=s.dailyLimit;
   qs('#tglPin').classList.toggle('on',!!s.pinEnabled);
-  qs('#pinStTxt').textContent=s.pinEnabled?'Enabled – change karne ke liye tap karein':'Disabled';
-  // Goals
+  qs('#pinStTxt').textContent=s.pinEnabled?'Enabled':'Disabled';
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('sel',b.getAttribute('data-lang')===curLang));
   const gl=qs('#goalsList');
-  if(!DS.goals.length){gl.innerHTML='<div style="color:var(--txt3);font-size:12px;padding:3px 2px 9px">Koi goal nahi. Neeche add karein!</div>';return;}
+  if(!DS.goals.length){gl.innerHTML=`<div style="color:var(--txt3);font-size:12px;padding:3px 2px 9px">No goals yet.</div>`;return;}
   gl.innerHTML=DS.goals.map((g,i)=>{
     const pct=Math.min(100,(g.saved/g.target)*100).toFixed(0);
     return`<div class="gcard">
@@ -1450,46 +1739,45 @@ function renderSettings(){
 function tglLimit(){DS.settings.limitEnabled=!DS.settings.limitEnabled;sS();renderSettings();renderDash();}
 function saveLimit(){
   const v=parseFloat(qs('#limitInp').value);
-  if(!v||v<=0){toast('Valid amount darj karein','err');return;}
-  DS.settings.dailyLimit=v;sS();renderSettings();renderDash();toast('Limit save hua! ✓','ok');
+  if(!v||v<=0){toast('Valid amount required','err');return;}
+  DS.settings.dailyLimit=v;sS();renderSettings();renderDash();toast(t('save')+' ✓','ok');
 }
 async function checkFPSupport(){
   const el=qs('#fpSupTxt');
   if(window.PublicKeyCredential){
-    try{const a=await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();el.textContent=a?'✅ Fingerprint/Face ID available':'❌ Is device mein biometric nahi';}
-    catch{el.textContent='Check karna possible nahi';}
-  } else el.textContent='❌ Browser support nahi karta';
+    try{const a=await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();el.textContent=a?'✅ Fingerprint/Face ID available':'❌ Not supported on this device';}
+    catch{el.textContent='Check failed';}
+  } else el.textContent='❌ Browser not supported';
 }
 function savePin(){
   const a=qs('#pinA').value, b=qs('#pinB').value;
-  if(a.length!==4||!/^\d+$/.test(a)){toast('PIN 4 digits ka hona chahiye','err');return;}
-  if(a!==b){toast('PINs match nahi karte','err');return;}
+  if(a.length!==4||!/^\d+$/.test(a)){toast('PIN must be 4 digits','err');return;}
+  if(a!==b){toast('PINs do not match','err');return;}
   DS.settings.pin=a;DS.settings.pinEnabled=true;sS();
-  closeM('pinModal');renderSettings();toast('PIN lock enable hua! ✓','ok');
+  closeM('pinModal');renderSettings();toast('PIN lock enabled! ✓','ok');
 }
 function disablePin(){
   DS.settings.pin='';DS.settings.pinEnabled=false;sS();
-  closeM('pinModal');renderSettings();toast('Lock disable hua','ok');
+  closeM('pinModal');renderSettings();toast('Lock disabled','ok');
 }
 function saveGoal(){
   const n=(qs('#gNameInp').value||'').trim();
-  const t=parseFloat(qs('#gTargetInp').value);
+  const tg=parseFloat(qs('#gTargetInp').value);
   const sv=parseFloat(qs('#gSavedInp').value)||0;
-  if(!n){toast('Goal ka naam darj karein','err');return;}
-  if(!t||t<=0){toast('Valid target darj karein','err');return;}
-  DS.goals.push({name:n,target:t,saved:sv});sG();
+  if(!n||!tg||tg<=0){toast('Fill all fields','err');return;}
+  DS.goals.push({name:n,target:tg,saved:sv});sG();
   closeM('goalModal');renderSettings();
   qs('#gNameInp').value='';qs('#gTargetInp').value='';qs('#gSavedInp').value='';
-  toast('Goal add hua! ✓','ok');
+  toast('Goal added! ✓','ok');
 }
 function delGoal(i){
-  if(!confirm('Goal delete karein?'))return;
-  DS.goals.splice(i,1);sG();renderSettings();toast('Goal delete hua','err');
+  if(!confirm('Delete goal?'))return;
+  DS.goals.splice(i,1);sG();renderSettings();toast('Deleted','err');
 }
 function clearAllData(){
-  if(!confirm('SABABHI DATA DELETE KAREIN?\n\nYeh undo nahi hoga!'))return;
+  if(!confirm('DELETE ALL DATA?\n\nThis cannot be undone!'))return;
   DS.txns=[];DS.goals=[];DS.bills=[];DS.emis=[];DS.budgets={};
-  sT();sG();sB();sE();sBg();renderDash();toast('Sab data clear hua','err');
+  sT();sG();sB();sE();sBg();renderDash();toast('All data cleared','err');
 }
 
 // ═══════════════════════════════════════════════════
@@ -1503,17 +1791,17 @@ function initLock(){
 }
 async function tryFP(){
   const btn=qs('#fpbtn'), lbl=qs('#fplbl');
-  if(!window.PublicKeyCredential){lbl.textContent='Biometric available nahi';return;}
+  if(!window.PublicKeyCredential){lbl.textContent='Biometric not available';return;}
   try{
     const a=await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-    if(!a){lbl.textContent='Is device mein biometric nahi';return;}
-    btn.classList.add('scanning');lbl.textContent='Fingerprint rakho ya Face ID use karo...';
+    if(!a){lbl.textContent='No biometric on this device';return;}
+    btn.classList.add('scanning');lbl.textContent='Use fingerprint or Face ID...';
     await navigator.credentials.get({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),allowCredentials:[],userVerification:'required',timeout:30000}});
     btn.classList.remove('scanning');
     qs('#lkscr').style.display='none';pinBuf='';
-    toast('Biometric se unlock hua! ✓','ok');
+    toast('Unlocked! ✓','ok');
   }catch(e){
-    btn.classList.remove('scanning');lbl.textContent='PIN use karein';
+    btn.classList.remove('scanning');lbl.textContent='Use PIN instead';
   }
 }
 function pinTap(n){
@@ -1522,13 +1810,8 @@ function pinTap(n){
   else if(pinBuf.length<4) pinBuf+=n;
   for(let i=0;i<4;i++) qs('#pd'+i).classList.toggle('on',i<pinBuf.length);
   if(pinBuf.length===4){
-    if(pinBuf===DS.settings.pin){
-      qs('#lkscr').style.display='none';pinBuf='';
-      toast('Unlock hua! ✓','ok');
-    } else {
-      qs('#pinerr').textContent='Galat PIN, dobara try karein';
-      setTimeout(()=>{pinBuf='';for(let i=0;i<4;i++) qs('#pd'+i).classList.remove('on');qs('#pinerr').textContent='';},700);
-    }
+    if(pinBuf===DS.settings.pin){qs('#lkscr').style.display='none';pinBuf='';toast('Unlocked! ✓','ok');}
+    else{qs('#pinerr').textContent='Wrong PIN, try again';setTimeout(()=>{pinBuf='';for(let i=0;i<4;i++) qs('#pd'+i).classList.remove('on');qs('#pinerr').textContent='';},700);}
   }
 }
 
@@ -1536,7 +1819,7 @@ function pinTap(n){
 //  EXPORT
 // ═══════════════════════════════════════════════════
 function exportPDF(){
-  if(!window.jspdf){toast('PDF library load ho rahi hai...','warn');return;}
+  if(!window.jspdf){toast('Loading PDF library...','warn');return;}
   try{
     const{jsPDF}=window.jspdf;const doc=new jsPDF();
     doc.setFontSize(18);doc.setTextColor(139,127,255);doc.text('MyKharcha – Expense Report',14,20);
@@ -1547,28 +1830,26 @@ function exportPDF(){
     const xs=[14,36,54,72,100,127,154];
     hds.forEach((h,i)=>doc.text(h,xs[i],y));
     y+=2;doc.setDrawColor(139,127,255);doc.line(14,y,196,y);y+=6;
-    DS.txns.slice(0,80).forEach(t=>{
+    DS.txns.slice(0,80).forEach(tx=>{
       if(y>278){doc.addPage();y=20;}
-      const cats=t.type==='expense'?ECATS:ICATS;
-      const cat=cats.find(c=>c.id===t.cat)||{n:t.cat};
-      doc.text(t.date||'',xs[0],y);doc.text((t.time||'').slice(0,5),xs[1],y);
-      doc.text(t.type,xs[2],y);doc.text(cat.n,xs[3],y);
-      doc.text('Rs.'+t.amount,xs[4],y);doc.text(t.pay||'-',xs[5],y);
-      doc.text((t.note||'-').slice(0,18),xs[6],y);y+=6;
+      const cats=tx.type==='expense'?ECATS:ICATS;
+      const cat=cats.find(c=>c.id===tx.cat)||{n:tx.cat};
+      doc.text(tx.date||'',xs[0],y);doc.text((tx.time||'').slice(0,5),xs[1],y);
+      doc.text(tx.type,xs[2],y);doc.text(cat.n,xs[3],y);
+      doc.text('Rs.'+tx.amount,xs[4],y);doc.text(tx.pay||'-',xs[5],y);
+      doc.text((tx.note||'-').slice(0,18),xs[6],y);y+=6;
     });
-    doc.save('MyKharcha_Report.pdf');toast('PDF export hua! ✓','ok');
-  }catch(e){console.error(e);toast('PDF export fail hua: '+e.message,'err');}
+    doc.save('MyKharcha_Report.pdf');toast('PDF exported! ✓','ok');
+  }catch(e){toast('PDF export failed','err');}
 }
 function exportXLSX(){
-  if(!window.XLSX){toast('Excel library load ho rahi hai...','warn');return;}
+  if(!window.XLSX){toast('Loading Excel library...','warn');return;}
   try{
-    const rows=DS.txns.map(t=>({Date:t.date,Time:t.time,Type:t.type,Category:t.cat,Amount:t.amount,Payment:t.pay||'',Note:t.note||''}));
+    const rows=DS.txns.map(tx=>({Date:tx.date,Time:tx.time,Type:tx.type,Category:tx.cat,Amount:tx.amount,Payment:tx.pay||'',Note:tx.note||''}));
     const ws=XLSX.utils.json_to_sheet(rows);
-    const wb=XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb,ws,'Transactions');
-    XLSX.writeFile(wb,'MyKharcha.xlsx');
-    toast('Excel export hua! ✓','ok');
-  }catch(e){toast('Excel export fail: '+e.message,'err');}
+    const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Transactions');
+    XLSX.writeFile(wb,'MyKharcha.xlsx');toast('Excel exported! ✓','ok');
+  }catch(e){toast('Excel export failed','err');}
 }
 function doBackup(){
   const data=JSON.stringify({txns:DS.txns,goals:DS.goals,bills:DS.bills,emis:DS.emis,settings:DS.settings,budgets:DS.budgets},null,2);
@@ -1576,7 +1857,7 @@ function doBackup(){
   a.href=URL.createObjectURL(new Blob([data],{type:'application/json'}));
   a.download=`MyKharcha_Backup_${toDS(new Date())}.json`;
   document.body.appendChild(a);a.click();document.body.removeChild(a);
-  toast('Backup save hua! ✓','ok');
+  toast('Backup saved! ✓','ok');
 }
 function doRestore(e){
   const f=e.target.files[0];if(!f)return;
@@ -1584,15 +1865,12 @@ function doRestore(e){
   rd.onload=ev=>{
     try{
       const d=JSON.parse(ev.target.result);
-      if(d.txns) DS.txns=d.txns;
-      if(d.goals) DS.goals=d.goals;
-      if(d.bills) DS.bills=d.bills;
-      if(d.emis) DS.emis=d.emis;
+      if(d.txns) DS.txns=d.txns;if(d.goals) DS.goals=d.goals;
+      if(d.bills) DS.bills=d.bills;if(d.emis) DS.emis=d.emis;
       if(d.settings) DS.settings=Object.assign({},DS.settings,d.settings);
       if(d.budgets) DS.budgets=d.budgets;
-      sT();sG();sB();sE();sS();sBg();
-      renderDash();updNotif();
-      toast('Data restore hua! ✓','ok');
+      sT();sG();sB();sE();sS();sBg();renderDash();updNotif();
+      toast('Data restored! ✓','ok');
     }catch(err){toast('Invalid backup file','err');}
   };
   rd.readAsText(f);e.target.value='';
@@ -1604,14 +1882,14 @@ function doRestore(e){
 const qs=s=>document.querySelector(s);
 const r=n=>'₹'+(n||0).toLocaleString('en-IN',{maximumFractionDigits:0});
 const rfmt=n=>(n||0).toLocaleString('en-IN');
-const sm=arr=>arr.reduce((s,t)=>s+t.amount,0);
+const sm=arr=>arr.reduce((s,tx)=>s+tx.amount,0);
 const toDS=d=>d.toISOString().split('T')[0];
 const smth=(ds,m,y)=>{try{const d=new Date(ds);return d.getMonth()===m&&d.getFullYear()===y;}catch{return false;}};
 function fmtDate(ds){
   try{
-    const d=new Date(ds+'T00:00:00');const t=new Date();t.setHours(0,0,0,0);
-    const diff=Math.round((t-d)/86400000);
-    if(diff===0)return'Aaj';if(diff===1)return'Kal';
+    const d=new Date(ds+'T00:00:00');const tx=new Date();tx.setHours(0,0,0,0);
+    const diff=Math.round((tx-d)/86400000);
+    if(diff===0)return t('today');if(diff===1)return'Yesterday';
     return d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'2-digit'});
   }catch{return ds;}
 }
@@ -1628,9 +1906,11 @@ function toast(msg,type='ok'){
 //  INIT
 // ═══════════════════════════════════════════════════
 load();
+curLang = DS.settings.lang || 'hi';
 applyTheme(DS.settings.theme);
 injectManifest();
 regSW();
+applyLang();
 
 const _n=new Date();
 qs('#hdrDate').textContent=_n.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'short'});
