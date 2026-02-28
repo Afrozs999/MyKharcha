@@ -10,663 +10,600 @@
 <meta name="apple-mobile-web-app-title" content="MyKharcha">
 <title>MyKharcha – Smart Expense Tracker</title>
 <link rel="manifest" id="manifestLink">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
 <style>
-:root {
-  --bg-primary:#0c0c1a; --bg-secondary:#111125; --bg-card:rgba(255,255,255,0.04);
-  --bg-card-hover:rgba(255,255,255,0.07); --border:rgba(255,255,255,0.07);
-  --border-hover:rgba(139,127,255,0.35); --text-primary:#eeeeff;
-  --text-secondary:rgba(180,180,220,0.7); --text-muted:rgba(140,140,180,0.5);
-  --purple:#8b7fff; --purple-dim:rgba(139,127,255,0.15);
-  --blue:#4db8ff; --blue-dim:rgba(77,184,255,0.12);
-  --green:#4dffb8; --green-dim:rgba(77,255,184,0.12);
-  --red:#ff5f7e; --red-dim:rgba(255,95,126,0.12);
-  --orange:#ffaa4d; --orange-dim:rgba(255,170,77,0.12);
-  --pink:#ff6bda; --cyan:#4dddff; --teal:#2dd4bf;
-  --grad-main:linear-gradient(135deg,#8b7fff 0%,#4db8ff 100%);
-  --grad-income:linear-gradient(135deg,#4dffb8 0%,#4db8ff 100%);
-  --grad-expense:linear-gradient(135deg,#ff5f7e 0%,#ffaa4d 100%);
-  --grad-warn:linear-gradient(135deg,#ffaa4d 0%,#ff6bda 100%);
-  --r-xl:24px; --r-lg:18px; --r-md:14px; --r-sm:10px;
-  --shadow:0 8px 40px rgba(0,0,0,0.5); --glow:0 0 30px rgba(139,127,255,0.25);
-  --t:all 0.25s cubic-bezier(0.4,0,0.2,1);
-  --ts:all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+/* ── VARIABLES ── */
+:root{
+  --bg:#0c0c1a; --bg2:#111125; --bg3:#181830;
+  --card:rgba(255,255,255,.05); --card-h:rgba(255,255,255,.09);
+  --bdr:rgba(255,255,255,.08); --bdr-h:rgba(139,127,255,.4);
+  --txt:#eeeeff; --txt2:rgba(180,180,220,.75); --txt3:rgba(140,140,180,.5);
+  --purple:#8b7fff; --pdim:rgba(139,127,255,.15);
+  --blue:#4db8ff;  --bdim:rgba(77,184,255,.13);
+  --green:#4dffb8; --gdim:rgba(77,255,184,.13);
+  --red:#ff5f7e;   --rdim:rgba(255,95,126,.13);
+  --orange:#ffaa4d;--odim:rgba(255,170,77,.13);
+  --gm:linear-gradient(135deg,#8b7fff,#4db8ff);
+  --gi:linear-gradient(135deg,#4dffb8,#4db8ff);
+  --ge:linear-gradient(135deg,#ff5f7e,#ffaa4d);
+  --gw:linear-gradient(135deg,#ffaa4d,#ff6bda);
+  --r1:24px; --r2:18px; --r3:14px; --r4:10px;
+  --sh:0 8px 40px rgba(0,0,0,.5);
+  --t:.25s cubic-bezier(.4,0,.2,1);
+  --ts:.4s cubic-bezier(.34,1.56,.64,1);
 }
-[data-theme="light"] {
-  --bg-primary:#f4f4fa; --bg-secondary:#ebebf7;
-  --bg-card:rgba(255,255,255,0.75); --bg-card-hover:rgba(255,255,255,0.95);
-  --border:rgba(0,0,0,0.07); --border-hover:rgba(139,127,255,0.4);
-  --text-primary:#1a1a2e; --text-secondary:rgba(60,60,100,0.7); --text-muted:rgba(80,80,120,0.5);
-  --purple-dim:rgba(139,127,255,0.12); --shadow:0 8px 40px rgba(100,100,160,0.15);
+[data-theme=light]{
+  --bg:#f0f0f8; --bg2:#e8e8f5; --bg3:#fff;
+  --card:rgba(255,255,255,.8); --card-h:rgba(255,255,255,1);
+  --bdr:rgba(0,0,0,.07); --bdr-h:rgba(139,127,255,.4);
+  --txt:#1a1a2e; --txt2:rgba(40,40,80,.7); --txt3:rgba(80,80,120,.5);
+  --pdim:rgba(139,127,255,.12); --bdim:rgba(77,184,255,.12);
+  --gdim:rgba(77,255,184,.12); --rdim:rgba(255,95,126,.12); --odim:rgba(255,170,77,.12);
+  --sh:0 4px 24px rgba(100,100,160,.15);
 }
+/* ── RESET ── */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{font-size:16px}
-body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg-primary);color:var(--text-primary);min-height:100svh;overflow-x:hidden;transition:background .35s,color .35s;-webkit-font-smoothing:antialiased}
-body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 60% 40% at 20% 10%,rgba(139,127,255,.07) 0%,transparent 60%),radial-gradient(ellipse 50% 35% at 80% 85%,rgba(77,184,255,.05) 0%,transparent 60%),radial-gradient(ellipse 40% 30% at 60% 40%,rgba(77,255,184,.03) 0%,transparent 50%)}
-::-webkit-scrollbar{width:3px;height:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--purple);border-radius:2px}
+html{font-size:16px;height:100%}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--txt);min-height:100svh;overflow-x:hidden;transition:background .3s,color .3s;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 60% 40% at 20% 10%,rgba(139,127,255,.07) 0%,transparent 60%),radial-gradient(ellipse 50% 35% at 80% 85%,rgba(77,184,255,.05) 0%,transparent 60%)}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--purple);border-radius:2px}
+input,select,textarea,button{font-family:inherit}
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+/* ── APP SHELL ── */
 #app{position:relative;z-index:1;max-width:430px;margin:0 auto;min-height:100svh}
-
-/* HEADER */
-.app-header{position:sticky;top:0;z-index:200;padding:14px 18px 10px;background:rgba(12,12,26,.88);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;transition:background .35s}
-[data-theme="light"] .app-header{background:rgba(244,244,250,.88)}
-.header-brand{display:flex;flex-direction:column}
-.header-brand .logo{font-family:'Outfit',sans-serif;font-size:20px;font-weight:900;letter-spacing:-.5px;background:var(--grad-main);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1}
-.header-brand .tagline{font-size:10px;color:var(--text-muted);letter-spacing:.3px;margin-top:1px}
-.header-actions{display:flex;gap:8px}
-.hdr-btn{width:36px;height:36px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--bg-card);color:var(--text-primary);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--t);position:relative}
-.hdr-btn:hover{background:var(--purple-dim);border-color:var(--purple);color:var(--purple);transform:scale(1.05)}
-.hdr-btn .material-icons-round{font-size:17px}
-.hdr-btn .badge{position:absolute;top:-3px;right:-3px;width:8px;height:8px;border-radius:50%;background:var(--red);border:2px solid var(--bg-primary)}
-.notif-badge{display:none}
-.notif-badge.show{display:block}
-
-/* PAGES */
-.page{display:none;padding-bottom:80px}
-.page.active{display:block;animation:pageIn .35s cubic-bezier(.4,0,.2,1)}
-@keyframes pageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-
-/* BOTTOM NAV */
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(12,12,26,.92);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border-top:1px solid var(--border);display:flex;z-index:300;padding:6px 0 max(8px,env(safe-area-inset-bottom))}
-[data-theme="light"] .bottom-nav{background:rgba(244,244,250,.92)}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;border:none;background:none;color:var(--text-muted);font-family:inherit;font-size:9px;font-weight:600;letter-spacing:.3px;cursor:pointer;transition:var(--t);text-transform:uppercase;position:relative}
-.nav-btn.active{color:var(--purple)}
-.nav-btn.active .nav-icon-wrap{background:var(--purple-dim)}
-.nav-icon-wrap{width:36px;height:28px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;transition:var(--t)}
-.nav-btn:hover .nav-icon-wrap{background:var(--purple-dim)}
-.nav-btn .material-icons-round{font-size:20px}
-.nav-dot{position:absolute;top:4px;right:calc(50% - 18px);width:6px;height:6px;border-radius:50%;background:var(--red);display:none}
-.nav-dot.show{display:block}
-
-/* FAB */
-.fab{position:fixed;bottom:72px;left:50%;transform:translateX(calc(-50% + 140px));width:52px;height:52px;border-radius:18px;background:var(--grad-main);border:none;color:white;cursor:pointer;box-shadow:0 8px 28px rgba(139,127,255,.5),var(--glow);display:flex;align-items:center;justify-content:center;z-index:250;transition:var(--ts)}
-.fab:hover{transform:translateX(calc(-50% + 140px)) scale(1.1) translateY(-3px)}
-.fab:active{transform:translateX(calc(-50% + 140px)) scale(.95)}
-.fab .material-icons-round{font-size:24px}
-
-.pg-pad{padding:14px 16px;display:flex;flex-direction:column;gap:14px}
-
-/* CARDS */
-.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-xl);backdrop-filter:blur(12px);transition:var(--t);overflow:hidden}
-.card:hover{border-color:var(--border-hover)}
-.card-pad{padding:18px}
-
-/* HERO */
-.hero-card{background:var(--grad-main);border-radius:var(--r-xl);padding:22px;position:relative;overflow:hidden;border:none}
-.hero-card::before{content:'';position:absolute;top:-40px;right:-40px;width:140px;height:140px;background:rgba(255,255,255,.1);border-radius:50%}
-.hero-card::after{content:'';position:absolute;bottom:-25px;left:30px;width:90px;height:90px;background:rgba(255,255,255,.06);border-radius:50%}
-.hero-card .hero-label{font-size:11px;font-weight:600;color:rgba(255,255,255,.75);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
-.hero-card .hero-amount{font-family:'Outfit',sans-serif;font-size:42px;font-weight:900;color:#fff;line-height:1;letter-spacing:-1px;position:relative;z-index:1}
-.hero-card .hero-sub{font-size:12px;color:rgba(255,255,255,.65);margin-top:4px}
-.hero-stats{display:flex;gap:10px;margin-top:18px;position:relative;z-index:1}
-.hero-stat{flex:1;background:rgba(255,255,255,.16);border-radius:14px;padding:10px 12px;backdrop-filter:blur(8px)}
-.hero-stat .hs-label{font-size:9px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.5px}
-.hero-stat .hs-val{font-family:'Outfit',sans-serif;font-size:16px;font-weight:800;color:#fff;margin-top:2px}
-.limit-strip{position:relative;z-index:1;margin-top:14px}
-.limit-strip .ls-row{display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.75);margin-bottom:6px}
-.limit-track{height:5px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden}
-.limit-fill{height:100%;border-radius:3px;background:rgba(255,255,255,.9);transition:width .7s ease}
-.limit-fill.over{background:#ffdd57}
-
-/* STAT MINIS */
-.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.stat-mini{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-lg);padding:15px;transition:var(--t)}
-.stat-mini:hover{border-color:var(--border-hover)}
-.stat-mini .sm-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
-.stat-mini .sm-icon .material-icons-round{font-size:17px}
-.stat-mini .sm-label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
-.stat-mini .sm-val{font-family:'Outfit',sans-serif;font-size:21px;font-weight:800;margin-top:3px;line-height:1}
-.stat-mini.inc{border-color:rgba(77,255,184,.15)}
-.stat-mini.inc .sm-icon{background:var(--green-dim)}
-.stat-mini.inc .sm-icon .material-icons-round{color:var(--green)}
-.stat-mini.inc .sm-val{color:var(--green)}
-.stat-mini.sav .sm-icon{background:var(--blue-dim)}
-.stat-mini.sav .sm-icon .material-icons-round{color:var(--blue)}
-.stat-mini.sav .sm-val{color:var(--blue)}
-
-/* SEC HEADER */
-.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.sec-hdr h2{font-family:'Outfit',sans-serif;font-size:16px;font-weight:800}
-.sec-hdr .see-all{font-size:11px;font-weight:700;color:var(--purple);cursor:pointer;letter-spacing:.3px}
-
-/* CATEGORY LIST */
-.cat-summary{display:flex;flex-direction:column;gap:7px}
-.cat-row-item{display:flex;align-items:center;gap:10px;padding:10px 13px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-md);transition:var(--t)}
-.cat-row-item:hover{border-color:var(--border-hover);background:var(--bg-card-hover)}
-.cat-row-item .cat-ico{width:32px;height:32px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
-.cat-row-item .cat-ico .material-icons-round{font-size:15px}
-.cat-row-item .cat-meta{flex:1;min-width:0}
-.cat-row-item .cat-name-r{font-size:12px;font-weight:700}
-.cat-prog-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:4px}
-.cat-prog-fill{height:100%;border-radius:2px;transition:width .8s ease}
-.cat-row-item .cat-pct-r{font-size:10px;color:var(--text-muted);font-weight:600}
-.cat-row-item .cat-amt-r{font-family:'Outfit',sans-serif;font-size:14px;font-weight:800}
-
-/* TXN ITEM */
-.txn-list{display:flex;flex-direction:column;gap:7px}
-.txn{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-lg);padding:13px 14px;display:flex;align-items:center;gap:11px;transition:var(--t);cursor:pointer;position:relative;overflow:hidden}
-.txn::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:0 3px 3px 0;opacity:0;transition:var(--t)}
-.txn:hover{border-color:var(--border-hover);background:var(--bg-card-hover);transform:translateX(3px)}
+/* ── HEADER ── */
+.hdr{position:sticky;top:0;z-index:200;padding:13px 16px 10px;background:rgba(12,12,26,.9);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;transition:background .3s}
+[data-theme=light] .hdr{background:rgba(240,240,248,.92)}
+.hdr-brand .logo{font-family:'Outfit',sans-serif;font-size:20px;font-weight:900;letter-spacing:-.5px;background:var(--gm);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hdr-brand .sub{font-size:10px;color:var(--txt3);margin-top:1px}
+.hdr-acts{display:flex;gap:8px;align-items:center}
+.hbtn{width:36px;height:36px;border-radius:var(--r3);border:1px solid var(--bdr);background:var(--card);color:var(--txt);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--t);position:relative;flex-shrink:0}
+.hbtn:hover{background:var(--pdim);border-color:var(--purple);color:var(--purple)}
+.hbtn .material-icons-round{font-size:18px}
+.hbtn .dot{position:absolute;top:-3px;right:-3px;width:8px;height:8px;border-radius:50%;background:var(--red);border:2px solid var(--bg);display:none}
+.hbtn .dot.on{display:block}
+/* ── PAGES ── */
+.page{display:none;padding-bottom:85px;min-height:calc(100svh - 60px)}
+.page.active{display:block;animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.pg{padding:14px 15px;display:flex;flex-direction:column;gap:13px}
+/* ── BOTTOM NAV ── */
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(12,12,26,.95);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-top:1px solid var(--bdr);display:flex;z-index:300;padding:5px 0 max(6px,env(safe-area-inset-bottom))}
+[data-theme=light] .bnav{background:rgba(240,240,248,.95)}
+.nbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 2px;border:none;background:none;color:var(--txt3);font-size:9px;font-weight:700;cursor:pointer;transition:var(--t);text-transform:uppercase;letter-spacing:.3px;position:relative}
+.nbtn.on{color:var(--purple)}
+.nbtn.on .niw{background:var(--pdim)}
+.niw{width:34px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:var(--t)}
+.nbtn:hover .niw{background:var(--pdim)}
+.nbtn .material-icons-round{font-size:21px}
+.nbtn .rdot{position:absolute;top:3px;right:calc(50% - 17px);width:6px;height:6px;border-radius:50%;background:var(--red);display:none}
+.nbtn .rdot.on{display:block}
+/* ── FAB ── */
+.fab{position:fixed;bottom:70px;right:max(16px,calc(50% - 215px + 16px));width:52px;height:52px;border-radius:18px;background:var(--gm);border:none;color:#fff;cursor:pointer;box-shadow:0 8px 28px rgba(139,127,255,.5);display:flex;align-items:center;justify-content:center;z-index:250;transition:var(--ts)}
+.fab:hover{transform:scale(1.1) translateY(-2px);box-shadow:0 14px 36px rgba(139,127,255,.6)}
+.fab:active{transform:scale(.94)}
+.fab .material-icons-round{font-size:26px}
+/* ── CARDS ── */
+.card{background:var(--card);border:1px solid var(--bdr);border-radius:var(--r1);backdrop-filter:blur(10px);overflow:hidden}
+.cp{padding:17px}
+/* ── HERO CARD ── */
+.hero{background:var(--gm);border-radius:var(--r1);padding:20px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-40px;right:-40px;width:130px;height:130px;background:rgba(255,255,255,.1);border-radius:50%}
+.hero::after{content:'';position:absolute;bottom:-25px;left:25px;width:85px;height:85px;background:rgba(255,255,255,.06);border-radius:50%}
+.hero .hl{font-size:11px;font-weight:600;color:rgba(255,255,255,.75);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
+.hero .ha{font-family:'Outfit',sans-serif;font-size:40px;font-weight:900;color:#fff;line-height:1;position:relative;z-index:1}
+.hero .hs{font-size:12px;color:rgba(255,255,255,.65);margin-top:3px}
+.hero-row{display:flex;gap:8px;margin-top:16px;position:relative;z-index:1}
+.hstat{flex:1;background:rgba(255,255,255,.17);border-radius:13px;padding:9px 11px}
+.hstat .sl{font-size:9px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.4px}
+.hstat .sv{font-family:'Outfit',sans-serif;font-size:15px;font-weight:800;color:#fff;margin-top:2px}
+.lstrip{position:relative;z-index:1;margin-top:13px}
+.lrow{display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.75);margin-bottom:5px}
+.ltrack{height:5px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden}
+.lfill{height:100%;border-radius:3px;background:rgba(255,255,255,.9);transition:width .7s ease}
+.lfill.over{background:#ffdd57}
+/* ── STAT MINIS ── */
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.smini{background:var(--card);border:1px solid var(--bdr);border-radius:var(--r2);padding:14px;transition:var(--t)}
+.smini:hover{border-color:var(--bdr-h)}
+.smini .ico{width:33px;height:33px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:9px}
+.smini .ico .material-icons-round{font-size:17px}
+.smini .lbl{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.smini .val{font-family:'Outfit',sans-serif;font-size:20px;font-weight:800;margin-top:3px;line-height:1}
+.smini.inc{border-color:rgba(77,255,184,.15)}.smini.inc .ico{background:var(--gdim)}.smini.inc .ico .material-icons-round{color:var(--green)}.smini.inc .val{color:var(--green)}
+.smini.sav .ico{background:var(--bdim)}.smini.sav .ico .material-icons-round{color:var(--blue)}.smini.sav .val{color:var(--blue)}
+/* ── SECTION HEADER ── */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
+.sh h2{font-family:'Outfit',sans-serif;font-size:16px;font-weight:800}
+.sh .sa{font-size:11px;font-weight:700;color:var(--purple);cursor:pointer}
+/* ── CATEGORY ROW ── */
+.clist{display:flex;flex-direction:column;gap:7px}
+.crow{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--card);border:1px solid var(--bdr);border-radius:var(--r3);transition:var(--t)}
+.crow:hover{border-color:var(--bdr-h);background:var(--card-h)}
+.crow .ci{width:30px;height:30px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.crow .ci .material-icons-round{font-size:14px}
+.crow .cm{flex:1;min-width:0}
+.crow .cn{font-size:12px;font-weight:700}
+.cpbar{height:3px;background:var(--bdr);border-radius:2px;overflow:hidden;margin-top:4px}
+.cpfill{height:100%;border-radius:2px;transition:width .8s ease}
+.crow .cp2{font-size:10px;color:var(--txt3);font-weight:600}
+.crow .ca{font-family:'Outfit',sans-serif;font-size:13px;font-weight:800}
+/* ── TRANSACTION ── */
+.tlist{display:flex;flex-direction:column;gap:7px}
+.txn{background:var(--card);border:1px solid var(--bdr);border-radius:var(--r2);padding:12px 13px;display:flex;align-items:center;gap:10px;transition:var(--t);position:relative;overflow:hidden}
+.txn::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;opacity:0;transition:var(--t)}
+.txn:hover{border-color:var(--bdr-h);background:var(--card-h);transform:translateX(2px)}
 .txn:hover::before{opacity:1}
-.txn.exp::before{background:var(--red)}
-.txn.inc::before{background:var(--green)}
-.txn-ico{width:42px;height:42px;border-radius:13px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
-.txn-ico .material-icons-round{font-size:19px}
-.txn-body{flex:1;min-width:0}
-.txn-body .t-cat{font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.txn-body .t-note{font-size:11px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
-.txn-body .t-time{font-size:10px;color:var(--text-muted);margin-top:1px}
-.txn-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
-.txn-right .t-amt{font-family:'Outfit',sans-serif;font-size:16px;font-weight:900;white-space:nowrap}
-.txn-right .t-amt.exp{color:var(--red)}
-.txn-right .t-amt.inc{color:var(--green)}
-.txn-actions-row{display:flex;gap:4px}
-.ta-btn{width:26px;height:26px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--t)}
-.ta-btn .material-icons-round{font-size:13px}
-.ta-btn:hover.edit{color:var(--blue);border-color:var(--blue);background:var(--blue-dim)}
-.ta-btn:hover.del{color:var(--red);border-color:var(--red);background:var(--red-dim)}
-.ta-btn:hover.wa{color:var(--green);border-color:var(--green);background:var(--green-dim)}
-
-/* PAY TAG */
-.pay-tag{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:5px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
-.pay-tag.cash{background:var(--green-dim);color:var(--green)}
-.pay-tag.upi{background:var(--blue-dim);color:var(--blue)}
-.pay-tag.card{background:var(--orange-dim);color:var(--orange)}
-.pay-tag.income-tag{background:var(--green-dim);color:var(--green)}
-
-/* EMPTY */
-.empty{text-align:center;padding:44px 20px;color:var(--text-muted)}
-.empty .material-icons-round{font-size:52px;display:block;margin-bottom:10px;opacity:.25}
-.empty h3{font-size:15px;font-weight:700;margin-bottom:5px}
-.empty p{font-size:12px;opacity:.7}
-
-/* MODAL */
-.overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
-.overlay.open{opacity:1;pointer-events:all}
-.modal{width:100%;max-width:430px;background:var(--bg-secondary);border-radius:28px 28px 0 0;border:1px solid var(--border);border-bottom:none;max-height:93svh;overflow-y:auto;transform:translateY(100%);transition:transform .4s cubic-bezier(.32,.72,0,1);padding-bottom:max(20px,env(safe-area-inset-bottom))}
-.overlay.open .modal{transform:translateY(0)}
-.m-handle{width:38px;height:4px;background:var(--border);border-radius:2px;margin:11px auto 0}
-.m-header{padding:14px 18px 12px;display:flex;align-items:center;justify-content:space-between}
-.m-header h2{font-family:'Outfit',sans-serif;font-size:21px;font-weight:900}
-.m-close{width:32px;height:32px;border-radius:9px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--t)}
-.m-close:hover{background:var(--red-dim);border-color:var(--red);color:var(--red)}
-.m-close .material-icons-round{font-size:16px}
-.m-body{padding:0 18px}
-
-/* FORM */
-.type-toggle{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px}
-.tt-btn{padding:11px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--bg-card);color:var(--text-muted);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:var(--t);display:flex;align-items:center;justify-content:center;gap:6px}
-.tt-btn .material-icons-round{font-size:16px}
-.tt-btn.act-exp{background:var(--red-dim);border-color:var(--red);color:var(--red)}
-.tt-btn.act-inc{background:var(--green-dim);border-color:var(--green);color:var(--green)}
-.fg{margin-bottom:15px}
-.fl{display:block;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
-.fi,.fs,.fta{width:100%;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-md);padding:12px 14px;color:var(--text-primary);font-family:inherit;font-size:14px;outline:none;transition:var(--t);-webkit-appearance:none}
+.txn.ex::before{background:var(--red)}.txn.in::before{background:var(--green)}
+.tico{width:40px;height:40px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.tico .material-icons-round{font-size:18px}
+.tbody{flex:1;min-width:0}
+.tbody .tc{font-size:13px;font-weight:700;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.tbody .tn{font-size:11px;color:var(--txt3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.tbody .tt{font-size:10px;color:var(--txt3);margin-top:1px}
+.tright{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.tamt{font-family:'Outfit',sans-serif;font-size:16px;font-weight:900;white-space:nowrap}
+.tamt.ex{color:var(--red)}.tamt.in{color:var(--green)}
+.tacts{display:flex;gap:3px}
+.tabtn{width:26px;height:26px;border-radius:7px;border:1px solid var(--bdr);background:transparent;color:var(--txt3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--t)}
+.tabtn .material-icons-round{font-size:13px}
+.tabtn:hover.ed{color:var(--blue);border-color:var(--blue);background:var(--bdim)}
+.tabtn:hover.dl{color:var(--red);border-color:var(--red);background:var(--rdim)}
+.tabtn:hover.wa{color:var(--green);border-color:var(--green);background:var(--gdim)}
+/* ── TAGS ── */
+.tag{display:inline-flex;align-items:center;padding:2px 7px;border-radius:5px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
+.tag.cash{background:var(--gdim);color:var(--green)}.tag.upi{background:var(--bdim);color:var(--blue)}.tag.card{background:var(--odim);color:var(--orange)}.tag.income-tag{background:var(--gdim);color:var(--green)}
+/* ── EMPTY STATE ── */
+.empty{text-align:center;padding:44px 20px;color:var(--txt3)}
+.empty .material-icons-round{font-size:52px;display:block;margin-bottom:10px;opacity:.2}
+.empty h3{font-size:15px;font-weight:700;margin-bottom:5px;color:var(--txt2)}
+.empty p{font-size:12px}
+/* ── MODAL ── */
+.ov{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.78);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.ov.open{opacity:1;pointer-events:all}
+.modal{width:100%;max-width:430px;background:var(--bg2);border-radius:26px 26px 0 0;border:1px solid var(--bdr);border-bottom:none;max-height:92svh;overflow-y:auto;transform:translateY(100%);transition:transform .38s cubic-bezier(.32,.72,0,1);padding-bottom:max(18px,env(safe-area-inset-bottom))}
+.ov.open .modal{transform:translateY(0)}
+.mhdl{width:36px;height:4px;background:var(--bdr);border-radius:2px;margin:10px auto 0}
+.mhdr{padding:13px 17px 11px;display:flex;align-items:center;justify-content:space-between}
+.mhdr h2{font-family:'Outfit',sans-serif;font-size:20px;font-weight:900}
+.mcls{width:31px;height:31px;border-radius:8px;border:1px solid var(--bdr);background:var(--card);color:var(--txt2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--t)}
+.mcls:hover{background:var(--rdim);border-color:var(--red);color:var(--red)}
+.mcls .material-icons-round{font-size:15px}
+.mbody{padding:0 17px}
+/* ── FORM ELEMENTS ── */
+.tg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.tbtn{padding:10px;border-radius:var(--r3);border:1px solid var(--bdr);background:var(--card);color:var(--txt3);font-size:13px;font-weight:700;cursor:pointer;transition:var(--t);display:flex;align-items:center;justify-content:center;gap:5px}
+.tbtn .material-icons-round{font-size:15px}
+.tbtn.ae{background:var(--rdim);border-color:var(--red);color:var(--red)}
+.tbtn.ai{background:var(--gdim);border-color:var(--green);color:var(--green)}
+.fg{margin-bottom:14px}
+.fl{display:block;font-size:11px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px}
+.fi,.fs,.fta{width:100%;background:var(--card);border:1px solid var(--bdr);border-radius:var(--r3);padding:11px 13px;color:var(--txt);font-size:14px;outline:none;transition:var(--t);-webkit-appearance:none;appearance:none}
 .fi:focus,.fs:focus,.fta:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(139,127,255,.12)}
-.fs{cursor:pointer}
-.fta{resize:none;min-height:76px}
-.frow{display:grid;grid-template-columns:1fr 1fr;gap:11px}
-.amt-wrap{position:relative}
-.amt-prefix{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Outfit',sans-serif;font-size:24px;font-weight:800;color:var(--purple);pointer-events:none}
-.amt-fi{width:100%;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 14px 16px 38px;color:var(--text-primary);font-family:'Outfit',sans-serif;font-size:32px;font-weight:900;outline:none;transition:var(--t)}
-.amt-fi:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(139,127,255,.12)}
-.amt-fi::placeholder{color:var(--text-muted);font-weight:400}
-.cat-chips-wrap{display:flex;flex-wrap:wrap;gap:7px}
-.cc{padding:7px 12px;border-radius:20px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-muted);font-size:11px;font-weight:700;cursor:pointer;transition:var(--t);display:flex;align-items:center;gap:4px}
-.cc:hover{border-color:var(--purple);color:var(--purple)}
-.cc.sel{background:var(--purple-dim);border-color:var(--purple);color:var(--purple)}
+.fta{resize:none;min-height:72px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.awrap{position:relative}
+.apfx{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-family:'Outfit',sans-serif;font-size:22px;font-weight:800;color:var(--purple);pointer-events:none}
+.afi{width:100%;background:var(--card);border:1px solid var(--bdr);border-radius:var(--r2);padding:15px 13px 15px 36px;color:var(--txt);font-family:'Outfit',sans-serif;font-size:30px;font-weight:900;outline:none;transition:var(--t)}
+.afi:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(139,127,255,.12)}
+.afi::placeholder{color:var(--txt3);font-weight:400}
+/* chips */
+.cwrap{display:flex;flex-wrap:wrap;gap:6px}
+.cc{padding:6px 11px;border-radius:18px;border:1px solid var(--bdr);background:var(--card);color:var(--txt3);font-size:11px;font-weight:700;cursor:pointer;transition:var(--t);display:flex;align-items:center;gap:4px}
 .cc .material-icons-round{font-size:13px}
-.pay-chips-wrap{display:flex;gap:8px}
-.pc{flex:1;padding:10px 6px;border-radius:var(--r-md);text-align:center;border:1px solid var(--border);background:var(--bg-card);color:var(--text-muted);font-size:11px;font-weight:700;cursor:pointer;transition:var(--t)}
-.pc.sel{background:var(--blue-dim);border-color:var(--blue);color:var(--blue)}
-.sub-btn{width:100%;padding:15px;background:var(--grad-main);border:none;border-radius:var(--r-lg);color:#fff;font-family:'Outfit',sans-serif;font-size:16px;font-weight:800;cursor:pointer;transition:var(--t);margin-top:6px;box-shadow:0 8px 28px rgba(139,127,255,.4);letter-spacing:.3px}
-.sub-btn:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(139,127,255,.55)}
-.sub-btn:active{transform:translateY(0)}
-.mb12{margin-bottom:12px}
-.sub-btn.danger{background:var(--grad-expense);box-shadow:0 8px 28px rgba(255,95,126,.3)}
-
-/* SEARCH + FILTERS */
-.search-wrap{position:relative}
-.search-wrap .material-icons-round{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:17px;pointer-events:none}
-.search-bar{width:100%;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-md);padding:11px 13px 11px 38px;color:var(--text-primary);font-family:inherit;font-size:13px;outline:none;transition:var(--t)}
-.search-bar:focus{border-color:var(--purple)}
-.filter-scroll{display:flex;gap:7px;overflow-x:auto;padding-bottom:3px}
-.filter-scroll::-webkit-scrollbar{display:none}
-.fc{padding:6px 13px;border-radius:18px;white-space:nowrap;flex-shrink:0;border:1px solid var(--border);background:var(--bg-card);color:var(--text-muted);font-size:11px;font-weight:700;cursor:pointer;transition:var(--t)}
-.fc.on{background:var(--purple-dim);border-color:var(--purple);color:var(--purple)}
-.date-row{display:flex;gap:8px;align-items:center}
-.date-row .fi{flex:1;padding:10px 12px;font-size:12px}
-.clr-btn{padding:10px 14px;border-radius:var(--r-md);background:var(--bg-card);border:1px solid var(--border);color:var(--text-secondary);font-size:12px;font-weight:700;cursor:pointer;transition:var(--t);white-space:nowrap}
-.clr-btn:hover{border-color:var(--purple);color:var(--purple)}
-.day-group{margin-bottom:16px}
-.day-label{display:flex;justify-content:space-between;align-items:center;padding:0 2px;margin-bottom:8px}
-.day-label .dl{font-size:12px;font-weight:700;color:var(--text-secondary)}
-.day-label .dr{font-family:'Outfit',sans-serif;font-size:13px;font-weight:800;color:var(--red)}
-
-/* REPORTS */
-.month-nav-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-lg)}
-.mnb-btn{background:var(--bg-card);border:1px solid var(--border);color:var(--text-primary);border-radius:var(--r-sm);padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;transition:var(--t)}
-.mnb-btn:hover{background:var(--purple-dim);border-color:var(--purple)}
-.mnb-title{font-family:'Outfit',sans-serif;font-size:16px;font-weight:800}
-.chart-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-xl);padding:18px}
-.chart-card h3{font-family:'Outfit',sans-serif;font-size:14px;font-weight:800;margin-bottom:16px;color:var(--text-secondary)}
-.chart-box{position:relative;height:195px}
-.exp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.exp-btn{padding:13px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--bg-card);color:var(--text-primary);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:var(--t);display:flex;align-items:center;justify-content:center;gap:7px}
-.exp-btn:hover{background:var(--purple-dim);border-color:var(--purple)}
-.exp-btn .material-icons-round{font-size:17px;color:var(--purple)}
-
-/* SETTINGS */
-.sg-title{font-size:10px;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin:6px 2px 8px}
-.sitem{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-lg);padding:13px 15px;display:flex;align-items:center;gap:13px;transition:var(--t);cursor:pointer;margin-bottom:8px}
-.sitem:hover{border-color:var(--border-hover);background:var(--bg-card-hover)}
-.s-ico{width:38px;height:38px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
-.s-ico .material-icons-round{font-size:18px}
-.s-info{flex:1}
-.s-info h4{font-size:13px;font-weight:700}
-.s-info p{font-size:11px;color:var(--text-muted);margin-top:2px}
-.s-chevron{color:var(--text-muted);font-size:17px}
-.tgl-sw{width:44px;height:24px;border-radius:12px;flex-shrink:0;background:var(--border);border:none;cursor:pointer;position:relative;transition:var(--t)}
-.tgl-sw.on{background:var(--purple)}
-.tgl-sw::after{content:'';position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.3);transition:var(--t)}
-.tgl-sw.on::after{transform:translateX(20px)}
-.limit-form,.budget-form-section{padding:13px 15px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-lg);margin-bottom:8px}
-.limit-input-row{display:flex;gap:8px;align-items:center}
-.lim-inp{flex:1;background:var(--bg-secondary);border:1px solid var(--border);border-radius:10px;padding:10px 13px;color:var(--text-primary);font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;outline:none;transition:var(--t)}
-.lim-inp:focus{border-color:var(--purple)}
-.sav-btn{padding:10px 16px;background:var(--grad-main);border:none;border-radius:10px;color:#fff;font-family:'Outfit',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:var(--t)}
-.sav-btn:hover{transform:scale(1.05)}
-
-/* GOAL CARDS */
-.goal-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px;margin-bottom:8px}
-.goal-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.goal-name-t{font-size:13px;font-weight:700}
-.goal-amts{font-size:11px;color:var(--text-muted)}
-.goal-bar-t{height:7px;background:var(--border);border-radius:4px;overflow:hidden}
-.goal-fill-t{height:100%;background:var(--grad-income);border-radius:4px;transition:width .8s ease}
-.goal-pct-t{font-size:11px;color:var(--blue);font-weight:700;margin-top:5px}
-.goal-del-btn{width:26px;height:26px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--t)}
-.goal-del-btn:hover{color:var(--red);border-color:var(--red);background:var(--red-dim)}
-.goal-del-btn .material-icons-round{font-size:13px}
-.add-goal-btn{width:100%;padding:12px;background:var(--bg-card);border:1px dashed var(--border);border-radius:var(--r-lg);color:var(--text-muted);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:var(--t);display:flex;align-items:center;justify-content:center;gap:7px;margin-top:4px}
-.add-goal-btn:hover{border-color:var(--purple);color:var(--purple);background:var(--purple-dim)}
-
-/* ===== BILL REMINDER STYLES ===== */
-.bill-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px 16px;display:flex;align-items:center;gap:12px;transition:var(--t);margin-bottom:8px;position:relative;overflow:hidden}
-.bill-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:0 4px 4px 0}
-.bill-card.due-today::before{background:var(--red)}
-.bill-card.due-soon::before{background:var(--orange)}
-.bill-card.upcoming::before{background:var(--purple)}
-.bill-card:hover{border-color:var(--border-hover);background:var(--bg-card-hover)}
-.bill-ico{width:40px;height:40px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
-.bill-ico .material-icons-round{font-size:18px}
-.bill-info{flex:1;min-width:0}
-.bill-info .b-name{font-size:13px;font-weight:700}
-.bill-info .b-due{font-size:11px;color:var(--text-muted);margin-top:2px}
-.bill-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
-.bill-amt{font-family:'Outfit',sans-serif;font-size:15px;font-weight:800}
-.bill-status{font-size:9px;font-weight:700;padding:3px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:.4px}
-.bill-status.today{background:var(--red-dim);color:var(--red)}
-.bill-status.soon{background:var(--orange-dim);color:var(--orange)}
-.bill-status.ok{background:var(--green-dim);color:var(--green)}
-.bill-status.paid{background:rgba(100,100,100,.15);color:var(--text-muted)}
-.bill-actions{display:flex;gap:4px}
-.bill-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:8px;font-size:10px;font-weight:700;background:var(--red-dim);color:var(--red);border:1px solid rgba(255,95,126,.2)}
-
-/* ===== EMI TRACKER STYLES ===== */
-.emi-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;margin-bottom:8px;transition:var(--t)}
-.emi-card:hover{border-color:var(--border-hover);background:var(--bg-card-hover)}
-.emi-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-.emi-ico{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.emi-ico .material-icons-round{font-size:18px;color:#fff}
-.emi-title{flex:1}
-.emi-title .e-name{font-size:13px;font-weight:700}
-.emi-title .e-bank{font-size:11px;color:var(--text-muted);margin-top:1px}
-.emi-title .e-emi-amt{font-family:'Outfit',sans-serif;font-size:15px;font-weight:800;color:var(--orange)}
-.emi-progress{margin-bottom:8px}
-.emi-prog-bar{height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:5px}
-.emi-prog-fill{height:100%;background:var(--grad-main);border-radius:4px;transition:width .8s ease}
-.emi-prog-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);font-weight:600}
-.emi-bottom{display:flex;gap:8px;flex-wrap:wrap}
-.emi-tag{padding:4px 10px;border-radius:8px;font-size:10px;font-weight:700;background:var(--bg-secondary);border:1px solid var(--border)}
-
-/* ===== BUDGET PLANNER STYLES ===== */
-.budget-month-summary{background:var(--grad-warn);border-radius:var(--r-xl);padding:20px;position:relative;overflow:hidden;margin-bottom:0}
-.budget-month-summary::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:rgba(255,255,255,.1);border-radius:50%}
-.bms-label{font-size:11px;font-weight:600;color:rgba(255,255,255,.8);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
-.bms-amt{font-family:'Outfit',sans-serif;font-size:36px;font-weight:900;color:#fff;line-height:1}
-.bms-sub{font-size:11px;color:rgba(255,255,255,.7);margin-top:4px}
-.bms-grid{display:flex;gap:10px;margin-top:14px;position:relative;z-index:1}
-.bms-item{flex:1;background:rgba(255,255,255,.18);border-radius:12px;padding:9px 11px;backdrop-filter:blur(8px)}
-.bms-item .bi-label{font-size:9px;color:rgba(255,255,255,.75);text-transform:uppercase;letter-spacing:.4px}
-.bms-item .bi-val{font-family:'Outfit',sans-serif;font-size:15px;font-weight:800;color:#fff;margin-top:2px}
-
-.budget-cat-list{display:flex;flex-direction:column;gap:8px}
-.budget-cat-item{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-md);padding:13px 15px;transition:var(--t)}
-.budget-cat-item:hover{border-color:var(--border-hover)}
-.bci-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.bci-ico{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.bci-ico .material-icons-round{font-size:14px}
-.bci-name{flex:1;font-size:12px;font-weight:700}
-.bci-pct{font-size:10px;font-weight:700;color:var(--text-muted)}
-.bci-amounts{display:flex;justify-content:space-between;font-size:11px;margin-bottom:6px}
-.bci-spent{font-weight:700}
-.bci-budget{color:var(--text-muted)}
-.bci-bar{height:5px;background:var(--border);border-radius:3px;overflow:hidden}
-.bci-fill{height:100%;border-radius:3px;transition:width .8s ease}
-.bci-fill.safe{background:var(--green)}
-.bci-fill.warn{background:var(--orange)}
-.bci-fill.over{background:var(--red)}
-.bci-edit{font-size:10px;font-weight:700;color:var(--purple);cursor:pointer;white-space:nowrap}
-
-/* INSTALL BANNER */
-.install-banner{background:linear-gradient(135deg,rgba(139,127,255,.12),rgba(77,184,255,.08));border:1px solid rgba(139,127,255,.25);border-radius:var(--r-lg);padding:12px 14px;display:flex;align-items:center;gap:11px}
-.install-banner .material-icons-round{color:var(--purple);font-size:22px;flex-shrink:0}
-.ib-info{flex:1}
-.ib-info h4{font-size:12px;font-weight:800}
-.ib-info p{font-size:10px;color:var(--text-muted);margin-top:1px}
-.ib-btn{padding:7px 13px;background:var(--purple);border:none;border-radius:9px;color:#fff;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;transition:var(--t)}
-.ib-btn:hover{transform:scale(1.05)}
-
-/* TOAST */
-.toast{position:fixed;top:74px;left:50%;transform:translateX(-50%) translateY(-120px);z-index:1000;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--r-md);padding:11px 18px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:8px;transition:transform .35s cubic-bezier(.34,1.56,.64,1);box-shadow:var(--shadow);max-width:320px;white-space:nowrap}
-.toast.show{transform:translateX(-50%) translateY(0)}
-.toast.ok{border-color:rgba(77,255,184,.35);color:var(--green)}
-.toast.err{border-color:rgba(255,95,126,.35);color:var(--red)}
-.toast.warn{border-color:rgba(255,170,77,.35);color:var(--orange)}
-.toast .material-icons-round{font-size:16px}
-
-/* FINGERPRINT */
-#lockScreen{position:fixed;inset:0;z-index:9999;background:var(--bg-primary);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:36px 28px}
-.lock-logo{font-family:'Outfit',sans-serif;font-size:28px;font-weight:900;background:var(--grad-main);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.lock-sub{font-size:12px;color:var(--text-muted);margin-top:-14px}
-.lock-methods{display:flex;flex-direction:column;align-items:center;gap:16px;width:100%;max-width:280px}
-.fp-btn{width:80px;height:80px;border-radius:50%;background:var(--purple-dim);border:2px solid var(--purple);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--ts);position:relative}
-.fp-btn:hover{transform:scale(1.08);box-shadow:0 0 30px rgba(139,127,255,.4)}
-.fp-btn .material-icons-round{font-size:38px;color:var(--purple)}
-.fp-btn.scanning{animation:fpPulse 1s infinite}
-@keyframes fpPulse{0%,100%{box-shadow:0 0 0 0 rgba(139,127,255,.4)}50%{box-shadow:0 0 0 20px rgba(139,127,255,0)}}
-.fp-label{font-size:12px;color:var(--text-muted);text-align:center}
-.lock-or{font-size:11px;color:var(--text-muted);position:relative;width:100%;text-align:center}
-.lock-or::before,.lock-or::after{content:'';position:absolute;top:50%;width:38%;height:1px;background:var(--border)}
-.lock-or::before{left:0}
-.lock-or::after{right:0}
-.pin-row{display:flex;gap:14px;margin:4px 0}
-.pd{width:14px;height:14px;border-radius:50%;border:2px solid var(--purple);background:transparent;transition:var(--t)}
-.pd.filled{background:var(--purple);box-shadow:0 0 12px rgba(139,127,255,.6)}
-.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;width:230px}
-.nb{aspect-ratio:1;border-radius:50%;background:var(--bg-card);border:1px solid var(--border);color:var(--text-primary);font-family:'Outfit',sans-serif;font-size:22px;font-weight:800;cursor:pointer;transition:var(--ts);display:flex;align-items:center;justify-content:center}
-.nb:hover{background:var(--purple-dim);border-color:var(--purple);color:var(--purple)}
+.cc:hover{border-color:var(--purple);color:var(--purple)}
+.cc.sel{background:var(--pdim);border-color:var(--purple);color:var(--purple)}
+.pwrap{display:flex;gap:8px}
+.pc{flex:1;padding:9px 4px;border-radius:var(--r3);text-align:center;border:1px solid var(--bdr);background:var(--card);color:var(--txt3);font-size:11px;font-weight:700;cursor:pointer;transition:var(--t)}
+.pc.sel{background:var(--bdim);border-color:var(--blue);color:var(--blue)}
+/* submit btn */
+.sbtn{width:100%;padding:14px;background:var(--gm);border:none;border-radius:var(--r2);color:#fff;font-family:'Outfit',sans-serif;font-size:16px;font-weight:800;cursor:pointer;transition:var(--t);margin-top:5px;box-shadow:0 8px 28px rgba(139,127,255,.4);letter-spacing:.3px}
+.sbtn:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(139,127,255,.55)}
+.sbtn:active{transform:translateY(0)}
+.sbtn.dng{background:var(--ge);box-shadow:0 8px 24px rgba(255,95,126,.3)}
+.sbtn.grn{background:linear-gradient(135deg,#25D366,#128C7E)}
+.mb{margin-bottom:12px}
+/* ── HISTORY ── */
+.swrap{position:relative}
+.swrap .material-icons-round{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--txt3);font-size:17px;pointer-events:none}
+.sbar{width:100%;background:var(--card);border:1px solid var(--bdr);border-radius:var(--r3);padding:10px 12px 10px 36px;color:var(--txt);font-size:13px;outline:none;transition:var(--t)}
+.sbar:focus{border-color:var(--purple)}
+.fscroll{display:flex;gap:6px;overflow-x:auto;padding-bottom:3px;-webkit-overflow-scrolling:touch}
+.fscroll::-webkit-scrollbar{display:none}
+.fc{padding:6px 12px;border-radius:16px;white-space:nowrap;flex-shrink:0;border:1px solid var(--bdr);background:var(--card);color:var(--txt3);font-size:11px;font-weight:700;cursor:pointer;transition:var(--t)}
+.fc.on{background:var(--pdim);border-color:var(--purple);color:var(--purple)}
+.drow{display:flex;gap:8px;align-items:center}
+.drow .fi{flex:1;padding:9px 11px;font-size:12px}
+.cbtn{padding:9px 13px;border-radius:var(--r3);background:var(--card);border:1px solid var(--bdr);color:var(--txt2);font-size:12px;font-weight:700;cursor:pointer;transition:var(--t);white-space:nowrap}
+.cbtn:hover{border-color:var(--purple);color:var(--purple)}
+.dgrp{margin-bottom:14px}
+.dlbl{display:flex;justify-content:space-between;padding:0 2px;margin-bottom:7px}
+.dlbl .dl{font-size:12px;font-weight:700;color:var(--txt2)}
+.dlbl .dr{font-family:'Outfit',sans-serif;font-size:13px;font-weight:800;color:var(--red)}
+/* ── REPORTS ── */
+.mnav{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;background:var(--card);border:1px solid var(--bdr);border-radius:var(--r2)}
+.mbtn{background:var(--card);border:1px solid var(--bdr);color:var(--txt);border-radius:var(--r4);padding:6px 13px;font-size:12px;font-weight:700;cursor:pointer;transition:var(--t)}
+.mbtn:hover{background:var(--pdim);border-color:var(--purple);color:var(--purple)}
+.mtit{font-family:'Outfit',sans-serif;font-size:15px;font-weight:800}
+.ccard{background:var(--card);border:1px solid var(--bdr);border-radius:var(--r1);padding:17px}
+.ccard h3{font-family:'Outfit',sans-serif;font-size:14px;font-weight:800;margin-bottom:14px;color:var(--txt2)}
+.cbox{position:relative;height:190px}
+.egrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ebtn{padding:12px;border-radius:var(--r3);border:1px solid var(--bdr);background:var(--card);color:var(--txt);font-size:12px;font-weight:700;cursor:pointer;transition:var(--t);display:flex;align-items:center;justify-content:center;gap:7px}
+.ebtn:hover{background:var(--pdim);border-color:var(--purple)}
+.ebtn .material-icons-round{font-size:17px;color:var(--purple)}
+/* ── BILLS ── */
+.bcard{background:var(--card);border:1px solid var(--bdr);border-radius:var(--r2);padding:13px 14px;display:flex;align-items:center;gap:11px;transition:var(--t);margin-bottom:7px;position:relative;overflow:hidden}
+.bcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px}
+.bcard.dt::before{background:var(--red)}.bcard.ds::before{background:var(--orange)}.bcard.uc::before{background:var(--purple)}
+.bcard:hover{border-color:var(--bdr-h);background:var(--card-h)}
+.bico{width:38px;height:38px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.bico .material-icons-round{font-size:18px}
+.binfo{flex:1;min-width:0}
+.binfo .bn{font-size:13px;font-weight:700}
+.binfo .bd{font-size:11px;color:var(--txt3);margin-top:2px}
+.bright{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.bamt{font-family:'Outfit',sans-serif;font-size:15px;font-weight:800}
+.bst{font-size:9px;font-weight:700;padding:3px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:.3px}
+.bst.tod{background:var(--rdim);color:var(--red)}.bst.sn{background:var(--odim);color:var(--orange)}.bst.ok{background:var(--gdim);color:var(--green)}.bst.pd{background:rgba(100,100,100,.15);color:var(--txt3)}
+.bacts{display:flex;gap:3px;margin-top:2px}
+/* ── EMI ── */
+.ecard{background:var(--card);border:1px solid var(--bdr);border-radius:var(--r2);padding:15px;margin-bottom:8px;transition:var(--t)}
+.ecard:hover{border-color:var(--bdr-h)}
+.etop{display:flex;align-items:center;gap:11px;margin-bottom:11px}
+.eico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.eico .material-icons-round{font-size:17px;color:#fff}
+.etit{flex:1;min-width:0}
+.etit .en{font-size:13px;font-weight:700}
+.etit .eb{font-size:11px;color:var(--txt3);margin-top:1px}
+.etit .ea{font-family:'Outfit',sans-serif;font-size:15px;font-weight:800;color:var(--orange)}
+.epbar{height:8px;background:var(--bdr);border-radius:4px;overflow:hidden;margin-bottom:5px}
+.epfill{height:100%;background:var(--gm);border-radius:4px;transition:width .8s ease}
+.eplbl{display:flex;justify-content:space-between;font-size:10px;color:var(--txt3);font-weight:600}
+.etags{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+.etag{padding:4px 9px;border-radius:7px;font-size:10px;font-weight:700;background:var(--bg2);border:1px solid var(--bdr)}
+/* ── BUDGET ── */
+.bhero{background:var(--gw);border-radius:var(--r1);padding:19px;position:relative;overflow:hidden}
+.bhero::before{content:'';position:absolute;top:-30px;right:-30px;width:110px;height:110px;background:rgba(255,255,255,.1);border-radius:50%}
+.bhl{font-size:11px;font-weight:600;color:rgba(255,255,255,.8);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.bha{font-family:'Outfit',sans-serif;font-size:35px;font-weight:900;color:#fff;line-height:1}
+.bhs{font-size:11px;color:rgba(255,255,255,.7);margin-top:3px}
+.bhrow{display:flex;gap:8px;margin-top:13px;position:relative;z-index:1}
+.bhitem{flex:1;background:rgba(255,255,255,.18);border-radius:11px;padding:8px 10px}
+.bhitem .bi{font-size:9px;color:rgba(255,255,255,.75);text-transform:uppercase;letter-spacing:.4px}
+.bhitem .bv{font-family:'Outfit',sans-serif;font-size:15px;font-weight:800;color:#fff;margin-top:2px}
+.bclist{display:flex;flex-direction:column;gap:8px}
+.bcitem{background:var(--card);border:1px solid var(--bdr);border-radius:var(--r3);padding:12px 14px;transition:var(--t)}
+.bcitem:hover{border-color:var(--bdr-h)}
+.bctop{display:flex;align-items:center;gap:9px;margin-bottom:7px}
+.bcico{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.bcico .material-icons-round{font-size:13px}
+.bcn{flex:1;font-size:12px;font-weight:700}
+.bcp{font-size:10px;font-weight:700;color:var(--txt3)}
+.bcamts{display:flex;justify-content:space-between;font-size:11px;margin-bottom:6px}
+.bcsp{font-weight:700}.bcbg{color:var(--txt3)}
+.bcbar{height:5px;background:var(--bdr);border-radius:3px;overflow:hidden}
+.bcfill{height:100%;border-radius:3px;transition:width .8s ease}
+.bcfill.sf{background:var(--green)}.bcfill.wn{background:var(--orange)}.bcfill.ov{background:var(--red)}
+/* ── SETTINGS ── */
+.sgt{font-size:10px;font-weight:800;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;margin:4px 2px 7px}
+.si{background:var(--card);border:1px solid var(--bdr);border-radius:var(--r2);padding:12px 14px;display:flex;align-items:center;gap:12px;transition:var(--t);cursor:pointer;margin-bottom:7px}
+.si:hover{border-color:var(--bdr-h);background:var(--card-h)}
+.sico{width:37px;height:37px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.sico .material-icons-round{font-size:18px}
+.sinf{flex:1}.sinf h4{font-size:13px;font-weight:700}.sinf p{font-size:11px;color:var(--txt3);margin-top:2px}
+/* toggle */
+.tgl{width:43px;height:23px;border-radius:12px;flex-shrink:0;background:var(--bdr);border:none;cursor:pointer;position:relative;transition:var(--t)}
+.tgl.on{background:var(--purple)}
+.tgl::after{content:'';position:absolute;left:3px;top:3px;width:17px;height:17px;border-radius:50%;background:#fff;box-shadow:0 2px 5px rgba(0,0,0,.3);transition:var(--t)}
+.tgl.on::after{transform:translateX(20px)}
+.lform{padding:12px 14px;background:var(--card);border:1px solid var(--bdr);border-radius:var(--r2);margin-bottom:7px}
+.linrow{display:flex;gap:8px;align-items:center}
+.linp{flex:1;background:var(--bg2);border:1px solid var(--bdr);border-radius:10px;padding:9px 12px;color:var(--txt);font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;outline:none;transition:var(--t)}
+.linp:focus{border-color:var(--purple)}
+.svbtn{padding:9px 15px;background:var(--gm);border:none;border-radius:10px;color:#fff;font-family:'Outfit',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:var(--t)}
+.svbtn:hover{transform:scale(1.04)}
+/* goals */
+.gcard{background:var(--card);border:1px solid var(--bdr);border-radius:var(--r2);padding:13px;margin-bottom:7px}
+.gtop{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.gname{font-size:13px;font-weight:700}.gamts{font-size:11px;color:var(--txt3);margin-top:2px}
+.gbar{height:7px;background:var(--bdr);border-radius:4px;overflow:hidden}.gfill{height:100%;background:var(--gi);border-radius:4px;transition:width .8s ease}
+.gpct{font-size:11px;color:var(--blue);font-weight:700;margin-top:5px}
+.gdel{width:25px;height:25px;border-radius:7px;border:1px solid var(--bdr);background:transparent;color:var(--txt3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--t);flex-shrink:0}
+.gdel:hover{color:var(--red);border-color:var(--red);background:var(--rdim)}
+.gdel .material-icons-round{font-size:13px}
+.agbtn{width:100%;padding:11px;background:var(--card);border:1px dashed var(--bdr);border-radius:var(--r2);color:var(--txt3);font-size:13px;font-weight:700;cursor:pointer;transition:var(--t);display:flex;align-items:center;justify-content:center;gap:7px;margin-top:3px}
+.agbtn:hover{border-color:var(--purple);color:var(--purple);background:var(--pdim)}
+/* install banner */
+.ibanner{background:linear-gradient(135deg,rgba(139,127,255,.12),rgba(77,184,255,.08));border:1px solid rgba(139,127,255,.25);border-radius:var(--r2);padding:11px 13px;display:flex;align-items:center;gap:10px}
+.ibanner .material-icons-round{color:var(--purple);font-size:21px;flex-shrink:0}
+.ibinfo{flex:1}.ibinfo h4{font-size:12px;font-weight:800}.ibinfo p{font-size:10px;color:var(--txt3);margin-top:1px}
+.ibbtn{padding:7px 12px;background:var(--purple);border:none;border-radius:8px;color:#fff;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;transition:var(--t)}
+.ibbtn:hover{transform:scale(1.05)}
+/* WA preview */
+.wabox{background:#075E54;border-radius:14px;padding:14px;margin-bottom:13px}
+.wahdr{font-size:10px;color:rgba(255,255,255,.6);margin-bottom:7px;text-transform:uppercase;letter-spacing:.5px}
+.wamsg{background:#128C7E;border-radius:10px;padding:11px 13px;font-size:12px;color:#fff;line-height:1.65;white-space:pre-wrap;word-break:break-word}
+/* ── LOCK SCREEN ── */
+#lkscr{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:30px 24px}
+.lklogo{font-family:'Outfit',sans-serif;font-size:26px;font-weight:900;background:var(--gm);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.lksub{font-size:12px;color:var(--txt3);margin-top:-14px}
+.lkmeths{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:260px}
+.fpbtn{width:76px;height:76px;border-radius:50%;background:var(--pdim);border:2px solid var(--purple);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--ts)}
+.fpbtn:hover{transform:scale(1.08);box-shadow:0 0 28px rgba(139,127,255,.4)}
+.fpbtn .material-icons-round{font-size:36px;color:var(--purple)}
+.fpbtn.scanning{animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(139,127,255,.4)}50%{box-shadow:0 0 0 18px transparent}}
+.fplbl{font-size:12px;color:var(--txt3);text-align:center}
+.lkor{font-size:11px;color:var(--txt3);width:100%;text-align:center;position:relative}
+.lkor::before,.lkor::after{content:'';position:absolute;top:50%;width:36%;height:1px;background:var(--bdr)}
+.lkor::before{left:0}.lkor::after{right:0}
+.pdots{display:flex;gap:13px;margin:3px 0}
+.pd{width:13px;height:13px;border-radius:50%;border:2px solid var(--purple);background:transparent;transition:var(--t)}
+.pd.on{background:var(--purple);box-shadow:0 0 10px rgba(139,127,255,.6)}
+.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:220px}
+.nb{aspect-ratio:1;border-radius:50%;background:var(--card);border:1px solid var(--bdr);color:var(--txt);font-family:'Outfit',sans-serif;font-size:21px;font-weight:800;cursor:pointer;transition:var(--ts);display:flex;align-items:center;justify-content:center}
+.nb:hover{background:var(--pdim);border-color:var(--purple);color:var(--purple)}
 .nb:active{transform:scale(.88)}
-.pin-error{font-size:12px;color:var(--red);font-weight:700;height:16px}
-
-/* WHATSAPP SHARE PREVIEW */
-.wa-preview{background:#075E54;border-radius:16px;padding:16px;margin-bottom:14px}
-.wa-preview .wa-header{font-size:10px;color:rgba(255,255,255,.6);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
-.wa-preview .wa-msg{background:#128C7E;border-radius:12px;padding:12px 14px;font-size:13px;color:#fff;line-height:1.6;white-space:pre-wrap;word-break:break-word}
-
-input[type="date"],input[type="time"]{color-scheme:dark}
-[data-theme="light"] input[type="date"],[data-theme="light"] input[type="time"]{color-scheme:light}
+.pinerr{font-size:12px;color:var(--red);font-weight:700;height:15px;text-align:center}
+/* ── TOAST ── */
+#toast{position:fixed;top:72px;left:50%;transform:translateX(-50%) translateY(-130px);z-index:3000;background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r3);padding:10px 16px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:8px;transition:transform .35s cubic-bezier(.34,1.56,.64,1);box-shadow:var(--sh);max-width:300px;white-space:nowrap}
+#toast.on{transform:translateX(-50%) translateY(0)}
+#toast.ok{border-color:rgba(77,255,184,.4);color:var(--green)}
+#toast.err{border-color:rgba(255,95,126,.4);color:var(--red)}
+#toast.warn{border-color:rgba(255,170,77,.4);color:var(--orange)}
+#toast .material-icons-round{font-size:16px}
+/* ── MISC ── */
+input[type=date],input[type=time]{color-scheme:dark}
+[data-theme=light] input[type=date],[data-theme=light] input[type=time]{color-scheme:light}
+.divider{height:1px;background:var(--bdr);margin:4px 0}
 </style>
 </head>
 <body>
 
 <!-- TOAST -->
-<div class="toast" id="toast">
-  <span class="material-icons-round" id="tIco">check_circle</span>
-  <span id="tMsg">Done!</span>
-</div>
+<div id="toast"><span class="material-icons-round" id="tIco">check_circle</span><span id="tMsg">Done!</span></div>
 
 <!-- LOCK SCREEN -->
-<div id="lockScreen" style="display:none">
-  <div class="lock-logo">MyKharcha</div>
-  <div class="lock-sub">Smart Expense Tracker</div>
-  <div class="lock-methods">
+<div id="lkscr" style="display:none">
+  <div class="lklogo">MyKharcha</div>
+  <div class="lksub">Smart Expense Tracker</div>
+  <div class="lkmeths">
     <div style="text-align:center">
-      <div class="fp-btn" id="fpBtn" onclick="tryFingerprint()" title="Use Fingerprint">
-        <span class="material-icons-round">fingerprint</span>
-      </div>
-      <div class="fp-label" id="fpLabel">Tap to use Fingerprint / Face ID</div>
+      <div class="fpbtn" id="fpbtn" onclick="tryFP()"><span class="material-icons-round">fingerprint</span></div>
+      <div class="fplbl" id="fplbl" style="margin-top:8px">Fingerprint / Face ID tap karein</div>
     </div>
-    <div class="lock-or">or use PIN</div>
-    <div class="pin-row" id="pinDots">
-      <div class="pd" id="pd0"></div><div class="pd" id="pd1"></div>
-      <div class="pd" id="pd2"></div><div class="pd" id="pd3"></div>
-    </div>
-    <div class="pin-error" id="pinErr"></div>
+    <div class="lkor">ya PIN use karein</div>
+    <div class="pdots"><div class="pd" id="pd0"></div><div class="pd" id="pd1"></div><div class="pd" id="pd2"></div><div class="pd" id="pd3"></div></div>
+    <div class="pinerr" id="pinerr"></div>
     <div class="numpad" id="numpad"></div>
   </div>
 </div>
 
-<!-- MAIN APP -->
+<!-- APP -->
 <div id="app">
-  <header class="app-header">
-    <div class="header-brand">
+
+  <!-- HEADER -->
+  <header class="hdr">
+    <div class="hdr-brand">
       <div class="logo">MyKharcha</div>
-      <div class="tagline" id="hdrDate">Loading...</div>
+      <div class="sub" id="hdrDate">Loading...</div>
     </div>
-    <div class="header-actions">
-      <button class="hdr-btn" id="notifBtn" onclick="switchPg('bills')" title="Bill Reminders">
+    <div class="hdr-acts">
+      <button class="hbtn" onclick="switchPg('bills')" title="Bill Reminders">
         <span class="material-icons-round">notifications</span>
-        <span class="badge notif-badge" id="notifBadge"></span>
+        <span class="dot" id="notifDot"></span>
       </button>
-      <button class="hdr-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle theme">
-        <span class="material-icons-round" id="themeIco">light_mode</span>
+      <button class="hbtn" onclick="toggleTheme()" title="Theme">
+        <span class="material-icons-round" id="thIco">light_mode</span>
       </button>
-      <button class="hdr-btn" onclick="openM('addModal')" title="Add transaction">
+      <button class="hbtn" onclick="openM('addModal')">
         <span class="material-icons-round">add</span>
       </button>
     </div>
   </header>
 
-  <!-- DASHBOARD -->
+  <!-- ═══ DASHBOARD ═══ -->
   <div id="pg-dash" class="page active">
-    <div class="pg-pad">
-      <div id="installBanner" class="install-banner" style="display:none">
+    <div class="pg">
+      <div id="installBanner" class="ibanner" style="display:none">
         <span class="material-icons-round">install_mobile</span>
-        <div class="ib-info"><h4>Install MyKharcha</h4><p>Add to home screen for full app experience</p></div>
-        <button class="ib-btn" onclick="doInstall()">Install</button>
+        <div class="ibinfo"><h4>Install MyKharcha</h4><p>Home screen pe add karein</p></div>
+        <button class="ibbtn" onclick="doInstall()">Install</button>
       </div>
-      <div class="hero-card">
-        <div class="hero-label">Balance This Month</div>
-        <div class="hero-amount" id="heroAmt">₹0</div>
-        <div class="hero-sub" id="heroSub">Income − Expenses</div>
-        <div class="hero-stats">
-          <div class="hero-stat"><div class="hs-label">Today</div><div class="hs-val" id="todayAmt">₹0</div></div>
-          <div class="hero-stat"><div class="hs-label">Month Exp</div><div class="hs-val" id="monthAmt">₹0</div></div>
-          <div class="hero-stat"><div class="hs-label">Txns</div><div class="hs-val" id="txnCnt">0</div></div>
+      <!-- Hero -->
+      <div class="hero">
+        <div class="hl">Is Mahine ka Balance</div>
+        <div class="ha" id="heroAmt">₹0</div>
+        <div class="hs" id="heroSub">Amdani − Kharcha</div>
+        <div class="hero-row">
+          <div class="hstat"><div class="sl">Aaj</div><div class="sv" id="todayAmt">₹0</div></div>
+          <div class="hstat"><div class="sl">Mahina</div><div class="sv" id="monthAmt">₹0</div></div>
+          <div class="hstat"><div class="sl">Txns</div><div class="sv" id="txnCnt">0</div></div>
         </div>
-        <div class="limit-strip" id="limitStrip" style="display:none">
-          <div class="ls-row"><span>Daily Limit</span><span id="limitTxt"></span></div>
-          <div class="limit-track"><div class="limit-fill" id="limitFill"></div></div>
-        </div>
-      </div>
-      <div class="stats-grid">
-        <div class="stat-mini inc">
-          <div class="sm-icon"><span class="material-icons-round">trending_up</span></div>
-          <div class="sm-label">Income</div><div class="sm-val" id="incAmt">₹0</div>
-        </div>
-        <div class="stat-mini sav">
-          <div class="sm-icon"><span class="material-icons-round">savings</span></div>
-          <div class="sm-label">Savings</div><div class="sm-val" id="savAmt">₹0</div>
+        <div class="lstrip" id="lstrip" style="display:none">
+          <div class="lrow"><span>Daily Limit</span><span id="ltxt"></span></div>
+          <div class="ltrack"><div class="lfill" id="lfill"></div></div>
         </div>
       </div>
-
-      <!-- Upcoming Bills on Dashboard -->
+      <!-- Income / Savings -->
+      <div class="sgrid">
+        <div class="smini inc">
+          <div class="ico"><span class="material-icons-round">trending_up</span></div>
+          <div class="lbl">Amdani</div><div class="val" id="incAmt">₹0</div>
+        </div>
+        <div class="smini sav">
+          <div class="ico"><span class="material-icons-round">savings</span></div>
+          <div class="lbl">Bachat</div><div class="val" id="savAmt">₹0</div>
+        </div>
+      </div>
+      <!-- Upcoming Bills -->
       <div id="dashBillsWrap" style="display:none">
-        <div class="sec-hdr">
-          <h2>📅 Upcoming Bills</h2>
-          <span class="see-all" onclick="switchPg('bills')">See All →</span>
-        </div>
+        <div class="sh"><h2>📅 Aane Wale Bills</h2><span class="sa" onclick="switchPg('bills')">Sab Dekho →</span></div>
         <div id="dashBillsList"></div>
       </div>
-
-      <div class="card card-pad">
-        <div class="sec-hdr"><h2>Categories</h2><span class="see-all" onclick="switchPg('reports')">View Report →</span></div>
-        <div class="cat-summary" id="catSummary"></div>
+      <!-- Categories -->
+      <div class="card cp">
+        <div class="sh"><h2>Categories</h2><span class="sa" onclick="switchPg('reports')">Report →</span></div>
+        <div class="clist" id="catSummary"></div>
       </div>
+      <!-- Recent -->
       <div>
-        <div class="sec-hdr"><h2>Recent Transactions</h2><span class="see-all" onclick="switchPg('history')">See All →</span></div>
-        <div class="txn-list" id="recentTxns"></div>
+        <div class="sh"><h2>Recent Transactions</h2><span class="sa" onclick="switchPg('history')">Sab Dekho →</span></div>
+        <div class="tlist" id="recentTxns"></div>
       </div>
     </div>
   </div>
 
-  <!-- HISTORY -->
+  <!-- ═══ HISTORY ═══ -->
   <div id="pg-history" class="page">
-    <div class="pg-pad">
-      <div class="search-wrap">
+    <div class="pg">
+      <div class="swrap">
         <span class="material-icons-round">search</span>
-        <input class="search-bar" id="searchInp" placeholder="Search notes..." oninput="renderHistory()">
+        <input class="sbar" id="searchInp" placeholder="Note se search karein..." oninput="renderHistory()">
       </div>
-      <div class="filter-scroll" id="catFilters"></div>
-      <div class="date-row">
+      <div class="fscroll" id="catFilters"></div>
+      <div class="drow">
         <input type="date" class="fi" id="dateFilter" onchange="renderHistory()">
-        <button class="clr-btn" onclick="clrDateFilter()">Clear</button>
+        <button class="cbtn" onclick="clearDateFilter()">Clear</button>
       </div>
-      <div id="historyContent"></div>
+      <div id="histContent"></div>
     </div>
   </div>
 
-  <!-- REPORTS -->
+  <!-- ═══ REPORTS ═══ -->
   <div id="pg-reports" class="page">
-    <div class="pg-pad">
-      <div class="month-nav-bar">
-        <button class="mnb-btn" onclick="chgMonth(-1)">‹ Prev</button>
-        <div class="mnb-title" id="rMonthTitle"></div>
-        <button class="mnb-btn" onclick="chgMonth(1)">Next ›</button>
+    <div class="pg">
+      <div class="mnav">
+        <button class="mbtn" onclick="chgMonth(-1)">‹ Pichla</button>
+        <div class="mtit" id="rMonthTitle"></div>
+        <button class="mbtn" onclick="chgMonth(1)">Agla ›</button>
       </div>
-      <div class="chart-card"><h3>📊 Monthly Spending (6 Months)</h3><div class="chart-box"><canvas id="barChart"></canvas></div></div>
-      <div class="chart-card"><h3>🍩 Category Breakdown</h3><div class="chart-box"><canvas id="pieChart"></canvas></div></div>
-      <div class="chart-card"><h3>📈 Daily Trend</h3><div class="chart-box"><canvas id="lineChart"></canvas></div></div>
-      <div class="card card-pad">
-        <div class="sec-hdr"><h2>Export & Backup</h2></div>
-        <div class="exp-grid">
-          <button class="exp-btn" onclick="exportPDF()"><span class="material-icons-round">picture_as_pdf</span>Export PDF</button>
-          <button class="exp-btn" onclick="exportXLSX()"><span class="material-icons-round">table_chart</span>Export Excel</button>
-          <button class="exp-btn" onclick="doBackup()"><span class="material-icons-round">backup</span>Backup JSON</button>
-          <button class="exp-btn" onclick="document.getElementById('restoreInp').click()"><span class="material-icons-round">restore</span>Restore Data</button>
+      <div class="ccard"><h3>📊 6 Mahine ka Kharcha</h3><div class="cbox"><canvas id="barChart"></canvas></div></div>
+      <div class="ccard"><h3>🍩 Category Breakdown</h3><div class="cbox"><canvas id="pieChart"></canvas></div></div>
+      <div class="ccard"><h3>📈 Daily Trend</h3><div class="cbox"><canvas id="lineChart"></canvas></div></div>
+      <div class="card cp">
+        <div class="sh"><h2>Export & Backup</h2></div>
+        <div class="egrid">
+          <button class="ebtn" onclick="exportPDF()"><span class="material-icons-round">picture_as_pdf</span>PDF Export</button>
+          <button class="ebtn" onclick="exportXLSX()"><span class="material-icons-round">table_chart</span>Excel Export</button>
+          <button class="ebtn" onclick="doBackup()"><span class="material-icons-round">backup</span>Backup JSON</button>
+          <button class="ebtn" onclick="document.getElementById('restoreInp').click()"><span class="material-icons-round">restore</span>Restore Data</button>
         </div>
         <input type="file" id="restoreInp" accept=".json" style="display:none" onchange="doRestore(event)">
       </div>
     </div>
   </div>
 
-  <!-- BILLS PAGE -->
+  <!-- ═══ BILLS ═══ -->
   <div id="pg-bills" class="page">
-    <div class="pg-pad">
-      <div class="sec-hdr">
-        <h2>📅 Bill Reminders</h2>
-        <span class="see-all" onclick="openM('billModal')">+ Add Bill</span>
-      </div>
-      <!-- Filter row for bills -->
-      <div class="filter-scroll" id="billFilters">
-        <div class="fc on" data-bf="all" onclick="setBillFilter(this)">All</div>
-        <div class="fc" data-bf="today" onclick="setBillFilter(this)">🔴 Due Today</div>
-        <div class="fc" data-bf="week" onclick="setBillFilter(this)">🟠 This Week</div>
-        <div class="fc" data-bf="paid" onclick="setBillFilter(this)">✅ Paid</div>
-        <div class="fc" data-bf="unpaid" onclick="setBillFilter(this)">⏳ Unpaid</div>
+    <div class="pg">
+      <div class="sh"><h2>📅 Bill Reminders</h2><span class="sa" onclick="openM('billModal')">+ Add Bill</span></div>
+      <div class="fscroll" id="billFilters">
+        <div class="fc on" data-bf="all" onclick="setBF(this)">Sab</div>
+        <div class="fc" data-bf="today" onclick="setBF(this)">🔴 Aaj Due</div>
+        <div class="fc" data-bf="week" onclick="setBF(this)">🟠 Is Hafte</div>
+        <div class="fc" data-bf="unpaid" onclick="setBF(this)">⏳ Unpaid</div>
+        <div class="fc" data-bf="paid" onclick="setBF(this)">✅ Paid</div>
       </div>
       <div id="billsList"></div>
-
-      <div style="margin-top:6px">
-        <div class="sec-hdr"><h2>💳 EMI Tracker</h2><span class="see-all" onclick="openM('emiModal')">+ Add EMI</span></div>
-        <div id="emiList"></div>
-      </div>
+      <div class="divider"></div>
+      <div class="sh"><h2>💳 EMI / Loan Tracker</h2><span class="sa" onclick="openM('emiModal')">+ Add EMI</span></div>
+      <div id="emiList"></div>
     </div>
   </div>
 
-  <!-- BUDGET PAGE -->
+  <!-- ═══ BUDGET ═══ -->
   <div id="pg-budget" class="page">
-    <div class="pg-pad">
-      <div class="month-nav-bar">
-        <button class="mnb-btn" onclick="chgBudgetMonth(-1)">‹ Prev</button>
-        <div class="mnb-title" id="budgetMonthTitle"></div>
-        <button class="mnb-btn" onclick="chgBudgetMonth(1)">Next ›</button>
+    <div class="pg">
+      <div class="mnav">
+        <button class="mbtn" onclick="chgBMonth(-1)">‹ Pichla</button>
+        <div class="mtit" id="budgetMonthTitle"></div>
+        <button class="mbtn" onclick="chgBMonth(1)">Agla ›</button>
       </div>
-      <!-- Budget Summary Card -->
-      <div class="budget-month-summary">
-        <div class="bms-label">Monthly Budget Overview</div>
-        <div class="bms-amt" id="budgetTotalBudget">₹0</div>
-        <div class="bms-sub" id="budgetSub">Total budget set this month</div>
-        <div class="bms-grid">
-          <div class="bms-item"><div class="bi-label">Spent</div><div class="bi-val" id="budgetSpent">₹0</div></div>
-          <div class="bms-item"><div class="bi-label">Remaining</div><div class="bi-val" id="budgetRemaining">₹0</div></div>
-          <div class="bms-item"><div class="bi-label">Used</div><div class="bi-val" id="budgetPct">0%</div></div>
+      <div class="bhero">
+        <div class="bhl">Monthly Budget Overview</div>
+        <div class="bha" id="budgetTotal">₹0</div>
+        <div class="bhs" id="budgetSub">Koi budget set nahi</div>
+        <div class="bhrow">
+          <div class="bhitem"><div class="bi">Kharca</div><div class="bv" id="budgetSpent">₹0</div></div>
+          <div class="bhitem"><div class="bi">Baki</div><div class="bv" id="budgetLeft">₹0</div></div>
+          <div class="bhitem"><div class="bi">Upyog</div><div class="bv" id="budgetPct">0%</div></div>
         </div>
       </div>
-      <div class="card card-pad">
-        <div class="sec-hdr"><h2>Category Budgets</h2><span class="see-all" onclick="openM('budgetEditModal')">Edit Budgets</span></div>
-        <div class="budget-cat-list" id="budgetCatList"></div>
+      <div class="card cp">
+        <div class="sh"><h2>Category Budgets</h2><span class="sa" onclick="openM('budgetEditModal')">Edit Budgets</span></div>
+        <div class="bclist" id="budgetCatList"></div>
       </div>
-      <div class="chart-card">
-        <h3>📊 Budget vs Actual</h3>
-        <div class="chart-box"><canvas id="budgetChart"></canvas></div>
-      </div>
+      <div class="ccard"><h3>📊 Budget vs Actual</h3><div class="cbox"><canvas id="budgetChart"></canvas></div></div>
     </div>
   </div>
 
-  <!-- SETTINGS -->
+  <!-- ═══ SETTINGS ═══ -->
   <div id="pg-settings" class="page">
-    <div class="pg-pad">
-      <div class="sg-title">Preferences</div>
-      <div class="sitem" onclick="toggleTheme()">
-        <div class="s-ico" style="background:rgba(139,127,255,.12)"><span class="material-icons-round" style="color:var(--purple)">palette</span></div>
-        <div class="s-info"><h4>Dark / Light Mode</h4><p>Toggle app appearance</p></div>
-        <button class="tgl-sw" id="tglTheme" onclick="event.stopPropagation();toggleTheme()"></button>
+    <div class="pg">
+      <div class="sgt">Preferences</div>
+      <div class="si" onclick="toggleTheme()">
+        <div class="sico" style="background:rgba(139,127,255,.12)"><span class="material-icons-round" style="color:var(--purple)">palette</span></div>
+        <div class="sinf"><h4>Dark / Light Mode</h4><p>App ka theme badlein</p></div>
+        <button class="tgl" id="tglTheme" onclick="event.stopPropagation();toggleTheme()"></button>
       </div>
-      <div class="sg-title">Spending Limit</div>
-      <div class="sitem" onclick="tglLimit()">
-        <div class="s-ico" style="background:var(--orange-dim)"><span class="material-icons-round" style="color:var(--orange)">notifications_active</span></div>
-        <div class="s-info"><h4>Daily Spending Limit</h4><p id="limitStatusTxt">Not configured</p></div>
-        <button class="tgl-sw" id="tglLimitBtn" onclick="event.stopPropagation();tglLimit()"></button>
+
+      <div class="sgt">Daily Spending Limit</div>
+      <div class="si" onclick="tglLimit()">
+        <div class="sico" style="background:var(--odim)"><span class="material-icons-round" style="color:var(--orange)">notifications_active</span></div>
+        <div class="sinf"><h4>Daily Limit Alert</h4><p id="limitStTxt">Set nahi hua</p></div>
+        <button class="tgl" id="tglLimit" onclick="event.stopPropagation();tglLimit()"></button>
       </div>
-      <div class="limit-form" id="limitForm" style="display:none">
-        <label class="fl">Daily Limit Amount (₹)</label>
-        <div class="limit-input-row">
-          <input class="lim-inp" id="limAmtInp" type="number" min="1" placeholder="e.g. 500">
-          <button class="sav-btn" onclick="saveLimit()">Save</button>
+      <div class="lform" id="limitForm" style="display:none">
+        <label class="fl">Daily Limit (₹)</label>
+        <div class="linrow">
+          <input class="linp" id="limitInp" type="number" min="1" placeholder="e.g. 500">
+          <button class="svbtn" onclick="saveLimit()">Save</button>
         </div>
       </div>
-      <div class="sg-title">Security</div>
-      <div class="sitem" onclick="openM('pinModal')">
-        <div class="s-ico" style="background:var(--red-dim)"><span class="material-icons-round" style="color:var(--red)">fingerprint</span></div>
-        <div class="s-info"><h4>Fingerprint / PIN Lock</h4><p id="pinStatusTxt">Disabled</p></div>
-        <button class="tgl-sw" id="tglPin"></button>
+
+      <div class="sgt">Security</div>
+      <div class="si" onclick="openM('pinModal')">
+        <div class="sico" style="background:var(--rdim)"><span class="material-icons-round" style="color:var(--red)">fingerprint</span></div>
+        <div class="sinf"><h4>Fingerprint / PIN Lock</h4><p id="pinStTxt">Disabled</p></div>
+        <button class="tgl" id="tglPin" onclick="event.stopPropagation();openM('pinModal')"></button>
       </div>
-      <div class="sg-title">Savings Goals</div>
+
+      <div class="sgt">Savings Goals</div>
       <div id="goalsList"></div>
-      <button class="add-goal-btn" onclick="openM('goalModal')"><span class="material-icons-round">add_circle_outline</span> Add New Goal</button>
-      <div class="sg-title" style="margin-top:16px">Data Management</div>
-      <div class="sitem" onclick="clearAllData()">
-        <div class="s-ico" style="background:var(--red-dim)"><span class="material-icons-round" style="color:var(--red)">delete_forever</span></div>
-        <div class="s-info"><h4>Clear All Data</h4><p>Permanently remove all transactions</p></div>
-        <span class="material-icons-round s-chevron">chevron_right</span>
+      <button class="agbtn" onclick="openM('goalModal')"><span class="material-icons-round">add_circle_outline</span>New Goal Add Karein</button>
+
+      <div class="sgt" style="margin-top:14px">Data Management</div>
+      <div class="si" onclick="clearAllData()">
+        <div class="sico" style="background:var(--rdim)"><span class="material-icons-round" style="color:var(--red)">delete_forever</span></div>
+        <div class="sinf"><h4>Sab Data Delete Karein</h4><p>Permanently remove karta hai</p></div>
+        <span class="material-icons-round" style="color:var(--txt3);font-size:18px">chevron_right</span>
       </div>
     </div>
   </div>
 
-  <!-- BOTTOM NAV (5 items) -->
-  <nav class="bottom-nav">
-    <button class="nav-btn active" id="nb-dash" onclick="switchPg('dash')">
-      <div class="nav-icon-wrap"><span class="material-icons-round">home</span></div>Home
+  <!-- BOTTOM NAV -->
+  <nav class="bnav">
+    <button class="nbtn on" id="nb-dash" onclick="switchPg('dash')">
+      <div class="niw"><span class="material-icons-round">home</span></div>Home
     </button>
-    <button class="nav-btn" id="nb-history" onclick="switchPg('history')">
-      <div class="nav-icon-wrap"><span class="material-icons-round">history</span></div>History
+    <button class="nbtn" id="nb-history" onclick="switchPg('history')">
+      <div class="niw"><span class="material-icons-round">history</span></div>History
     </button>
-    <button class="nav-btn" id="nb-bills" onclick="switchPg('bills')">
-      <div class="nav-icon-wrap"><span class="material-icons-round">event_note</span></div>Bills
-      <div class="nav-dot" id="billsDot"></div>
+    <button class="nbtn" id="nb-bills" onclick="switchPg('bills')">
+      <div class="niw"><span class="material-icons-round">event_note</span></div>Bills
+      <div class="rdot" id="billsDot"></div>
     </button>
-    <button class="nav-btn" id="nb-budget" onclick="switchPg('budget')">
-      <div class="nav-icon-wrap"><span class="material-icons-round">account_balance_wallet</span></div>Budget
+    <button class="nbtn" id="nb-budget" onclick="switchPg('budget')">
+      <div class="niw"><span class="material-icons-round">account_balance_wallet</span></div>Budget
     </button>
-    <button class="nav-btn" id="nb-settings" onclick="switchPg('settings')">
-      <div class="nav-icon-wrap"><span class="material-icons-round">tune</span></div>Settings
+    <button class="nbtn" id="nb-settings" onclick="switchPg('settings')">
+      <div class="niw"><span class="material-icons-round">tune</span></div>Settings
     </button>
   </nav>
 </div>
@@ -674,90 +611,89 @@ input[type="date"],input[type="time"]{color-scheme:dark}
 <!-- FAB -->
 <button class="fab" onclick="openM('addModal')"><span class="material-icons-round">add</span></button>
 
-<!-- ===== MODALS ===== -->
+<!-- ══════════ MODALS ══════════ -->
 
-<!-- ADD/EDIT TRANSACTION -->
-<div class="overlay" id="addModal">
+<!-- ADD / EDIT TRANSACTION -->
+<div class="ov" id="addModal">
   <div class="modal">
-    <div class="m-handle"></div>
-    <div class="m-header">
-      <h2 id="addModalTitle">Add Transaction</h2>
-      <button class="m-close" onclick="closeM('addModal')"><span class="material-icons-round">close</span></button>
+    <div class="mhdl"></div>
+    <div class="mhdr">
+      <h2 id="addMTitle">Transaction Add Karein</h2>
+      <button class="mcls" onclick="closeM('addModal')"><span class="material-icons-round">close</span></button>
     </div>
-    <div class="m-body">
-      <div class="type-toggle">
-        <button class="tt-btn act-exp" id="ttExp" onclick="setTxnType('expense')"><span class="material-icons-round">arrow_upward</span>Expense</button>
-        <button class="tt-btn" id="ttInc" onclick="setTxnType('income')"><span class="material-icons-round">arrow_downward</span>Income</button>
+    <div class="mbody">
+      <div class="tg">
+        <button class="tbtn ae" id="ttExp" onclick="setType('expense')"><span class="material-icons-round">arrow_upward</span>Kharcha</button>
+        <button class="tbtn" id="ttInc" onclick="setType('income')"><span class="material-icons-round">arrow_downward</span>Amdani</button>
       </div>
-      <div class="fg"><div class="amt-wrap"><span class="amt-prefix">₹</span><input class="amt-fi" id="amtInp" type="number" min="0" placeholder="0" inputmode="decimal"></div></div>
-      <div class="fg"><label class="fl">Category</label><div class="cat-chips-wrap" id="catChips"></div></div>
-      <div class="frow">
-        <div class="fg"><label class="fl">Date</label><input type="date" class="fi" id="dateInp"></div>
-        <div class="fg"><label class="fl">Time</label><input type="time" class="fi" id="timeInp"></div>
+      <div class="fg">
+        <div class="awrap"><span class="apfx">₹</span><input class="afi" id="amtInp" type="number" inputmode="decimal" min="0" placeholder="0"></div>
+      </div>
+      <div class="fg"><label class="fl">Category</label><div class="cwrap" id="catChips"></div></div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Tarikh</label><input type="date" class="fi" id="dateInp"></div>
+        <div class="fg"><label class="fl">Samay</label><input type="time" class="fi" id="timeInp"></div>
       </div>
       <div class="fg" id="payGrp">
         <label class="fl">Payment Method</label>
-        <div class="pay-chips-wrap">
+        <div class="pwrap">
           <div class="pc sel" data-p="Cash" onclick="selPay(this)">💵 Cash</div>
           <div class="pc" data-p="UPI" onclick="selPay(this)">📱 UPI</div>
           <div class="pc" data-p="Card" onclick="selPay(this)">💳 Card</div>
         </div>
       </div>
-      <div class="fg"><label class="fl">Note (optional)</label><textarea class="fta" id="noteInp" placeholder="What was this for?"></textarea></div>
-      <button class="sub-btn" onclick="submitTxn()"><span id="subBtnTxt">Add Expense</span></button>
-      <div class="mb12"></div>
+      <div class="fg"><label class="fl">Note (optional)</label><textarea class="fta" id="noteInp" placeholder="Kisliye kharch kiya?"></textarea></div>
+      <button class="sbtn" onclick="submitTxn()"><span id="subBtnTxt">Kharcha Add Karein</span></button>
+      <div class="mb"></div>
     </div>
   </div>
 </div>
 
-<!-- PIN/FINGERPRINT MODAL -->
-<div class="overlay" id="pinModal">
+<!-- PIN / FINGERPRINT SETTINGS -->
+<div class="ov" id="pinModal">
   <div class="modal">
-    <div class="m-handle"></div>
-    <div class="m-header"><h2>App Lock Settings</h2><button class="m-close" onclick="closeM('pinModal')"><span class="material-icons-round">close</span></button></div>
-    <div class="m-body">
-      <div class="fg" id="fpInfoBox" style="background:var(--purple-dim);border:1px solid var(--purple);border-radius:12px;padding:12px 14px;margin-bottom:16px">
-        <div style="display:flex;align-items:center;gap:10px">
-          <span class="material-icons-round" style="color:var(--purple);font-size:22px">fingerprint</span>
-          <div><div style="font-size:13px;font-weight:700">Fingerprint / Face ID</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px" id="fpSupportTxt">Checking support...</div></div>
-        </div>
+    <div class="mhdl"></div>
+    <div class="mhdr"><h2>App Lock</h2><button class="mcls" onclick="closeM('pinModal')"><span class="material-icons-round">close</span></button></div>
+    <div class="mbody">
+      <div style="background:var(--pdim);border:1px solid var(--purple);border-radius:12px;padding:12px;margin-bottom:14px;display:flex;align-items:center;gap:10px">
+        <span class="material-icons-round" style="color:var(--purple);font-size:22px">fingerprint</span>
+        <div><div style="font-size:13px;font-weight:700">Fingerprint / Face ID</div><div style="font-size:11px;color:var(--txt3);margin-top:2px" id="fpSupTxt">Check ho raha hai...</div></div>
       </div>
-      <div class="fg"><label class="fl">Set 4-Digit PIN (Backup)</label><input type="password" class="fi" id="pinA" maxlength="4" inputmode="numeric" placeholder="••••"></div>
-      <div class="fg"><label class="fl">Confirm PIN</label><input type="password" class="fi" id="pinB" maxlength="4" inputmode="numeric" placeholder="••••"></div>
-      <button class="sub-btn" onclick="savePin()">Enable Lock</button>
-      <div id="disablePinWrap" style="display:none;margin-top:10px"><button class="sub-btn danger" onclick="disablePin()">Disable Lock</button></div>
-      <div class="mb12"></div>
+      <div class="fg"><label class="fl">Naya 4-Digit PIN</label><input type="password" class="fi" id="pinA" maxlength="4" inputmode="numeric" placeholder="••••"></div>
+      <div class="fg"><label class="fl">PIN Confirm Karein</label><input type="password" class="fi" id="pinB" maxlength="4" inputmode="numeric" placeholder="••••"></div>
+      <button class="sbtn" onclick="savePin()">Lock Enable Karein</button>
+      <div id="disablePinDiv" style="display:none;margin-top:10px"><button class="sbtn dng" onclick="disablePin()">Lock Disable Karein</button></div>
+      <div class="mb"></div>
     </div>
   </div>
 </div>
 
 <!-- GOAL MODAL -->
-<div class="overlay" id="goalModal">
+<div class="ov" id="goalModal">
   <div class="modal">
-    <div class="m-handle"></div>
-    <div class="m-header"><h2>Add Savings Goal</h2><button class="m-close" onclick="closeM('goalModal')"><span class="material-icons-round">close</span></button></div>
-    <div class="m-body">
-      <div class="fg"><label class="fl">Goal Name</label><input class="fi" id="gNameInp" placeholder="e.g. iPhone, Vacation, MacBook"></div>
+    <div class="mhdl"></div>
+    <div class="mhdr"><h2>Savings Goal Add Karein</h2><button class="mcls" onclick="closeM('goalModal')"><span class="material-icons-round">close</span></button></div>
+    <div class="mbody">
+      <div class="fg"><label class="fl">Goal ka Naam</label><input class="fi" id="gNameInp" placeholder="e.g. iPhone, Vacation, Bike"></div>
       <div class="fg"><label class="fl">Target Amount (₹)</label><input type="number" class="fi" id="gTargetInp" placeholder="50000"></div>
-      <div class="fg"><label class="fl">Already Saved (₹)</label><input type="number" class="fi" id="gSavedInp" placeholder="0"></div>
-      <button class="sub-btn" onclick="saveGoal()">Add Goal</button>
-      <div class="mb12"></div>
+      <div class="fg"><label class="fl">Abhi Tak Bachaya (₹)</label><input type="number" class="fi" id="gSavedInp" placeholder="0"></div>
+      <button class="sbtn" onclick="saveGoal()">Goal Add Karein</button>
+      <div class="mb"></div>
     </div>
   </div>
 </div>
 
 <!-- BILL MODAL -->
-<div class="overlay" id="billModal">
+<div class="ov" id="billModal">
   <div class="modal">
-    <div class="m-handle"></div>
-    <div class="m-header"><h2 id="billModalTitle">Add Bill Reminder</h2><button class="m-close" onclick="closeM('billModal')"><span class="material-icons-round">close</span></button></div>
-    <div class="m-body">
-      <div class="fg"><label class="fl">Bill Name</label><input class="fi" id="bNameInp" placeholder="e.g. Electricity, Netflix, WiFi"></div>
-      <div class="fg"><label class="fl">Amount (₹)</label><input type="number" class="fi" id="bAmtInp" placeholder="e.g. 500"></div>
-      <div class="frow">
+    <div class="mhdl"></div>
+    <div class="mhdr"><h2 id="billMTitle">Bill Reminder Add Karein</h2><button class="mcls" onclick="closeM('billModal')"><span class="material-icons-round">close</span></button></div>
+    <div class="mbody">
+      <div class="fg"><label class="fl">Bill ka Naam</label><input class="fi" id="bNameInp" placeholder="e.g. Electricity, Netflix, WiFi"></div>
+      <div class="fg"><label class="fl">Amount (₹)</label><input type="number" class="fi" id="bAmtInp" placeholder="500"></div>
+      <div class="fr">
         <div class="fg"><label class="fl">Due Date</label><input type="date" class="fi" id="bDueInp"></div>
-        <div class="fg">
-          <label class="fl">Category</label>
+        <div class="fg"><label class="fl">Category</label>
           <select class="fs" id="bCatInp">
             <option value="bills">Bills</option><option value="recharge">Recharge</option>
             <option value="rent">Rent</option><option value="food">Food</option>
@@ -765,780 +701,947 @@ input[type="date"],input[type="time"]{color-scheme:dark}
           </select>
         </div>
       </div>
-      <div class="fg">
-        <label class="fl">Repeat</label>
+      <div class="fg"><label class="fl">Repeat</label>
         <select class="fs" id="bRepeatInp">
-          <option value="none">One Time</option><option value="monthly">Every Month</option>
-          <option value="weekly">Every Week</option><option value="yearly">Every Year</option>
+          <option value="none">Ek Baar</option><option value="monthly">Har Mahine</option>
+          <option value="weekly">Har Hafte</option><option value="yearly">Har Saal</option>
         </select>
       </div>
-      <div class="fg"><label class="fl">Note (optional)</label><input class="fi" id="bNoteInp" placeholder="e.g. Account number, provider name"></div>
-      <button class="sub-btn" onclick="saveBill()"><span id="billBtnTxt">Add Bill Reminder</span></button>
-      <div class="mb12"></div>
+      <div class="fg"><label class="fl">Note (optional)</label><input class="fi" id="bNoteInp" placeholder="Account number, provider..."></div>
+      <button class="sbtn" id="billSubmitBtn" onclick="saveBill()">Bill Reminder Add Karein</button>
+      <div class="mb"></div>
     </div>
   </div>
 </div>
 
 <!-- EMI MODAL -->
-<div class="overlay" id="emiModal">
+<div class="ov" id="emiModal">
   <div class="modal">
-    <div class="m-handle"></div>
-    <div class="m-header"><h2 id="emiModalTitle">Add EMI / Loan</h2><button class="m-close" onclick="closeM('emiModal')"><span class="material-icons-round">close</span></button></div>
-    <div class="m-body">
-      <div class="fg"><label class="fl">Loan / EMI Name</label><input class="fi" id="eNameInp" placeholder="e.g. Home Loan, Car EMI, Personal Loan"></div>
+    <div class="mhdl"></div>
+    <div class="mhdr"><h2 id="emiMTitle">EMI / Loan Add Karein</h2><button class="mcls" onclick="closeM('emiModal')"><span class="material-icons-round">close</span></button></div>
+    <div class="mbody">
+      <div class="fg"><label class="fl">Loan / EMI ka Naam</label><input class="fi" id="eNameInp" placeholder="e.g. Home Loan, Car EMI"></div>
       <div class="fg"><label class="fl">Bank / Lender</label><input class="fi" id="eBankInp" placeholder="e.g. SBI, HDFC, ICICI"></div>
-      <div class="frow">
+      <div class="fr">
         <div class="fg"><label class="fl">Total Amount (₹)</label><input type="number" class="fi" id="eTotalInp" placeholder="500000"></div>
-        <div class="fg"><label class="fl">EMI / Month (₹)</label><input type="number" class="fi" id="eEmiInp" placeholder="15000"></div>
+        <div class="fg"><label class="fl">EMI/Month (₹)</label><input type="number" class="fi" id="eEmiInp" placeholder="15000"></div>
       </div>
-      <div class="frow">
-        <div class="fg"><label class="fl">Total EMIs</label><input type="number" class="fi" id="eTotalEmiInp" placeholder="48"></div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Kul EMIs</label><input type="number" class="fi" id="eTotalEmiInp" placeholder="48"></div>
         <div class="fg"><label class="fl">EMIs Paid</label><input type="number" class="fi" id="ePaidInp" placeholder="12"></div>
       </div>
-      <div class="frow">
+      <div class="fr">
         <div class="fg"><label class="fl">Start Date</label><input type="date" class="fi" id="eStartInp"></div>
-        <div class="fg"><label class="fl">Due Day (1-31)</label><input type="number" class="fi" id="eDueDayInp" min="1" max="31" placeholder="5"></div>
+        <div class="fg"><label class="fl">Due Day (1-28)</label><input type="number" class="fi" id="eDayInp" min="1" max="28" placeholder="5"></div>
       </div>
       <div class="fg"><label class="fl">Interest Rate (% p.a.)</label><input type="number" class="fi" id="eRateInp" placeholder="8.5" step="0.1"></div>
-      <button class="sub-btn" onclick="saveEmi()"><span id="emiBtnTxt">Add EMI</span></button>
-      <div class="mb12"></div>
+      <button class="sbtn" id="emiSubmitBtn" onclick="saveEmi()">EMI Add Karein</button>
+      <div class="mb"></div>
     </div>
   </div>
 </div>
 
 <!-- WHATSAPP SHARE MODAL -->
-<div class="overlay" id="waModal">
+<div class="ov" id="waModal">
   <div class="modal">
-    <div class="m-handle"></div>
-    <div class="m-header"><h2>Share via WhatsApp</h2><button class="m-close" onclick="closeM('waModal')"><span class="material-icons-round">close</span></button></div>
-    <div class="m-body">
+    <div class="mhdl"></div>
+    <div class="mhdr"><h2>WhatsApp Share</h2><button class="mcls" onclick="closeM('waModal')"><span class="material-icons-round">close</span></button></div>
+    <div class="mbody">
       <div class="fg">
         <label class="fl">Share Type</label>
-        <div style="display:flex;gap:8px;flex-wrap:wrap" id="waTypeChips">
-          <div class="cc sel" data-wt="single" onclick="setWaType(this)">Single Txn</div>
-          <div class="cc" data-wt="today" onclick="setWaType(this)">Today Summary</div>
+        <div class="cwrap">
+          <div class="cc sel" data-wt="single" onclick="setWaType(this)">Single Entry</div>
+          <div class="cc" data-wt="today" onclick="setWaType(this)">Aaj ka Summary</div>
           <div class="cc" data-wt="month" onclick="setWaType(this)">Month Report</div>
         </div>
       </div>
-      <div class="wa-preview">
-        <div class="wa-header">Message Preview</div>
-        <div class="wa-msg" id="waPreview">Loading...</div>
-      </div>
-      <button class="sub-btn" style="background:linear-gradient(135deg,#25D366,#128C7E)" onclick="doWaShare()">
-        <span class="material-icons-round" style="vertical-align:middle;font-size:18px;margin-right:6px">send</span> Share on WhatsApp
-      </button>
-      <div class="mb12"></div>
+      <div class="wabox"><div class="wahdr">Message Preview</div><div class="wamsg" id="waPreview"></div></div>
+      <button class="sbtn grn" onclick="doWaShare()"><span class="material-icons-round" style="vertical-align:middle;font-size:18px;margin-right:5px">send</span>WhatsApp pe Share Karein</button>
+      <div class="mb"></div>
     </div>
   </div>
 </div>
 
 <!-- BUDGET EDIT MODAL -->
-<div class="overlay" id="budgetEditModal">
+<div class="ov" id="budgetEditModal">
   <div class="modal">
-    <div class="m-handle"></div>
-    <div class="m-header"><h2>Set Category Budgets</h2><button class="m-close" onclick="closeM('budgetEditModal')"><span class="material-icons-round">close</span></button></div>
-    <div class="m-body">
-      <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Set monthly budget for each category. Leave 0 for no limit.</div>
-      <div id="budgetInputsList"></div>
-      <button class="sub-btn" onclick="saveBudgets()">Save Budgets</button>
-      <div class="mb12"></div>
+    <div class="mhdl"></div>
+    <div class="mhdr"><h2>Category Budgets Set Karein</h2><button class="mcls" onclick="closeM('budgetEditModal')"><span class="material-icons-round">close</span></button></div>
+    <div class="mbody">
+      <div style="font-size:12px;color:var(--txt3);margin-bottom:13px">Har category ke liye monthly budget set karein (0 = koi limit nahi)</div>
+      <div id="budgetInpsList"></div>
+      <button class="sbtn" onclick="saveBudgets()">Budgets Save Karein</button>
+      <div class="mb"></div>
     </div>
   </div>
 </div>
 
 <script>
-// ============================================================
+// ═══════════════════════════════════════════════════
 //  CONSTANTS
-// ============================================================
-const EXP_CATS=[
-  {id:'food',label:'Food',icon:'restaurant',color:'#ff5f7e'},
-  {id:'travel',label:'Travel',icon:'directions_car',color:'#ffaa4d'},
-  {id:'shopping',label:'Shopping',icon:'shopping_bag',color:'#c084fc'},
-  {id:'bills',label:'Bills',icon:'receipt_long',color:'#4db8ff'},
-  {id:'recharge',label:'Recharge',icon:'smartphone',color:'#4dffb8'},
-  {id:'rent',label:'Rent',icon:'home',color:'#fb923c'},
-  {id:'health',label:'Health',icon:'favorite',color:'#f472b6'},
-  {id:'other',label:'Other',icon:'more_horiz',color:'#818cf8'},
+// ═══════════════════════════════════════════════════
+const ECATS=[
+  {id:'food',    n:'Food',     ico:'restaurant',     c:'#ff5f7e'},
+  {id:'travel',  n:'Travel',   ico:'directions_car', c:'#ffaa4d'},
+  {id:'shopping',n:'Shopping', ico:'shopping_bag',   c:'#c084fc'},
+  {id:'bills',   n:'Bills',    ico:'receipt_long',   c:'#4db8ff'},
+  {id:'recharge',n:'Recharge', ico:'smartphone',     c:'#4dffb8'},
+  {id:'rent',    n:'Rent',     ico:'home',           c:'#fb923c'},
+  {id:'health',  n:'Health',   ico:'favorite',       c:'#f472b6'},
+  {id:'other',   n:'Other',    ico:'more_horiz',     c:'#818cf8'},
 ];
-const INC_CATS=[
-  {id:'salary',label:'Salary',icon:'work',color:'#4dffb8'},
-  {id:'freelance',label:'Freelance',icon:'laptop_mac',color:'#4db8ff'},
-  {id:'business',label:'Business',icon:'store',color:'#ffaa4d'},
-  {id:'investment',label:'Investment',icon:'trending_up',color:'#8b7fff'},
-  {id:'gift',label:'Gift',icon:'card_giftcard',color:'#f472b6'},
-  {id:'other_inc',label:'Other',icon:'more_horiz',color:'#818cf8'},
+const ICATS=[
+  {id:'salary',    n:'Salary',    ico:'work',         c:'#4dffb8'},
+  {id:'freelance', n:'Freelance', ico:'laptop_mac',   c:'#4db8ff'},
+  {id:'business',  n:'Business',  ico:'store',        c:'#ffaa4d'},
+  {id:'investment',n:'Invest',    ico:'trending_up',  c:'#8b7fff'},
+  {id:'gift',      n:'Gift',      ico:'card_giftcard',c:'#f472b6'},
+  {id:'other_inc', n:'Other',     ico:'more_horiz',   c:'#818cf8'},
 ];
-const BILL_ICONS={bills:'receipt_long',recharge:'smartphone',rent:'home',food:'restaurant',shopping:'shopping_bag',other:'payments'};
-const EMI_COLORS=['#8b7fff','#4db8ff','#4dffb8','#ff5f7e','#ffaa4d','#f472b6','#fb923c','#2dd4bf'];
+const BICO={bills:'receipt_long',recharge:'smartphone',rent:'home',food:'restaurant',shopping:'shopping_bag',other:'payments'};
+const ECLRS=['#8b7fff','#4db8ff','#4dffb8','#ff5f7e','#ffaa4d','#f472b6','#fb923c','#2dd4bf'];
 
-// ============================================================
+// ═══════════════════════════════════════════════════
 //  STATE
-// ============================================================
-let DS={
-  txns:[],goals:[],bills:[],emis:[],
-  settings:{theme:'dark',limitEnabled:false,dailyLimit:0,pinEnabled:false,pin:'',biometricEnabled:false},
-  budgets:{}
-};
-let curType='expense',selCat='food',selPay_='Cash',editId=null;
-let rMonth=new Date().getMonth(),rYear=new Date().getFullYear();
-let bMonth=new Date().getMonth(),bYear=new Date().getFullYear();
-let editBillId=null,editEmiId=null;
-let barC,pieC,lineC,budgetC;
-let deferredPrompt=null,pinBuffer='';
-let waType='single',waTxnId=null;
-let budgetBiometricAvailable=false;
+// ═══════════════════════════════════════════════════
+let DS={txns:[],goals:[],bills:[],emis:[],settings:{theme:'dark',limitEnabled:false,dailyLimit:0,pinEnabled:false,pin:''},budgets:{}};
+let curType='expense', selCat='food', selPayM='Cash', editId=null;
+let rMonth=new Date().getMonth(), rYear=new Date().getFullYear();
+let bMonth=new Date().getMonth(), bYear=new Date().getFullYear();
+let editBillId=null, editEmiId=null;
+let barC=null, pieC=null, lineC=null, budgetC=null;
+let deferredPrompt=null, pinBuf='';
+let waType='single', waTxnId=null;
 
-// ============================================================
+// ═══════════════════════════════════════════════════
 //  STORAGE
-// ============================================================
+// ═══════════════════════════════════════════════════
 function load(){
   try{
-    const t=localStorage.getItem('mk_txns'),g=localStorage.getItem('mk_goals'),
-          s=localStorage.getItem('mk_settings'),b=localStorage.getItem('mk_bills'),
-          e=localStorage.getItem('mk_emis'),bgt=localStorage.getItem('mk_budgets');
+    const t=localStorage.getItem('mk_txns'), g=localStorage.getItem('mk_goals'),
+          s=localStorage.getItem('mk_settings'), b=localStorage.getItem('mk_bills'),
+          e=localStorage.getItem('mk_emis'), bg=localStorage.getItem('mk_budgets');
     if(t) DS.txns=JSON.parse(t);
     if(g) DS.goals=JSON.parse(g);
-    if(s) DS.settings={...DS.settings,...JSON.parse(s)};
+    if(s) DS.settings=Object.assign({},DS.settings,JSON.parse(s));
     if(b) DS.bills=JSON.parse(b);
     if(e) DS.emis=JSON.parse(e);
-    if(bgt) DS.budgets=JSON.parse(bgt);
-  }catch(e){}
+    if(bg) DS.budgets=JSON.parse(bg);
+  }catch(e){console.warn('Load error',e);}
 }
-const saveTxns=()=>localStorage.setItem('mk_txns',JSON.stringify(DS.txns));
-const saveGoals=()=>localStorage.setItem('mk_goals',JSON.stringify(DS.goals));
-const saveSets=()=>localStorage.setItem('mk_settings',JSON.stringify(DS.settings));
-const saveBills=()=>localStorage.setItem('mk_bills',JSON.stringify(DS.bills));
-const saveEmis=()=>localStorage.setItem('mk_emis',JSON.stringify(DS.emis));
-const saveBudgets=()=>{localStorage.setItem('mk_budgets',JSON.stringify(DS.budgets));closeM('budgetEditModal');renderBudget();toast('Budgets saved!','ok');}
+const sT=()=>localStorage.setItem('mk_txns',JSON.stringify(DS.txns));
+const sG=()=>localStorage.setItem('mk_goals',JSON.stringify(DS.goals));
+const sS=()=>localStorage.setItem('mk_settings',JSON.stringify(DS.settings));
+const sB=()=>localStorage.setItem('mk_bills',JSON.stringify(DS.bills));
+const sE=()=>localStorage.setItem('mk_emis',JSON.stringify(DS.emis));
+const sBg=()=>localStorage.setItem('mk_budgets',JSON.stringify(DS.budgets));
 
-// ============================================================
-//  PWA MANIFEST
-// ============================================================
+// ═══════════════════════════════════════════════════
+//  PWA
+// ═══════════════════════════════════════════════════
 function injectManifest(){
-  const m={name:'MyKharcha – Smart Expense Tracker',short_name:'MyKharcha',description:'Track your daily expenses smartly',start_url:'./',display:'standalone',background_color:'#0c0c1a',theme_color:'#0c0c1a',orientation:'portrait',icons:[{src:makeIcon(192),sizes:'192x192',type:'image/png',purpose:'any maskable'},{src:makeIcon(512),sizes:'512x512',type:'image/png',purpose:'any maskable'}]};
+  const m={name:'MyKharcha – Smart Expense Tracker',short_name:'MyKharcha',description:'Smart Expense Tracker',start_url:'./',display:'standalone',background_color:'#0c0c1a',theme_color:'#0c0c1a',orientation:'portrait',icons:[{src:mkIco(192),sizes:'192x192',type:'image/png',purpose:'any maskable'},{src:mkIco(512),sizes:'512x512',type:'image/png',purpose:'any maskable'}]};
   const blob=new Blob([JSON.stringify(m)],{type:'application/manifest+json'});
   document.getElementById('manifestLink').href=URL.createObjectURL(blob);
 }
-function makeIcon(sz){
+function mkIco(sz){
   const c=document.createElement('canvas');c.width=c.height=sz;
-  const ctx=c.getContext('2d'),r=sz*.22;
-  ctx.fillStyle='#0c0c1a';ctx.beginPath();ctx.roundRect(0,0,sz,sz,r);ctx.fill();
+  const ctx=c.getContext('2d');
+  ctx.fillStyle='#0c0c1a';ctx.beginPath();ctx.roundRect(0,0,sz,sz,sz*.22);ctx.fill();
   const g=ctx.createLinearGradient(sz*.1,sz*.1,sz*.9,sz*.9);g.addColorStop(0,'#8b7fff');g.addColorStop(1,'#4db8ff');
   ctx.fillStyle=g;ctx.font=`bold ${sz*.55}px system-ui`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('₹',sz/2,sz/2);
   return c.toDataURL('image/png');
 }
-function registerSW(){
+function regSW(){
   if(!('serviceWorker' in navigator))return;
-  const sw=`const C='mk-v2';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))));self.clients.claim();});self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>{if(r)return r;return fetch(e.request).catch(()=>r);}));});`;
+  const sw=`const C='mk-v3';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))));self.clients.claim();});self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));});`;
   navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'text/javascript'}))).catch(()=>{});
 }
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;document.getElementById('installBanner').style.display='flex';});
+function doInstall(){if(!deferredPrompt)return;deferredPrompt.prompt();deferredPrompt.userChoice.then(()=>{deferredPrompt=null;document.getElementById('installBanner').style.display='none';});}
 
-// ============================================================
+// ═══════════════════════════════════════════════════
 //  THEME
-// ============================================================
-function toggleTheme(){const isL=document.documentElement.getAttribute('data-theme')==='light';applyTheme(isL?'dark':'light');DS.settings.theme=isL?'dark':'light';saveSets();}
+// ═══════════════════════════════════════════════════
+function toggleTheme(){
+  const isL=document.documentElement.getAttribute('data-theme')==='light';
+  applyTheme(isL?'dark':'light');
+}
 function applyTheme(t){
-  document.documentElement.setAttribute('data-theme',t||DS.settings.theme);
-  const isL=(t||DS.settings.theme)==='light';
-  document.getElementById('themeIco').textContent=isL?'dark_mode':'light_mode';
+  t=t||DS.settings.theme||'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  DS.settings.theme=t; sS();
+  const isL=t==='light';
+  document.getElementById('thIco').textContent=isL?'dark_mode':'light_mode';
   document.getElementById('tglTheme').classList.toggle('on',isL);
-  document.getElementById('metaTheme').content=isL?'#f4f4fa':'#0c0c1a';
+  document.getElementById('metaTheme').content=isL?'#f0f0f8':'#0c0c1a';
 }
 
-// ============================================================
-//  PAGES
-// ============================================================
+// ═══════════════════════════════════════════════════
+//  PAGE NAVIGATION
+// ═══════════════════════════════════════════════════
 function switchPg(pg){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.nbtn').forEach(b=>b.classList.remove('on'));
   document.getElementById('pg-'+pg).classList.add('active');
   const nb=document.getElementById('nb-'+pg);
-  if(nb) nb.classList.add('active');
-  if(pg==='dash') renderDash();
+  if(nb) nb.classList.add('on');
+  window.scrollTo(0,0);
+  if(pg==='dash')    renderDash();
   if(pg==='history') renderHistory();
   if(pg==='reports') renderReports();
-  if(pg==='bills') renderBills();
-  if(pg==='budget') renderBudget();
-  if(pg==='settings') renderSettings();
+  if(pg==='bills')   renderBills();
+  if(pg==='budget')  renderBudget();
+  if(pg==='settings')renderSettings();
 }
-function openM(id){
-  if(id==='addModal'){editId=null;resetForm();}
-  if(id==='pinModal'){document.getElementById('disablePinWrap').style.display=DS.settings.pinEnabled?'':'none';document.getElementById('pinA').value='';document.getElementById('pinB').value='';checkBiometricSupport();}
-  if(id==='billModal'){editBillId=null;document.getElementById('billModalTitle').textContent='Add Bill Reminder';document.getElementById('billBtnTxt').textContent='Add Bill Reminder';document.getElementById('bDueInp').value=toDateStr(new Date());}
-  if(id==='emiModal'){editEmiId=null;document.getElementById('emiModalTitle').textContent='Add EMI / Loan';document.getElementById('emiBtnTxt').textContent='Add EMI';document.getElementById('eStartInp').value=toDateStr(new Date());}
-  if(id==='budgetEditModal'){buildBudgetInputs();}
-  document.getElementById(id).classList.add('open');
-}
-function closeM(id){document.getElementById(id).classList.remove('open');}
-document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
 
-// ============================================================
-//  FORM – TRANSACTIONS
-// ============================================================
+// ═══════════════════════════════════════════════════
+//  MODALS
+// ═══════════════════════════════════════════════════
+function openM(id){
+  if(id==='addModal'){resetForm();}
+  if(id==='pinModal'){
+    document.getElementById('disablePinDiv').style.display=DS.settings.pinEnabled?'':'none';
+    document.getElementById('pinA').value='';document.getElementById('pinB').value='';
+    checkFPSupport();
+  }
+  if(id==='billModal' && !editBillId){
+    // reset bill form
+    document.getElementById('billMTitle').textContent='Bill Reminder Add Karein';
+    document.getElementById('billSubmitBtn').textContent='Bill Reminder Add Karein';
+    document.getElementById('bNameInp').value='';document.getElementById('bAmtInp').value='';
+    document.getElementById('bDueInp').value=toDS(new Date());document.getElementById('bNoteInp').value='';
+    document.getElementById('bCatInp').value='bills';document.getElementById('bRepeatInp').value='none';
+  }
+  if(id==='emiModal' && !editEmiId){
+    document.getElementById('emiMTitle').textContent='EMI / Loan Add Karein';
+    document.getElementById('emiSubmitBtn').textContent='EMI Add Karein';
+    ['eNameInp','eBankInp','eTotalInp','eEmiInp','eTotalEmiInp','ePaidInp','eRateInp','eDayInp'].forEach(x=>document.getElementById(x).value='');
+    document.getElementById('eStartInp').value=toDS(new Date());
+  }
+  if(id==='budgetEditModal') buildBudgetInps();
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeM(id){
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow='';
+  if(id==='billModal') editBillId=null;
+  if(id==='emiModal') editEmiId=null;
+}
+// close on overlay click
+document.addEventListener('click',function(e){
+  if(e.target.classList.contains('ov')) closeM(e.target.id);
+});
+
+// ═══════════════════════════════════════════════════
+//  TRANSACTION FORM
+// ═══════════════════════════════════════════════════
 function resetForm(){
-  document.getElementById('amtInp').value='';document.getElementById('noteInp').value='';
-  document.getElementById('addModalTitle').textContent='Add Transaction';
-  document.getElementById('subBtnTxt').textContent='Add Expense';
+  editId=null;
+  document.getElementById('addMTitle').textContent='Transaction Add Karein';
+  document.getElementById('subBtnTxt').textContent='Kharcha Add Karein';
+  document.getElementById('amtInp').value='';
+  document.getElementById('noteInp').value='';
   const now=new Date();
-  document.getElementById('dateInp').value=toDateStr(now);
+  document.getElementById('dateInp').value=toDS(now);
   document.getElementById('timeInp').value=now.toTimeString().slice(0,5);
-  selCat='food';selPay_='Cash';curType='expense';setTxnType('expense');
+  selCat='food'; selPayM='Cash'; curType='expense';
+  setType('expense');
   document.querySelectorAll('.pc').forEach(c=>c.classList.toggle('sel',c.dataset.p==='Cash'));
 }
-function setTxnType(t){
+function setType(t){
   curType=t;
-  document.getElementById('ttExp').className='tt-btn'+(t==='expense'?' act-exp':'');
-  document.getElementById('ttInc').className='tt-btn'+(t==='income'?' act-inc':'');
+  document.getElementById('ttExp').className='tbtn'+(t==='expense'?' ae':'');
+  document.getElementById('ttInc').className='tbtn'+(t==='income'?' ai':'');
   document.getElementById('payGrp').style.display=t==='expense'?'':'none';
   selCat=t==='expense'?'food':'salary';
-  if(!editId) document.getElementById('subBtnTxt').textContent=t==='expense'?'Add Expense':'Add Income';
+  if(!editId) document.getElementById('subBtnTxt').textContent=t==='expense'?'Kharcha Add Karein':'Amdani Add Karein';
   buildCatChips();
 }
 function buildCatChips(){
-  const cats=curType==='expense'?EXP_CATS:INC_CATS;
-  document.getElementById('catChips').innerHTML=cats.map(c=>`<div class="cc ${c.id===selCat?'sel':''}" data-id="${c.id}" onclick="pickCat('${c.id}')"><span class="material-icons-round" style="color:${c.color}">${c.icon}</span>${c.label}</div>`).join('');
+  const cats=curType==='expense'?ECATS:ICATS;
+  document.getElementById('catChips').innerHTML=cats.map(c=>
+    `<div class="cc${c.id===selCat?' sel':''}" onclick="pickCat('${c.id}')"><span class="material-icons-round" style="color:${c.c}">${c.ico}</span>${c.n}</div>`
+  ).join('');
 }
 function pickCat(id){selCat=id;buildCatChips();}
-function selPay(el){document.querySelectorAll('.pc').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');selPay_=el.dataset.p;}
+function selPay(el){document.querySelectorAll('.pc').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');selPayM=el.dataset.p;}
+
 function submitTxn(){
   const amt=parseFloat(document.getElementById('amtInp').value);
-  if(!amt||amt<=0){toast('Valid amount darj karen','err');return;}
-  const txn={id:editId||Date.now().toString(),type:curType,amount:amt,cat:selCat,date:document.getElementById('dateInp').value,time:document.getElementById('timeInp').value,note:document.getElementById('noteInp').value.trim(),pay:curType==='expense'?selPay_:'N/A'};
-  if(editId){const i=DS.txns.findIndex(t=>t.id===editId);if(i>-1)DS.txns[i]=txn;toast('Transaction update hua!','ok');}
-  else{DS.txns.unshift(txn);toast((curType==='expense'?'Kharcha':'Amdani')+' add hua!','ok');chkLimit(txn);}
-  saveTxns();closeM('addModal');renderDash();
+  if(!amt||amt<=0){toast('Valid amount darj karein','err');return;}
+  const d=document.getElementById('dateInp').value;
+  const ti=document.getElementById('timeInp').value;
+  if(!d){toast('Tarikh select karein','err');return;}
+  const txn={
+    id:editId||Date.now().toString(),
+    type:curType, amount:amt, cat:selCat,
+    date:d, time:ti,
+    note:document.getElementById('noteInp').value.trim(),
+    pay:curType==='expense'?selPayM:'N/A'
+  };
+  if(editId){
+    const i=DS.txns.findIndex(t=>t.id===editId);
+    if(i>-1) DS.txns[i]=txn;
+    toast('Transaction update hua! ✓','ok');
+  } else {
+    DS.txns.unshift(txn);
+    toast((curType==='expense'?'Kharcha':'Amdani')+' add hua! ✓','ok');
+    chkLimit(txn);
+  }
+  sT();closeM('addModal');renderDash();
+  if(document.getElementById('pg-history').classList.contains('active')) renderHistory();
 }
 function editTxn(id){
   const t=DS.txns.find(x=>x.id===id);if(!t)return;
-  editId=id;setTxnType(t.type);
+  editId=id;
+  setType(t.type);
   document.getElementById('amtInp').value=t.amount;
   document.getElementById('dateInp').value=t.date;
   document.getElementById('timeInp').value=t.time;
   document.getElementById('noteInp').value=t.note||'';
-  selCat=t.cat;selPay_=t.pay||'Cash';buildCatChips();
-  document.querySelectorAll('.pc').forEach(c=>c.classList.toggle('sel',c.dataset.p===selPay_));
-  document.getElementById('addModalTitle').textContent='Edit Transaction';
-  document.getElementById('subBtnTxt').textContent='Update';
+  selCat=t.cat; selPayM=t.pay||'Cash';
+  buildCatChips();
+  document.querySelectorAll('.pc').forEach(c=>c.classList.toggle('sel',c.dataset.p===selPayM));
+  document.getElementById('addMTitle').textContent='Transaction Edit Karein';
+  document.getElementById('subBtnTxt').textContent='Update Karein';
   openM('addModal');
 }
 function delTxn(id){
   if(!confirm('Is transaction ko delete karein?'))return;
-  DS.txns=DS.txns.filter(t=>t.id!==id);saveTxns();renderDash();renderHistory();toast('Delete hua','err');
+  DS.txns=DS.txns.filter(t=>t.id!==id);
+  sT();renderDash();
+  if(document.getElementById('pg-history').classList.contains('active')) renderHistory();
+  toast('Delete hua ✓','err');
 }
 function chkLimit(txn){
   if(!DS.settings.limitEnabled||!DS.settings.dailyLimit||txn.type!=='expense')return;
-  const today=toDateStr(new Date());
-  const spent=DS.txns.filter(t=>t.type==='expense'&&t.date===today).reduce((s,t)=>s+t.amount,0);
-  if(spent>DS.settings.dailyLimit) toast(`⚠️ Daily limit ₹${fmt(DS.settings.dailyLimit)} exceed ho gaya!`,'warn');
+  const spent=DS.txns.filter(t=>t.type==='expense'&&t.date===toDS(new Date())).reduce((s,t)=>s+t.amount,0);
+  if(spent>DS.settings.dailyLimit) toast(`⚠️ Daily limit ₹${rfmt(DS.settings.dailyLimit)} exceed!`,'warn');
 }
 
-// ============================================================
+// ═══════════════════════════════════════════════════
 //  DASHBOARD
-// ============================================================
+// ═══════════════════════════════════════════════════
 function renderDash(){
-  const today=toDateStr(new Date()),now=new Date(),cm=now.getMonth(),cy=now.getFullYear();
-  const todayExp=DS.txns.filter(t=>t.type==='expense'&&t.date===today);
-  const monthExp=DS.txns.filter(t=>t.type==='expense'&&sameMonth(t.date,cm,cy));
-  const monthInc=DS.txns.filter(t=>t.type==='income'&&sameMonth(t.date,cm,cy));
-  const todayTot=sum(todayExp),monthTot=sum(monthExp),incTot=sum(monthInc),bal=incTot-monthTot;
-  document.getElementById('heroAmt').textContent=r(Math.abs(bal));
-  document.getElementById('heroSub').textContent=bal>=0?'▲ Is mahine ka surplus':'▼ Is mahine ka deficit';
-  document.getElementById('todayAmt').textContent=r(todayTot);
-  document.getElementById('monthAmt').textContent=r(monthTot);
-  document.getElementById('txnCnt').textContent=monthExp.length+monthInc.length;
-  document.getElementById('incAmt').textContent=r(incTot);
-  document.getElementById('savAmt').textContent=r(Math.max(0,bal));
-  if(DS.settings.limitEnabled&&DS.settings.dailyLimit){
-    const pct=Math.min(100,(todayTot/DS.settings.dailyLimit)*100);
-    document.getElementById('limitStrip').style.display='';
-    document.getElementById('limitFill').style.width=pct+'%';
-    document.getElementById('limitFill').classList.toggle('over',pct>=100);
-    document.getElementById('limitTxt').textContent=`${r(todayTot)} / ${r(DS.settings.dailyLimit)}`;
-  } else document.getElementById('limitStrip').style.display='none';
+  const today=toDS(new Date()), now=new Date(), cm=now.getMonth(), cy=now.getFullYear();
+  const tE=DS.txns.filter(t=>t.type==='expense'&&t.date===today);
+  const mE=DS.txns.filter(t=>t.type==='expense'&&smth(t.date,cm,cy));
+  const mI=DS.txns.filter(t=>t.type==='income'&&smth(t.date,cm,cy));
+  const tT=sm(tE), mT=sm(mE), iT=sm(mI), bal=iT-mT;
+  qs('#heroAmt').textContent=r(Math.abs(bal));
+  qs('#heroSub').textContent=bal>=0?'▲ Is mahine ka surplus':'▼ Is mahine ka deficit';
+  qs('#todayAmt').textContent=r(tT);
+  qs('#monthAmt').textContent=r(mT);
+  qs('#txnCnt').textContent=mE.length+mI.length;
+  qs('#incAmt').textContent=r(iT);
+  qs('#savAmt').textContent=r(Math.max(0,bal));
+  // Limit bar
+  const ls=DS.settings;
+  if(ls.limitEnabled&&ls.dailyLimit){
+    const pct=Math.min(100,(tT/ls.dailyLimit)*100);
+    qs('#lstrip').style.display='';
+    qs('#lfill').style.width=pct+'%';
+    qs('#lfill').classList.toggle('over',pct>=100);
+    qs('#ltxt').textContent=`${r(tT)} / ${r(ls.dailyLimit)}`;
+  } else qs('#lstrip').style.display='none';
   // Categories
-  const ct={};EXP_CATS.forEach(c=>{ct[c.id]=0;});monthExp.forEach(t=>{if(ct[t.cat]!==undefined)ct[t.cat]+=t.amount;});
-  const sorted=EXP_CATS.filter(c=>ct[c.id]>0).sort((a,b)=>ct[b.id]-ct[a.id]);
-  const cs=document.getElementById('catSummary');
-  cs.innerHTML=sorted.length?sorted.slice(0,6).map(c=>{const pct=monthTot>0?((ct[c.id]/monthTot)*100).toFixed(0):0;return`<div class="cat-row-item"><div class="cat-ico" style="background:${c.color}18"><span class="material-icons-round" style="color:${c.color}">${c.icon}</span></div><div class="cat-meta"><div class="cat-name-r">${c.label}</div><div class="cat-prog-bar"><div class="cat-prog-fill" style="width:${pct}%;background:${c.color}"></div></div></div><div class="cat-pct-r">${pct}%</div><div class="cat-amt-r" style="color:${c.color}">${r(ct[c.id])}</div></div>`;}).join(''):'<div style="text-align:center;color:var(--text-muted);padding:18px;font-size:12px">Is mahine koi kharcha nahi</div>';
+  const ct={};ECATS.forEach(c=>{ct[c.id]=0;});
+  mE.forEach(t=>{if(ct[t.cat]!==undefined) ct[t.cat]+=t.amount;});
+  const sorted=ECATS.filter(c=>ct[c.id]>0).sort((a,b)=>ct[b.id]-ct[a.id]);
+  const cs=qs('#catSummary');
+  cs.innerHTML=sorted.length?sorted.slice(0,6).map(c=>{
+    const pct=mT>0?((ct[c.id]/mT)*100).toFixed(0):0;
+    return`<div class="crow"><div class="ci" style="background:${c.c}18"><span class="material-icons-round" style="color:${c.c}">${c.ico}</span></div><div class="cm"><div class="cn">${c.n}</div><div class="cpbar"><div class="cpfill" style="width:${pct}%;background:${c.c}"></div></div></div><div class="cp2">${pct}%</div><div class="ca" style="color:${c.c}">${r(ct[c.id])}</div></div>`;
+  }).join(''):'<div class="empty"><span class="material-icons-round">pie_chart</span><p>Is mahine koi kharcha nahi</p></div>';
   // Recent
-  const rt=document.getElementById('recentTxns');
-  const recent=DS.txns.slice(0,5);
-  rt.innerHTML=recent.length?recent.map(t=>txnHTML(t,false)).join(''):`<div class="empty"><span class="material-icons-round">receipt_long</span><h3>Koi transaction nahi</h3><p>+ dabao apna pehla kharcha add karne ke liye</p></div>`;
-  // Upcoming bills on dashboard
-  const dueBills=DS.bills.filter(b=>!b.paid&&daysUntilDue(b.dueDate)<=3).slice(0,3);
-  const dbw=document.getElementById('dashBillsWrap');
-  if(dueBills.length){dbw.style.display='';document.getElementById('dashBillsList').innerHTML=dueBills.map(b=>billCardHTML(b,false)).join('');}
+  const rt=qs('#recentTxns');
+  const rec=DS.txns.slice(0,5);
+  rt.innerHTML=rec.length?rec.map(t=>txnRow(t,false)).join(''):`<div class="empty"><span class="material-icons-round">receipt_long</span><h3>Koi transaction nahi</h3><p>+ dabao pehla kharcha add karne ke liye</p></div>`;
+  // Dashboard bills
+  const due=DS.bills.filter(b=>!b.paid&&dUntil(b.dueDate)<=3).sort((a,b)=>dUntil(a.dueDate)-dUntil(b.dueDate)).slice(0,3);
+  const dbw=qs('#dashBillsWrap');
+  if(due.length){dbw.style.display='';qs('#dashBillsList').innerHTML=due.map(b=>billRow(b,false)).join('');}
   else dbw.style.display='none';
-  updateNotifBadge();
-}
-function txnHTML(t,actions){
-  const cats=t.type==='expense'?EXP_CATS:INC_CATS;
-  const cat=cats.find(c=>c.id===t.cat)||{label:t.cat,icon:'paid',color:'#8888aa'};
-  const payLabel=t.type==='expense'?`<span class="pay-tag ${t.pay?.toLowerCase()}">${t.pay}</span>`:`<span class="pay-tag income-tag">Income</span>`;
-  const act=actions?`<div class="txn-actions-row">
-    <button class="ta-btn edit" onclick="event.stopPropagation();editTxn('${t.id}')"><span class="material-icons-round">edit</span></button>
-    <button class="ta-btn wa" onclick="event.stopPropagation();openWaShare('${t.id}')"><span class="material-icons-round">share</span></button>
-    <button class="ta-btn del" onclick="event.stopPropagation();delTxn('${t.id}')"><span class="material-icons-round">delete</span></button>
-  </div>`:'';
-  return`<div class="txn ${t.type==='expense'?'exp':'inc'}"><div class="txn-ico" style="background:${cat.color}18"><span class="material-icons-round" style="color:${cat.color}">${cat.icon}</span></div><div class="txn-body"><div class="t-cat">${cat.label} ${payLabel}</div><div class="t-note">${t.note||'Koi note nahi'}</div><div class="t-time">${fmtDate(t.date)} · ${t.time}</div></div><div class="txn-right"><div class="t-amt ${t.type==='expense'?'exp':'inc'}">${t.type==='expense'?'-':'+'}${r(t.amount)}</div>${act}</div></div>`;
+  updNotif();
 }
 
-// ============================================================
+function txnRow(t,acts){
+  const cats=t.type==='expense'?ECATS:ICATS;
+  const cat=cats.find(c=>c.id===t.cat)||{n:t.cat,ico:'paid',c:'#888'};
+  const pt=t.type==='expense'?`<span class="tag ${(t.pay||'').toLowerCase()}">${t.pay||''}</span>`:`<span class="tag income-tag">Amdani</span>`;
+  const ab=acts?`<div class="tacts">
+    <button class="tabtn ed" onclick="event.stopPropagation();editTxn('${t.id}')" title="Edit"><span class="material-icons-round">edit</span></button>
+    <button class="tabtn wa" onclick="event.stopPropagation();openWa('${t.id}')" title="WhatsApp Share"><span class="material-icons-round">share</span></button>
+    <button class="tabtn dl" onclick="event.stopPropagation();delTxn('${t.id}')" title="Delete"><span class="material-icons-round">delete</span></button>
+  </div>`:'';
+  return`<div class="txn ${t.type==='expense'?'ex':'in'}">
+    <div class="tico" style="background:${cat.c}18"><span class="material-icons-round" style="color:${cat.c}">${cat.ico}</span></div>
+    <div class="tbody">
+      <div class="tc">${cat.n} ${pt}</div>
+      <div class="tn">${t.note||'Note nahi'}</div>
+      <div class="tt">${fmtDate(t.date)} · ${t.time||''}</div>
+    </div>
+    <div class="tright">
+      <div class="tamt ${t.type==='expense'?'ex':'in'}">${t.type==='expense'?'-':'+'}${r(t.amount)}</div>
+      ${ab}
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════
 //  HISTORY
-// ============================================================
+// ═══════════════════════════════════════════════════
 function renderHistory(){
-  const fr=document.getElementById('catFilters');
-  if(fr.children.length<2){fr.innerHTML=`<div class="fc on" data-c="all" onclick="setCatF(this)">All</div>`+EXP_CATS.map(c=>`<div class="fc" data-c="${c.id}" onclick="setCatF(this)">${c.label}</div>`).join('')+INC_CATS.map(c=>`<div class="fc" data-c="${c.id}" onclick="setCatF(this)">${c.label}</div>`).join('');}
-  const ac=document.querySelector('#catFilters .fc.on')?.dataset.c||'all';
-  const sq=document.getElementById('searchInp').value.toLowerCase();
-  const fd=document.getElementById('dateFilter').value;
+  const fr=qs('#catFilters');
+  if(!fr.children.length){
+    fr.innerHTML=`<div class="fc on" data-c="all" onclick="setCF(this)">Sab</div>`
+      +ECATS.map(c=>`<div class="fc" data-c="${c.id}" onclick="setCF(this)">${c.n}</div>`).join('')
+      +ICATS.map(c=>`<div class="fc" data-c="${c.id}" onclick="setCF(this)">${c.n}</div>`).join('');
+  }
+  const ac=(qs('#catFilters .fc.on')||{dataset:{c:'all'}}).dataset.c;
+  const sq=(qs('#searchInp').value||'').toLowerCase();
+  const fd=qs('#dateFilter').value;
   let txns=[...DS.txns];
   if(ac!=='all') txns=txns.filter(t=>t.cat===ac);
-  if(sq) txns=txns.filter(t=>(t.note||'').toLowerCase().includes(sq));
+  if(sq) txns=txns.filter(t=>(t.note||'').toLowerCase().includes(sq)||(t.cat||'').toLowerCase().includes(sq));
   if(fd) txns=txns.filter(t=>t.date===fd);
-  const hc=document.getElementById('historyContent');
-  if(!txns.length){hc.innerHTML=`<div class="empty"><span class="material-icons-round">search_off</span><h3>Kuch nahi mila</h3><p>Alag filter try karen</p></div>`;return;}
-  const grps={};txns.forEach(t=>{if(!grps[t.date])grps[t.date]=[];grps[t.date].push(t);});
+  const hc=qs('#histContent');
+  if(!txns.length){hc.innerHTML=`<div class="empty"><span class="material-icons-round">search_off</span><h3>Kuch nahi mila</h3><p>Alag filter try karein</p></div>`;return;}
+  const grps={};
+  txns.forEach(t=>{(grps[t.date]=grps[t.date]||[]).push(t);});
   const days=Object.keys(grps).sort((a,b)=>new Date(b)-new Date(a));
-  hc.innerHTML=days.map(d=>{const items=grps[d];const dt=items.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);return`<div class="day-group"><div class="day-label"><span class="dl">${fmtDate(d)}</span><span class="dr">-${r(dt)}</span></div><div class="txn-list">${items.map(t=>txnHTML(t,true)).join('')}</div></div>`;}).join('');
+  hc.innerHTML=days.map(d=>{
+    const items=grps[d];
+    const dt=items.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+    return`<div class="dgrp"><div class="dlbl"><span class="dl">${fmtDate(d)}</span><span class="dr">-${r(dt)}</span></div><div class="tlist">${items.map(t=>txnRow(t,true)).join('')}</div></div>`;
+  }).join('');
 }
-function setCatF(el){document.querySelectorAll('#catFilters .fc').forEach(c=>c.classList.remove('on'));el.classList.add('on');renderHistory();}
-function clrDateFilter(){document.getElementById('dateFilter').value='';renderHistory();}
+function setCF(el){qs('#catFilters .fc.on').classList.remove('on');el.classList.add('on');renderHistory();}
+function clearDateFilter(){qs('#dateFilter').value='';renderHistory();}
 
-// ============================================================
+// ═══════════════════════════════════════════════════
 //  REPORTS
-// ============================================================
+// ═══════════════════════════════════════════════════
 function renderReports(){
-  document.getElementById('rMonthTitle').textContent=new Date(rYear,rMonth).toLocaleDateString('en-IN',{month:'long',year:'numeric'});
-  buildBarChart();buildPieChart();buildLineChart();
+  qs('#rMonthTitle').textContent=new Date(rYear,rMonth).toLocaleDateString('en-IN',{month:'long',year:'numeric'});
+  buildBar();buildPie();buildLine();
 }
 function chgMonth(d){rMonth+=d;if(rMonth<0){rMonth=11;rYear--;}if(rMonth>11){rMonth=0;rYear++;}renderReports();}
-const cOpts=()=>({grid:document.documentElement.getAttribute('data-theme')==='light'?'rgba(0,0,0,.06)':'rgba(255,255,255,.06)',text:document.documentElement.getAttribute('data-theme')==='light'?'#666':'#888aaa'});
-function buildBarChart(){
-  if(barC)barC.destroy();const labels=[],data=[];
-  for(let i=5;i>=0;i--){let m=rMonth-i,y=rYear;if(m<0){m+=12;y--;}labels.push(new Date(y,m).toLocaleDateString('en-IN',{month:'short'}));data.push(DS.txns.filter(t=>t.type==='expense'&&sameMonth(t.date,m,y)).reduce((s,t)=>s+t.amount,0));}
-  const o=cOpts();barC=new Chart(document.getElementById('barChart'),{type:'bar',data:{labels,datasets:[{data,backgroundColor:'rgba(139,127,255,.75)',borderRadius:8,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:o.grid},ticks:{color:o.text}},y:{grid:{color:o.grid},ticks:{color:o.text,callback:v=>'₹'+v.toLocaleString('en-IN')}}}}});
+const cO=()=>({g:document.documentElement.getAttribute('data-theme')==='light'?'rgba(0,0,0,.06)':'rgba(255,255,255,.06)',t:document.documentElement.getAttribute('data-theme')==='light'?'#555':'#888aaa'});
+
+function buildBar(){
+  if(barC){barC.destroy();barC=null;}
+  const labels=[],data=[];
+  for(let i=5;i>=0;i--){let m=rMonth-i,y=rYear;if(m<0){m+=12;y--;}labels.push(new Date(y,m).toLocaleDateString('en-IN',{month:'short'}));data.push(DS.txns.filter(t=>t.type==='expense'&&smth(t.date,m,y)).reduce((s,t)=>s+t.amount,0));}
+  const o=cO();
+  barC=new Chart(qs('#barChart'),{type:'bar',data:{labels,datasets:[{data,backgroundColor:'rgba(139,127,255,.75)',borderRadius:8,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:o.g},ticks:{color:o.t}},y:{grid:{color:o.g},ticks:{color:o.t,callback:v=>'₹'+v.toLocaleString('en-IN')}}}}});
 }
-function buildPieChart(){
-  if(pieC)pieC.destroy();const labs=[],data=[],cols=[];
-  EXP_CATS.forEach(c=>{const tot=DS.txns.filter(t=>t.type==='expense'&&sameMonth(t.date,rMonth,rYear)&&t.cat===c.id).reduce((s,t)=>s+t.amount,0);if(tot>0){labs.push(c.label);data.push(tot);cols.push(c.color);}});
-  if(!data.length){labs.push('No Data');data.push(1);cols.push('#333');}
-  const o=cOpts();pieC=new Chart(document.getElementById('pieChart'),{type:'doughnut',data:{labels:labs,datasets:[{data,backgroundColor:cols,borderWidth:0,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom',labels:{color:o.text,padding:10,font:{size:10}}}}}});
+function buildPie(){
+  if(pieC){pieC.destroy();pieC=null;}
+  const lbs=[],data=[],clrs=[];
+  ECATS.forEach(c=>{const tot=DS.txns.filter(t=>t.type==='expense'&&smth(t.date,rMonth,rYear)&&t.cat===c.id).reduce((s,t)=>s+t.amount,0);if(tot>0){lbs.push(c.n);data.push(tot);clrs.push(c.c);}});
+  if(!data.length){lbs.push('Koi Data Nahi');data.push(1);clrs.push('#333');}
+  const o=cO();
+  pieC=new Chart(qs('#pieChart'),{type:'doughnut',data:{labels:lbs,datasets:[{data,backgroundColor:clrs,borderWidth:0,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom',labels:{color:o.t,padding:10,font:{size:10}}}}}});
 }
-function buildLineChart(){
-  if(lineC)lineC.destroy();const days=new Date(rYear,rMonth+1,0).getDate();const labs=[],data=[];
-  for(let d=1;d<=days;d++){const ds=`${rYear}-${String(rMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;labs.push(d);data.push(DS.txns.filter(t=>t.type==='expense'&&t.date===ds).reduce((s,t)=>s+t.amount,0));}
-  const o=cOpts();lineC=new Chart(document.getElementById('lineChart'),{type:'line',data:{labels:labs,datasets:[{data,borderColor:'#4db8ff',backgroundColor:'rgba(77,184,255,.1)',tension:.4,fill:true,pointRadius:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:o.grid},ticks:{color:o.text}},y:{grid:{color:o.grid},ticks:{color:o.text,callback:v=>'₹'+v.toLocaleString('en-IN')}}}}});
+function buildLine(){
+  if(lineC){lineC.destroy();lineC=null;}
+  const days=new Date(rYear,rMonth+1,0).getDate();
+  const lbs=[],data=[];
+  for(let d=1;d<=days;d++){const ds=`${rYear}-${String(rMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;lbs.push(d);data.push(DS.txns.filter(t=>t.type==='expense'&&t.date===ds).reduce((s,t)=>s+t.amount,0));}
+  const o=cO();
+  lineC=new Chart(qs('#lineChart'),{type:'line',data:{labels:lbs,datasets:[{data,borderColor:'#4db8ff',backgroundColor:'rgba(77,184,255,.1)',tension:.4,fill:true,pointRadius:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:o.g},ticks:{color:o.t}},y:{grid:{color:o.g},ticks:{color:o.t,callback:v=>'₹'+v.toLocaleString('en-IN')}}}}});
 }
 
-// ============================================================
-//  BILL REMINDERS
-// ============================================================
-function daysUntilDue(dueDateStr){
-  const due=new Date(dueDateStr+'T00:00:00');
-  const today=new Date();today.setHours(0,0,0,0);
-  return Math.ceil((due-today)/86400000);
-}
-function billCardHTML(bill,showActions){
-  const days=daysUntilDue(bill.dueDate);
-  const cat=EXP_CATS.find(c=>c.id===bill.cat)||{color:'#818cf8'};
-  const ico=BILL_ICONS[bill.cat]||'payments';
-  let statusClass='ok',statusTxt='Upcoming',cardClass='upcoming';
-  if(bill.paid){statusClass='paid';statusTxt='Paid';cardClass='';}
-  else if(days<0){statusClass='today';statusTxt='Overdue';cardClass='due-today';}
-  else if(days===0){statusClass='today';statusTxt='Due Today';cardClass='due-today';}
-  else if(days<=3){statusClass='soon';statusTxt=`${days}d left`;cardClass='due-soon';}
-  else statusTxt=`${days}d left`;
-  const acts=showActions?`<div class="bill-actions">
-    ${!bill.paid?`<button class="ta-btn" style="color:var(--green);border-color:var(--green)" onclick="markBillPaid('${bill.id}')"><span class="material-icons-round">check</span></button>`:''}
-    <button class="ta-btn edit" onclick="editBill('${bill.id}')"><span class="material-icons-round">edit</span></button>
-    <button class="ta-btn del" onclick="delBill('${bill.id}')"><span class="material-icons-round">delete</span></button>
+// ═══════════════════════════════════════════════════
+//  BILLS
+// ═══════════════════════════════════════════════════
+function dUntil(ds){const d=new Date(ds+'T00:00:00');const t=new Date();t.setHours(0,0,0,0);return Math.ceil((d-t)/86400000);}
+
+function billRow(b,acts){
+  const days=dUntil(b.dueDate);
+  const cat=ECATS.find(c=>c.id===b.cat)||{c:'#818cf8'};
+  const ico=BICO[b.cat]||'payments';
+  let sc='ok',st='Aane wala',cc='uc';
+  if(b.paid){sc='pd';st='Paid';cc='';}
+  else if(days<0){sc='tod';st=`${Math.abs(days)}d overdue`;cc='dt';}
+  else if(days===0){sc='tod';st='Aaj Due';cc='dt';}
+  else if(days<=3){sc='sn';st=`${days}d baki`;cc='ds';}
+  else st=`${days}d baki`;
+  const ab=acts?`<div class="bacts">
+    ${!b.paid?`<button class="tabtn" style="color:var(--green);border-color:var(--green)" onclick="markPaid('${b.id}')" title="Paid mark karein"><span class="material-icons-round" style="font-size:13px">check</span></button>`:''}
+    <button class="tabtn ed" onclick="editBill('${b.id}')" title="Edit"><span class="material-icons-round">edit</span></button>
+    <button class="tabtn dl" onclick="delBill('${b.id}')" title="Delete"><span class="material-icons-round">delete</span></button>
   </div>`:'';
-  return`<div class="bill-card ${cardClass}"><div class="bill-ico" style="background:${cat.color}18"><span class="material-icons-round" style="color:${cat.color}">${ico}</span></div><div class="bill-info"><div class="b-name">${bill.name}</div><div class="b-due">${bill.repeat!=='none'?'🔄 '+bill.repeat.charAt(0).toUpperCase()+bill.repeat.slice(1):''} · Due: ${bill.dueDate}</div>${bill.note?`<div class="b-due">${bill.note}</div>`:''}</div><div class="bill-right"><div class="bill-amt" style="color:${cat.color}">${r(bill.amount)}</div><div class="bill-status ${statusClass}">${statusTxt}</div>${acts}</div></div>`;
+  return`<div class="bcard ${cc}">
+    <div class="bico" style="background:${cat.c}18"><span class="material-icons-round" style="color:${cat.c}">${ico}</span></div>
+    <div class="binfo">
+      <div class="bn">${b.name}</div>
+      <div class="bd">${b.repeat!=='none'?'🔄 '+{monthly:'Har Mahine',weekly:'Har Hafte',yearly:'Har Saal'}[b.repeat]+' · ':''} Due: ${b.dueDate}</div>
+      ${b.note?`<div class="bd">${b.note}</div>`:''}
+    </div>
+    <div class="bright">
+      <div class="bamt" style="color:${cat.c}">${r(b.amount)}</div>
+      <div class="bst ${sc}">${st}</div>
+      ${ab}
+    </div>
+  </div>`;
 }
+
 function saveBill(){
-  const name=document.getElementById('bNameInp').value.trim();
-  const amt=parseFloat(document.getElementById('bAmtInp').value);
-  const due=document.getElementById('bDueInp').value;
-  if(!name){toast('Bill ka naam darj karen','err');return;}
-  if(!amt||amt<=0){toast('Amount darj karen','err');return;}
-  if(!due){toast('Due date select karen','err');return;}
-  const bill={id:editBillId||Date.now().toString(),name,amount:amt,dueDate:due,cat:document.getElementById('bCatInp').value,repeat:document.getElementById('bRepeatInp').value,note:document.getElementById('bNoteInp').value.trim(),paid:false};
-  if(editBillId){const i=DS.bills.findIndex(b=>b.id===editBillId);if(i>-1)DS.bills[i]=bill;toast('Bill update hua!','ok');}
-  else{DS.bills.push(bill);toast('Bill reminder add hua!','ok');}
-  saveBills();closeM('billModal');renderBills();renderDash();updateNotifBadge();
-  document.getElementById('bNameInp').value='';document.getElementById('bAmtInp').value='';document.getElementById('bNoteInp').value='';
+  const name=(qs('#bNameInp').value||'').trim();
+  const amt=parseFloat(qs('#bAmtInp').value);
+  const due=qs('#bDueInp').value;
+  if(!name){toast('Bill ka naam darj karein','err');return;}
+  if(!amt||amt<=0){toast('Valid amount darj karein','err');return;}
+  if(!due){toast('Due date select karein','err');return;}
+  const bill={
+    id:editBillId||Date.now().toString(),
+    name, amount:amt, dueDate:due,
+    cat:qs('#bCatInp').value,
+    repeat:qs('#bRepeatInp').value,
+    note:(qs('#bNoteInp').value||'').trim(),
+    paid:false
+  };
+  if(editBillId){
+    const i=DS.bills.findIndex(b=>b.id===editBillId);
+    if(i>-1) DS.bills[i]={...DS.bills[i],...bill};
+    toast('Bill update hua! ✓','ok');
+  } else {
+    DS.bills.push(bill);
+    toast('Bill reminder add hua! ✓','ok');
+  }
+  sB();closeM('billModal');renderBills();renderDash();
 }
 function editBill(id){
   const b=DS.bills.find(x=>x.id===id);if(!b)return;
   editBillId=id;
-  document.getElementById('bNameInp').value=b.name;document.getElementById('bAmtInp').value=b.amount;
-  document.getElementById('bDueInp').value=b.dueDate;document.getElementById('bCatInp').value=b.cat;
-  document.getElementById('bRepeatInp').value=b.repeat;document.getElementById('bNoteInp').value=b.note||'';
-  document.getElementById('billModalTitle').textContent='Edit Bill';document.getElementById('billBtnTxt').textContent='Update Bill';
+  qs('#billMTitle').textContent='Bill Edit Karein';
+  qs('#billSubmitBtn').textContent='Bill Update Karein';
+  qs('#bNameInp').value=b.name;qs('#bAmtInp').value=b.amount;
+  qs('#bDueInp').value=b.dueDate;qs('#bCatInp').value=b.cat;
+  qs('#bRepeatInp').value=b.repeat;qs('#bNoteInp').value=b.note||'';
   openM('billModal');
 }
-function delBill(id){if(!confirm('Delete karen?'))return;DS.bills=DS.bills.filter(b=>b.id!==id);saveBills();renderBills();renderDash();updateNotifBadge();toast('Bill delete hua','err');}
-function markBillPaid(id){
-  const b=DS.bills.find(x=>x.id===id);if(!b)return;
-  b.paid=true;
-  // Auto add as expense transaction
-  DS.txns.unshift({id:Date.now().toString(),type:'expense',amount:b.amount,cat:b.cat,date:toDateStr(new Date()),time:new Date().toTimeString().slice(0,5),note:'Bill paid: '+b.name,pay:'UPI'});
-  saveTxns();
-  // If monthly repeat, set next due date
-  if(b.repeat==='monthly'){const nd=new Date(b.dueDate);nd.setMonth(nd.getMonth()+1);b.dueDate=toDateStr(nd);b.paid=false;}
-  else if(b.repeat==='weekly'){const nd=new Date(b.dueDate);nd.setDate(nd.getDate()+7);b.dueDate=toDateStr(nd);b.paid=false;}
-  else if(b.repeat==='yearly'){const nd=new Date(b.dueDate);nd.setFullYear(nd.getFullYear()+1);b.dueDate=toDateStr(nd);b.paid=false;}
-  saveBills();renderBills();renderDash();updateNotifBadge();toast('Bill paid! Kharche mein add hua 💳','ok');
+function delBill(id){
+  if(!confirm('Bill delete karein?'))return;
+  DS.bills=DS.bills.filter(b=>b.id!==id);
+  sB();renderBills();renderDash();updNotif();toast('Bill delete hua','err');
 }
-function setBillFilter(el){document.querySelectorAll('#billFilters .fc').forEach(c=>c.classList.remove('on'));el.classList.add('on');renderBills();}
+function markPaid(id){
+  const b=DS.bills.find(x=>x.id===id);if(!b)return;
+  // Add as expense
+  DS.txns.unshift({id:Date.now().toString(),type:'expense',amount:b.amount,cat:b.cat,date:toDS(new Date()),time:new Date().toTimeString().slice(0,5),note:'Bill paid: '+b.name,pay:'UPI'});
+  sT();
+  // Handle repeat
+  if(b.repeat==='monthly'){const nd=new Date(b.dueDate);nd.setMonth(nd.getMonth()+1);b.dueDate=toDS(nd);}
+  else if(b.repeat==='weekly'){const nd=new Date(b.dueDate);nd.setDate(nd.getDate()+7);b.dueDate=toDS(nd);}
+  else if(b.repeat==='yearly'){const nd=new Date(b.dueDate);nd.setFullYear(nd.getFullYear()+1);b.dueDate=toDS(nd);}
+  else b.paid=true;
+  sB();renderBills();renderDash();updNotif();toast('Bill paid! Kharche mein add hua ✓','ok');
+}
+function setBF(el){qs('#billFilters .fc.on').classList.remove('on');el.classList.add('on');renderBills();}
 function renderBills(){
-  const af=document.querySelector('#billFilters .fc.on')?.dataset.bf||'all';
-  const today=toDateStr(new Date());
+  const af=(qs('#billFilters .fc.on')||{dataset:{bf:'all'}}).dataset.bf;
   let bills=[...DS.bills].sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
-  if(af==='today') bills=bills.filter(b=>!b.paid&&daysUntilDue(b.dueDate)<=0);
-  else if(af==='week') bills=bills.filter(b=>!b.paid&&daysUntilDue(b.dueDate)<=7&&daysUntilDue(b.dueDate)>=0);
+  if(af==='today') bills=bills.filter(b=>!b.paid&&dUntil(b.dueDate)<=0);
+  else if(af==='week') bills=bills.filter(b=>!b.paid&&dUntil(b.dueDate)<=7&&dUntil(b.dueDate)>=0);
   else if(af==='paid') bills=bills.filter(b=>b.paid);
   else if(af==='unpaid') bills=bills.filter(b=>!b.paid);
-  const bl=document.getElementById('billsList');
-  bl.innerHTML=bills.length?bills.map(b=>billCardHTML(b,true)).join(''):`<div class="empty"><span class="material-icons-round">event_available</span><h3>Koi bill nahi</h3><p>+ Add Bill dabao reminder add karne ke liye</p></div>`;
+  const bl=qs('#billsList');
+  bl.innerHTML=bills.length?bills.map(b=>billRow(b,true)).join(''):`<div class="empty"><span class="material-icons-round">event_available</span><h3>Koi bill nahi</h3><p>+ Add Bill dabao</p></div>`;
   renderEmis();
+  updNotif();
 }
-function updateNotifBadge(){
-  const dueCount=DS.bills.filter(b=>!b.paid&&daysUntilDue(b.dueDate)<=1).length;
-  const badge=document.getElementById('notifBadge');
-  const dot=document.getElementById('billsDot');
-  badge.classList.toggle('show',dueCount>0);
-  if(dot) dot.classList.toggle('show',dueCount>0);
+function updNotif(){
+  const cnt=DS.bills.filter(b=>!b.paid&&dUntil(b.dueDate)<=1).length;
+  qs('#notifDot').classList.toggle('on',cnt>0);
+  qs('#billsDot').classList.toggle('on',cnt>0);
 }
 
-// ============================================================
-//  EMI TRACKER
-// ============================================================
+// ═══════════════════════════════════════════════════
+//  EMI
+// ═══════════════════════════════════════════════════
 function saveEmi(){
-  const name=document.getElementById('eNameInp').value.trim();
-  const total=parseFloat(document.getElementById('eTotalInp').value);
-  const emi=parseFloat(document.getElementById('eEmiInp').value);
-  const totalEmis=parseInt(document.getElementById('eTotalEmiInp').value);
-  const paid=parseInt(document.getElementById('ePaidInp').value)||0;
-  if(!name||!total||!emi||!totalEmis){toast('Sabhi fields bharen','err');return;}
-  const emiObj={id:editEmiId||Date.now().toString(),name,bank:document.getElementById('eBankInp').value.trim(),total,emi,totalEmis,paid,startDate:document.getElementById('eStartInp').value,dueDay:parseInt(document.getElementById('eDueDayInp').value)||5,rate:parseFloat(document.getElementById('eRateInp').value)||0};
-  if(editEmiId){const i=DS.emis.findIndex(e=>e.id===editEmiId);if(i>-1)DS.emis[i]=emiObj;toast('EMI update hua!','ok');}
-  else{DS.emis.push(emiObj);toast('EMI add hua!','ok');}
-  saveEmis();closeM('emiModal');renderBills();
-  ['eNameInp','eBankInp','eTotalInp','eEmiInp','eTotalEmiInp','ePaidInp','eRateInp','eDueDayInp'].forEach(id=>document.getElementById(id).value='');
-}
-function delEmi(id){if(!confirm('Delete karen?'))return;DS.emis=DS.emis.filter(e=>e.id!==id);saveEmis();renderBills();toast('EMI delete hua','err');}
-function renderEmis(){
-  const el=document.getElementById('emiList');
-  if(!DS.emis.length){el.innerHTML=`<div class="empty"><span class="material-icons-round">credit_card</span><h3>Koi EMI nahi</h3><p>+ Add EMI dabao apna loan track karne ke liye</p></div>`;return;}
-  el.innerHTML=DS.emis.map((e,idx)=>{
-    const rem=e.totalEmis-e.paid;
-    const pct=Math.min(100,(e.paid/e.totalEmis)*100).toFixed(0);
-    const remAmt=rem*e.emi;
-    const clr=EMI_COLORS[idx%EMI_COLORS.length];
-    const nextDue=`${e.dueDay} ${new Date().toLocaleDateString('en-IN',{month:'short'})}`;
-    return`<div class="emi-card">
-      <div class="emi-top">
-        <div class="emi-ico" style="background:${clr}"><span class="material-icons-round">credit_card</span></div>
-        <div class="emi-title">
-          <div class="e-name">${e.name}${e.bank?` · ${e.bank}`:''}</div>
-          <div class="e-bank">Next due: ${nextDue} · Rate: ${e.rate}% p.a.</div>
-          <div class="e-emi-amt">${r(e.emi)}/month</div>
-        </div>
-        <div style="display:flex;gap:4px">
-          <button class="ta-btn edit" onclick="editEmiItem('${e.id}')"><span class="material-icons-round">edit</span></button>
-          <button class="ta-btn del" onclick="delEmi('${e.id}')"><span class="material-icons-round">delete</span></button>
-        </div>
-      </div>
-      <div class="emi-progress">
-        <div class="emi-prog-bar"><div class="emi-prog-fill" style="width:${pct}%;background:${clr}"></div></div>
-        <div class="emi-prog-labels"><span>${e.paid}/${e.totalEmis} EMIs paid (${pct}%)</span><span>${rem} remaining</span></div>
-      </div>
-      <div class="emi-bottom">
-        <div class="emi-tag">Total: ${r(e.total)}</div>
-        <div class="emi-tag">Baki: ${r(remAmt)}</div>
-        <div class="emi-tag" style="color:${clr}">Paid: ${r(e.paid*e.emi)}</div>
-      </div>
-    </div>`;
-  }).join('');
+  const name=(qs('#eNameInp').value||'').trim();
+  const total=parseFloat(qs('#eTotalInp').value);
+  const emi=parseFloat(qs('#eEmiInp').value);
+  const totalE=parseInt(qs('#eTotalEmiInp').value);
+  const paid=parseInt(qs('#ePaidInp').value)||0;
+  if(!name){toast('EMI ka naam darj karein','err');return;}
+  if(!total||!emi||!totalE){toast('Sabhi fields bharen','err');return;}
+  const obj={id:editEmiId||Date.now().toString(),name,bank:(qs('#eBankInp').value||'').trim(),total,emi,totalEmis:totalE,paid,startDate:qs('#eStartInp').value,dueDay:parseInt(qs('#eDayInp').value)||5,rate:parseFloat(qs('#eRateInp').value)||0};
+  if(editEmiId){const i=DS.emis.findIndex(e=>e.id===editEmiId);if(i>-1) DS.emis[i]=obj;toast('EMI update hua! ✓','ok');}
+  else{DS.emis.push(obj);toast('EMI add hua! ✓','ok');}
+  sE();closeM('emiModal');renderEmis();
 }
 function editEmiItem(id){
   const e=DS.emis.find(x=>x.id===id);if(!e)return;
   editEmiId=id;
-  document.getElementById('eNameInp').value=e.name;document.getElementById('eBankInp').value=e.bank||'';
-  document.getElementById('eTotalInp').value=e.total;document.getElementById('eEmiInp').value=e.emi;
-  document.getElementById('eTotalEmiInp').value=e.totalEmis;document.getElementById('ePaidInp').value=e.paid;
-  document.getElementById('eStartInp').value=e.startDate;document.getElementById('eDueDayInp').value=e.dueDay;
-  document.getElementById('eRateInp').value=e.rate;
-  document.getElementById('emiModalTitle').textContent='Edit EMI';document.getElementById('emiBtnTxt').textContent='Update EMI';
+  qs('#emiMTitle').textContent='EMI Edit Karein';
+  qs('#emiSubmitBtn').textContent='EMI Update Karein';
+  qs('#eNameInp').value=e.name;qs('#eBankInp').value=e.bank||'';
+  qs('#eTotalInp').value=e.total;qs('#eEmiInp').value=e.emi;
+  qs('#eTotalEmiInp').value=e.totalEmis;qs('#ePaidInp').value=e.paid;
+  qs('#eStartInp').value=e.startDate;qs('#eDayInp').value=e.dueDay;
+  qs('#eRateInp').value=e.rate;
   openM('emiModal');
 }
-
-// ============================================================
-//  WHATSAPP SHARE
-// ============================================================
-function openWaShare(txnId){waTxnId=txnId;waType='single';setWaType(document.querySelector('[data-wt="single"]'));openM('waModal');}
-function setWaType(el){
-  document.querySelectorAll('[data-wt]').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');
-  waType=el.dataset.wt;updateWaPreview();
+function delEmi(id){
+  if(!confirm('EMI delete karein?'))return;
+  DS.emis=DS.emis.filter(e=>e.id!==id);sE();renderEmis();toast('EMI delete hua','err');
 }
-function updateWaPreview(){
-  let msg='';
-  const appName='📊 *MyKharcha Report*';
-  if(waType==='single'&&waTxnId){
-    const t=DS.txns.find(x=>x.id===waTxnId);
-    if(t){const cats=t.type==='expense'?EXP_CATS:INC_CATS;const cat=cats.find(c=>c.id===t.cat)||{label:t.cat};msg=`${appName}\n\n${t.type==='expense'?'💸 Kharcha':'💰 Amdani'} Record\n\n💰 Amount: *${r(t.amount)}*\n📂 Category: ${cat.label}\n📅 Date: ${t.date} ${t.time}\n${t.type==='expense'?`💳 Payment: ${t.pay}\n`:''}\n📝 Note: ${t.note||'—'}\n\n_MyKharcha App se share kiya_`;}
-  } else if(waType==='today'){
-    const today=toDateStr(new Date());
-    const todayTxns=DS.txns.filter(t=>t.date===today);
-    const exp=todayTxns.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
-    const inc=todayTxns.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
-    msg=`${appName}\n\n📅 *Aaj ka Summary* (${today})\n\n💸 Total Kharcha: *${r(exp)}*\n💰 Total Amdani: *${r(inc)}*\n💚 Balance: *${r(inc-exp)}*\n📊 Transactions: ${todayTxns.length}\n\n_MyKharcha App se share kiya_`;
-  } else if(waType==='month'){
-    const now=new Date(),m=now.getMonth(),y=now.getFullYear();
-    const mExp=DS.txns.filter(t=>t.type==='expense'&&sameMonth(t.date,m,y));
-    const mInc=DS.txns.filter(t=>t.type==='income'&&sameMonth(t.date,m,y));
-    const expT=sum(mExp),incT=sum(mInc);
-    const mn=now.toLocaleDateString('en-IN',{month:'long',year:'numeric'});
-    const topCat=EXP_CATS.map(c=>({...c,t:mExp.filter(x=>x.cat===c.id).reduce((s,x)=>s+x.amount,0)})).sort((a,b)=>b.t-a.t)[0];
-    msg=`${appName}\n\n📅 *${mn} Report*\n\n💸 Kul Kharcha: *${r(expT)}*\n💰 Kul Amdani: *${r(incT)}*\n💚 Savings: *${r(Math.max(0,incT-expT))}*\n📊 Transactions: ${mExp.length+mInc.length}\n${topCat&&topCat.t>0?`🏆 Top Category: ${topCat.label} (${r(topCat.t)})\n`:''}\n_MyKharcha App se share kiya_`;
-  }
-  document.getElementById('waPreview').textContent=msg;
-}
-function doWaShare(){
-  const msg=document.getElementById('waPreview').textContent;
-  const url=`https://wa.me/?text=${encodeURIComponent(msg)}`;
-  window.open(url,'_blank');closeM('waModal');toast('WhatsApp khul raha hai!','ok');
-}
-
-// ============================================================
-//  BUDGET PLANNER
-// ============================================================
-function chgBudgetMonth(d){bMonth+=d;if(bMonth<0){bMonth=11;bYear--;}if(bMonth>11){bMonth=0;bYear++;}renderBudget();}
-function buildBudgetInputs(){
-  const inp=document.getElementById('budgetInputsList');
-  inp.innerHTML=EXP_CATS.map(c=>`<div class="fg"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="material-icons-round" style="color:${c.color};font-size:16px">${c.icon}</span><label class="fl" style="margin-bottom:0">${c.label} Budget (₹)</label></div><input type="number" class="fi" id="bg_${c.id}" placeholder="0 = No limit" value="${DS.budgets[c.id]||''}"></div>`).join('');
-}
-function saveBudgets(){
-  EXP_CATS.forEach(c=>{const v=parseFloat(document.getElementById('bg_'+c.id).value)||0;if(v>0)DS.budgets[c.id]=v;else delete DS.budgets[c.id];});
-  localStorage.setItem('mk_budgets',JSON.stringify(DS.budgets));closeM('budgetEditModal');renderBudget();toast('Budget save hua!','ok');
-}
-function renderBudget(){
-  document.getElementById('budgetMonthTitle').textContent=new Date(bYear,bMonth).toLocaleDateString('en-IN',{month:'long',year:'numeric'});
-  const monthExp=DS.txns.filter(t=>t.type==='expense'&&sameMonth(t.date,bMonth,bYear));
-  const totalBudget=Object.values(DS.budgets).reduce((s,v)=>s+v,0);
-  const totalSpent=sum(monthExp);
-  const rem=Math.max(0,totalBudget-totalSpent);
-  const pct=totalBudget>0?Math.min(100,(totalSpent/totalBudget)*100).toFixed(0):0;
-  document.getElementById('budgetTotalBudget').textContent=r(totalBudget);
-  document.getElementById('budgetSub').textContent=totalBudget>0?`Is mahine ka total budget`:'Koi budget set nahi hua';
-  document.getElementById('budgetSpent').textContent=r(totalSpent);
-  document.getElementById('budgetRemaining').textContent=r(rem);
-  document.getElementById('budgetPct').textContent=pct+'%';
-  // Category budgets
-  const bcl=document.getElementById('budgetCatList');
-  const catData=EXP_CATS.map(c=>{const spent=monthExp.filter(t=>t.cat===c.id).reduce((s,t)=>s+t.amount,0);const budget=DS.budgets[c.id]||0;return{...c,spent,budget};}).filter(c=>c.spent>0||c.budget>0).sort((a,b)=>b.spent-a.spent);
-  if(!catData.length){bcl.innerHTML='<div style="text-align:center;color:var(--text-muted);padding:18px;font-size:12px">Is mahine koi kharcha ya budget nahi</div>';return;}
-  bcl.innerHTML=catData.map(c=>{
-    const pct2=c.budget>0?Math.min(100,(c.spent/c.budget)*100).toFixed(0):(c.spent>0?100:0);
-    const fillClass=c.budget>0?(c.spent/c.budget>1?'over':c.spent/c.budget>0.8?'warn':'safe'):'safe';
-    return`<div class="budget-cat-item">
-      <div class="bci-top">
-        <div class="bci-ico" style="background:${c.color}18"><span class="material-icons-round" style="color:${c.color};font-size:14px">${c.icon}</span></div>
-        <div class="bci-name">${c.label}</div>
-        <div class="bci-pct">${pct2}%</div>
+function renderEmis(){
+  const el=qs('#emiList');
+  if(!DS.emis.length){el.innerHTML=`<div class="empty"><span class="material-icons-round">credit_card</span><h3>Koi EMI nahi</h3><p>+ Add EMI dabao loan track karne ke liye</p></div>`;return;}
+  el.innerHTML=DS.emis.map((e,idx)=>{
+    const rem=e.totalEmis-e.paid, pct=Math.min(100,(e.paid/e.totalEmis)*100).toFixed(1);
+    const remAmt=rem*e.emi, clr=ECLRS[idx%ECLRS.length];
+    return`<div class="ecard">
+      <div class="etop">
+        <div class="eico" style="background:${clr}"><span class="material-icons-round">credit_card</span></div>
+        <div class="etit">
+          <div class="en">${e.name}${e.bank?' · '+e.bank:''}</div>
+          <div class="eb">Due day: ${e.dueDay} · Rate: ${e.rate}% p.a.</div>
+          <div class="ea">${r(e.emi)}/mahine</div>
+        </div>
+        <div style="display:flex;gap:3px">
+          <button class="tabtn ed" onclick="editEmiItem('${e.id}')" title="Edit"><span class="material-icons-round">edit</span></button>
+          <button class="tabtn dl" onclick="delEmi('${e.id}')" title="Delete"><span class="material-icons-round">delete</span></button>
+        </div>
       </div>
-      <div class="bci-amounts">
-        <span class="bci-spent" style="color:${c.color}">${r(c.spent)} spent</span>
-        <span class="bci-budget">${c.budget>0?r(c.budget)+' budget':'No limit'}</span>
+      <div class="epbar"><div class="epfill" style="width:${pct}%;background:${clr}"></div></div>
+      <div class="eplbl"><span>${e.paid}/${e.totalEmis} paid (${pct}%)</span><span>${rem} baki</span></div>
+      <div class="etags">
+        <div class="etag">Total: ${r(e.total)}</div>
+        <div class="etag">Baki: ${r(remAmt)}</div>
+        <div class="etag" style="color:${clr}">Paid: ${r(e.paid*e.emi)}</div>
       </div>
-      <div class="bci-bar"><div class="bci-fill ${fillClass}" style="width:${pct2}%;background:${c.color}"></div></div>
     </div>`;
   }).join('');
-  // Budget vs Actual Chart
-  buildBudgetChart(catData);
-}
-function buildBudgetChart(catData){
-  if(budgetC)budgetC.destroy();
-  const labels=catData.map(c=>c.label);
-  const spentData=catData.map(c=>c.spent);
-  const budgetData=catData.map(c=>c.budget||0);
-  const o=cOpts();
-  budgetC=new Chart(document.getElementById('budgetChart'),{type:'bar',data:{labels,datasets:[{label:'Spent',data:spentData,backgroundColor:'rgba(255,95,126,.75)',borderRadius:6,borderSkipped:false},{label:'Budget',data:budgetData,backgroundColor:'rgba(139,127,255,.35)',borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{color:o.text,font:{size:10}}}},scales:{x:{grid:{color:o.grid},ticks:{color:o.text,font:{size:9}}},y:{grid:{color:o.grid},ticks:{color:o.text,callback:v=>'₹'+v.toLocaleString('en-IN')}}}}});
 }
 
-// ============================================================
+// ═══════════════════════════════════════════════════
+//  WHATSAPP SHARE
+// ═══════════════════════════════════════════════════
+function openWa(txnId){
+  waTxnId=txnId; waType='single';
+  document.querySelectorAll('[data-wt]').forEach(c=>c.classList.toggle('sel',c.dataset.wt==='single'));
+  updateWaPreview();
+  openM('waModal');
+}
+function setWaType(el){
+  document.querySelectorAll('[data-wt]').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel'); waType=el.dataset.wt;
+  updateWaPreview();
+}
+function updateWaPreview(){
+  const app='📊 *MyKharcha*';
+  let msg='';
+  if(waType==='single'&&waTxnId){
+    const t=DS.txns.find(x=>x.id===waTxnId);
+    if(t){
+      const cats=t.type==='expense'?ECATS:ICATS;
+      const cat=cats.find(c=>c.id===t.cat)||{n:t.cat};
+      msg=`${app}\n\n${t.type==='expense'?'💸 Kharcha':'💰 Amdani'} Record\n\n💰 Amount: *${r(t.amount)}*\n📂 Category: ${cat.n}\n📅 Date: ${t.date} ${t.time||''}\n${t.type==='expense'?`💳 Payment: ${t.pay}\n`:''}\n📝 Note: ${t.note||'—'}\n\n_MyKharcha se share kiya_`;
+    }
+  } else if(waType==='today'){
+    const today=toDS(new Date());
+    const tt=DS.txns.filter(t=>t.date===today);
+    const ex=tt.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+    const inc=tt.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+    msg=`${app}\n\n📅 *Aaj ka Summary* (${today})\n\n💸 Kharcha: *${r(ex)}*\n💰 Amdani: *${r(inc)}*\n💚 Balance: *${r(inc-ex)}*\n📊 Transactions: ${tt.length}\n\n_MyKharcha se share kiya_`;
+  } else if(waType==='month'){
+    const now=new Date(),m=now.getMonth(),y=now.getFullYear();
+    const mE=DS.txns.filter(t=>t.type==='expense'&&smth(t.date,m,y));
+    const mI=DS.txns.filter(t=>t.type==='income'&&smth(t.date,m,y));
+    const eT=sm(mE),iT=sm(mI);
+    const mn=now.toLocaleDateString('en-IN',{month:'long',year:'numeric'});
+    const topC=ECATS.map(c=>({...c,t:mE.filter(x=>x.cat===c.id).reduce((s,x)=>s+x.amount,0)})).sort((a,b)=>b.t-a.t)[0];
+    msg=`${app}\n\n📅 *${mn} Report*\n\n💸 Kharcha: *${r(eT)}*\n💰 Amdani: *${r(iT)}*\n💚 Bachat: *${r(Math.max(0,iT-eT))}*\n📊 Transactions: ${mE.length+mI.length}\n${topC&&topC.t>0?`🏆 Top: ${topC.n} (${r(topC.t)})\n`:''}\n_MyKharcha se share kiya_`;
+  }
+  qs('#waPreview').textContent=msg||'Share type select karein';
+}
+function doWaShare(){
+  const msg=qs('#waPreview').textContent;
+  if(!msg||msg==='Share type select karein'){toast('Pehle type select karein','err');return;}
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+  closeM('waModal');toast('WhatsApp khul raha hai! ✓','ok');
+}
+
+// ═══════════════════════════════════════════════════
+//  BUDGET
+// ═══════════════════════════════════════════════════
+function chgBMonth(d){bMonth+=d;if(bMonth<0){bMonth=11;bYear--;}if(bMonth>11){bMonth=0;bYear++;}renderBudget();}
+function buildBudgetInps(){
+  qs('#budgetInpsList').innerHTML=ECATS.map(c=>`
+    <div class="fg">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <span class="material-icons-round" style="color:${c.c};font-size:16px">${c.ico}</span>
+        <label class="fl" style="margin-bottom:0">${c.n} Budget (₹)</label>
+      </div>
+      <input type="number" class="fi" id="bg_${c.id}" placeholder="0 = koi limit nahi" value="${DS.budgets[c.id]||''}">
+    </div>`).join('');
+}
+function saveBudgets(){
+  ECATS.forEach(c=>{const v=parseFloat(qs('#bg_'+c.id).value)||0;if(v>0) DS.budgets[c.id]=v;else delete DS.budgets[c.id];});
+  sBg();closeM('budgetEditModal');renderBudget();toast('Budgets save hua! ✓','ok');
+}
+function renderBudget(){
+  qs('#budgetMonthTitle').textContent=new Date(bYear,bMonth).toLocaleDateString('en-IN',{month:'long',year:'numeric'});
+  const mE=DS.txns.filter(t=>t.type==='expense'&&smth(t.date,bMonth,bYear));
+  const totalB=Object.values(DS.budgets).reduce((s,v)=>s+v,0);
+  const totalS=sm(mE), rem=Math.max(0,totalB-totalS);
+  const pct=totalB>0?Math.min(100,(totalS/totalB)*100).toFixed(0):0;
+  qs('#budgetTotal').textContent=r(totalB);
+  qs('#budgetSub').textContent=totalB>0?`Is mahine ka total budget`:'Abhi koi budget set nahi — "Edit Budgets" dabao';
+  qs('#budgetSpent').textContent=r(totalS);
+  qs('#budgetLeft').textContent=r(rem);
+  qs('#budgetPct').textContent=pct+'%';
+  const bcl=qs('#budgetCatList');
+  const cd=ECATS.map(c=>{const sp=mE.filter(t=>t.cat===c.id).reduce((s,t)=>s+t.amount,0);const bg=DS.budgets[c.id]||0;return{...c,sp,bg};}).filter(c=>c.sp>0||c.bg>0).sort((a,b)=>b.sp-a.sp);
+  if(!cd.length){bcl.innerHTML='<div class="empty" style="padding:20px 0"><p>Is mahine koi kharcha ya budget nahi</p></div>';return;}
+  bcl.innerHTML=cd.map(c=>{
+    const p2=c.bg>0?Math.min(100,(c.sp/c.bg)*100).toFixed(0):(c.sp>0?100:0);
+    const fc=c.bg>0?(c.sp/c.bg>1?'ov':c.sp/c.bg>0.8?'wn':'sf'):'sf';
+    return`<div class="bcitem">
+      <div class="bctop"><div class="bcico" style="background:${c.c}18"><span class="material-icons-round" style="color:${c.c}">${c.ico}</span></div><div class="bcn">${c.n}</div><div class="bcp">${p2}%</div></div>
+      <div class="bcamts"><span class="bcsp" style="color:${c.c}">${r(c.sp)} kharch</span><span class="bcbg">${c.bg>0?r(c.bg)+' budget':'Limit nahi'}</span></div>
+      <div class="bcbar"><div class="bcfill ${fc}" style="width:${p2}%;background:${c.c}"></div></div>
+    </div>`;
+  }).join('');
+  buildBudgetChart(cd);
+}
+function buildBudgetChart(cd){
+  if(budgetC){budgetC.destroy();budgetC=null;}
+  const o=cO();
+  budgetC=new Chart(qs('#budgetChart'),{type:'bar',data:{labels:cd.map(c=>c.n),datasets:[{label:'Kharch',data:cd.map(c=>c.sp),backgroundColor:'rgba(255,95,126,.75)',borderRadius:6,borderSkipped:false},{label:'Budget',data:cd.map(c=>c.bg),backgroundColor:'rgba(139,127,255,.35)',borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{color:o.t,font:{size:10}}}},scales:{x:{grid:{color:o.g},ticks:{color:o.t,font:{size:9}}},y:{grid:{color:o.g},ticks:{color:o.t,callback:v=>'₹'+v.toLocaleString('en-IN')}}}}});
+}
+
+// ═══════════════════════════════════════════════════
 //  SETTINGS
-// ============================================================
+// ═══════════════════════════════════════════════════
 function renderSettings(){
   const s=DS.settings;
-  document.getElementById('tglTheme').classList.toggle('on',s.theme==='light');
-  document.getElementById('tglLimitBtn').classList.toggle('on',!!s.limitEnabled);
-  document.getElementById('limitStatusTxt').textContent=s.limitEnabled&&s.dailyLimit?`₹${s.dailyLimit.toLocaleString('en-IN')}/din active`:'Set nahi hua';
-  document.getElementById('limitForm').style.display=s.limitEnabled?'':'none';
-  if(s.dailyLimit) document.getElementById('limAmtInp').value=s.dailyLimit;
-  document.getElementById('tglPin').classList.toggle('on',!!s.pinEnabled);
-  document.getElementById('pinStatusTxt').textContent=s.pinEnabled?'Enabled – tap to change':'Disabled';
-  const gl=document.getElementById('goalsList');
-  if(!DS.goals.length){gl.innerHTML='<div style="color:var(--text-muted);font-size:12px;padding:4px 2px 10px">Koi goal nahi. Neeche add karen!</div>';return;}
-  gl.innerHTML=DS.goals.map((g,i)=>{const pct=Math.min(100,(g.saved/g.target)*100).toFixed(0);return`<div class="goal-card"><div class="goal-top"><div><div class="goal-name-t">🎯 ${g.name}</div><div class="goal-amts">₹${g.saved.toLocaleString('en-IN')} / ₹${g.target.toLocaleString('en-IN')}</div></div><button class="goal-del-btn" onclick="delGoal(${i})"><span class="material-icons-round">close</span></button></div><div class="goal-bar-t"><div class="goal-fill-t" style="width:${pct}%"></div></div><div class="goal-pct-t">${pct}% complete</div></div>`;}).join('');
+  qs('#tglTheme').classList.toggle('on',s.theme==='light');
+  qs('#tglLimit').classList.toggle('on',!!s.limitEnabled);
+  qs('#limitStTxt').textContent=s.limitEnabled&&s.dailyLimit?`₹${rfmt(s.dailyLimit)}/din active`:'Set nahi hua';
+  qs('#limitForm').style.display=s.limitEnabled?'':'none';
+  if(s.dailyLimit) qs('#limitInp').value=s.dailyLimit;
+  qs('#tglPin').classList.toggle('on',!!s.pinEnabled);
+  qs('#pinStTxt').textContent=s.pinEnabled?'Enabled – change karne ke liye tap karein':'Disabled';
+  // Goals
+  const gl=qs('#goalsList');
+  if(!DS.goals.length){gl.innerHTML='<div style="color:var(--txt3);font-size:12px;padding:3px 2px 9px">Koi goal nahi. Neeche add karein!</div>';return;}
+  gl.innerHTML=DS.goals.map((g,i)=>{
+    const pct=Math.min(100,(g.saved/g.target)*100).toFixed(0);
+    return`<div class="gcard">
+      <div class="gtop">
+        <div><div class="gname">🎯 ${g.name}</div><div class="gamts">₹${rfmt(g.saved)} / ₹${rfmt(g.target)}</div></div>
+        <button class="gdel" onclick="delGoal(${i})"><span class="material-icons-round">close</span></button>
+      </div>
+      <div class="gbar"><div class="gfill" style="width:${pct}%"></div></div>
+      <div class="gpct">${pct}% complete</div>
+    </div>`;
+  }).join('');
 }
-function tglLimit(){DS.settings.limitEnabled=!DS.settings.limitEnabled;saveSets();renderSettings();renderDash();}
-function saveLimit(){const v=parseFloat(document.getElementById('limAmtInp').value);if(!v||v<=0){toast('Valid amount darj karen','err');return;}DS.settings.dailyLimit=v;saveSets();renderSettings();renderDash();toast('Limit save hua!','ok');}
-
-// ============================================================
-//  FINGERPRINT / PIN
-// ============================================================
-async function checkBiometricSupport(){
-  const el=document.getElementById('fpSupportTxt');
+function tglLimit(){DS.settings.limitEnabled=!DS.settings.limitEnabled;sS();renderSettings();renderDash();}
+function saveLimit(){
+  const v=parseFloat(qs('#limitInp').value);
+  if(!v||v<=0){toast('Valid amount darj karein','err');return;}
+  DS.settings.dailyLimit=v;sS();renderSettings();renderDash();toast('Limit save hua! ✓','ok');
+}
+async function checkFPSupport(){
+  const el=qs('#fpSupTxt');
   if(window.PublicKeyCredential){
-    try{
-      const avail=await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-      budgetBiometricAvailable=avail;
-      el.textContent=avail?'✅ Fingerprint / Face ID available hai':'❌ Is device mein biometric nahi hai';
-    }catch{el.textContent='Biometric check karna possible nahi';}
-  } else {el.textContent='❌ Browser support nahi karta';}
+    try{const a=await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();el.textContent=a?'✅ Fingerprint/Face ID available':'❌ Is device mein biometric nahi';}
+    catch{el.textContent='Check karna possible nahi';}
+  } else el.textContent='❌ Browser support nahi karta';
 }
 function savePin(){
-  const a=document.getElementById('pinA').value,b=document.getElementById('pinB').value;
+  const a=qs('#pinA').value, b=qs('#pinB').value;
   if(a.length!==4||!/^\d+$/.test(a)){toast('PIN 4 digits ka hona chahiye','err');return;}
   if(a!==b){toast('PINs match nahi karte','err');return;}
-  DS.settings.pin=a;DS.settings.pinEnabled=true;saveSets();
-  closeM('pinModal');renderSettings();toast('Lock enable hua!','ok');
+  DS.settings.pin=a;DS.settings.pinEnabled=true;sS();
+  closeM('pinModal');renderSettings();toast('PIN lock enable hua! ✓','ok');
 }
-function disablePin(){DS.settings.pin='';DS.settings.pinEnabled=false;saveSets();closeM('pinModal');renderSettings();toast('Lock disable hua','ok');}
+function disablePin(){
+  DS.settings.pin='';DS.settings.pinEnabled=false;sS();
+  closeM('pinModal');renderSettings();toast('Lock disable hua','ok');
+}
 function saveGoal(){
-  const n=document.getElementById('gNameInp').value.trim(),t=parseFloat(document.getElementById('gTargetInp').value),s=parseFloat(document.getElementById('gSavedInp').value)||0;
-  if(!n){toast('Goal ka naam darj karen','err');return;}if(!t||t<=0){toast('Valid target darj karen','err');return;}
-  DS.goals.push({name:n,target:t,saved:s});saveGoals();closeM('goalModal');renderSettings();
-  document.getElementById('gNameInp').value='';document.getElementById('gTargetInp').value='';document.getElementById('gSavedInp').value='';
-  toast('Goal add hua!','ok');
+  const n=(qs('#gNameInp').value||'').trim();
+  const t=parseFloat(qs('#gTargetInp').value);
+  const sv=parseFloat(qs('#gSavedInp').value)||0;
+  if(!n){toast('Goal ka naam darj karein','err');return;}
+  if(!t||t<=0){toast('Valid target darj karein','err');return;}
+  DS.goals.push({name:n,target:t,saved:sv});sG();
+  closeM('goalModal');renderSettings();
+  qs('#gNameInp').value='';qs('#gTargetInp').value='';qs('#gSavedInp').value='';
+  toast('Goal add hua! ✓','ok');
 }
-function delGoal(i){DS.goals.splice(i,1);saveGoals();renderSettings();}
+function delGoal(i){
+  if(!confirm('Goal delete karein?'))return;
+  DS.goals.splice(i,1);sG();renderSettings();toast('Goal delete hua','err');
+}
 function clearAllData(){
-  if(!confirm('Sab data permanently delete karen? Yeh undo nahi hoga!'))return;
+  if(!confirm('SABABHI DATA DELETE KAREIN?\n\nYeh undo nahi hoga!'))return;
   DS.txns=[];DS.goals=[];DS.bills=[];DS.emis=[];DS.budgets={};
-  saveTxns();saveGoals();saveBills();saveEmis();localStorage.removeItem('mk_budgets');
-  renderDash();toast('Sab data clear hua','err');
+  sT();sG();sB();sE();sBg();renderDash();toast('Sab data clear hua','err');
 }
 
-// ============================================================
-//  LOCK SCREEN – FINGERPRINT + PIN
-// ============================================================
+// ═══════════════════════════════════════════════════
+//  LOCK SCREEN
+// ═══════════════════════════════════════════════════
 function initLock(){
   if(!DS.settings.pinEnabled)return;
-  document.getElementById('lockScreen').style.display='flex';
-  const np=document.getElementById('numpad');
-  np.innerHTML=[1,2,3,4,5,6,7,8,9,'','0','⌫'].map(n=>`<button class="nb" onclick="pinTap('${n}')">${n}</button>`).join('');
-  // Try biometric automatically
-  setTimeout(tryFingerprint,500);
+  qs('#lkscr').style.display='flex';
+  qs('#numpad').innerHTML=[1,2,3,4,5,6,7,8,9,'','0','⌫'].map(n=>`<button class="nb" onclick="pinTap('${n}')">${n}</button>`).join('');
+  setTimeout(tryFP,600);
 }
-async function tryFingerprint(){
-  const fpBtn=document.getElementById('fpBtn');
-  const fpLabel=document.getElementById('fpLabel');
-  if(!window.PublicKeyCredential){fpLabel.textContent='Biometric not supported';return;}
+async function tryFP(){
+  const btn=qs('#fpbtn'), lbl=qs('#fplbl');
+  if(!window.PublicKeyCredential){lbl.textContent='Biometric available nahi';return;}
   try{
-    const avail=await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-    if(!avail){fpLabel.textContent='Biometric not available on this device';return;}
-    fpBtn.classList.add('scanning');
-    fpLabel.textContent='Scanning... apni fingerprint rakhein';
-    // Use WebAuthn to trigger biometric prompt
-    const cred=await navigator.credentials.get({
-      publicKey:{
-        challenge:new Uint8Array(32),
-        allowCredentials:[],
-        userVerification:'required',
-        timeout:30000
-      }
-    }).catch(()=>null);
-    fpBtn.classList.remove('scanning');
-    if(cred!==null||DS.settings.pin==='BIOMETRIC'){
-      // Unlock
-      document.getElementById('lockScreen').style.display='none';
-      fpLabel.textContent='Unlock hua! ✅';
-    } else {fpLabel.textContent='Biometric fail. PIN use karen';}
+    const a=await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+    if(!a){lbl.textContent='Is device mein biometric nahi';return;}
+    btn.classList.add('scanning');lbl.textContent='Fingerprint rakho ya Face ID use karo...';
+    await navigator.credentials.get({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),allowCredentials:[],userVerification:'required',timeout:30000}});
+    btn.classList.remove('scanning');
+    qs('#lkscr').style.display='none';pinBuf='';
+    toast('Biometric se unlock hua! ✓','ok');
   }catch(e){
-    fpBtn.classList.remove('scanning');
-    // Cancelled or failed – fall back to PIN
-    fpLabel.textContent='PIN use karen';
+    btn.classList.remove('scanning');lbl.textContent='PIN use karein';
   }
 }
 function pinTap(n){
   if(n==='') return;
-  if(n==='⌫') pinBuffer=pinBuffer.slice(0,-1);
-  else if(pinBuffer.length<4) pinBuffer+=n;
-  for(let i=0;i<4;i++) document.getElementById('pd'+i).classList.toggle('filled',i<pinBuffer.length);
-  if(pinBuffer.length===4){
-    if(pinBuffer===DS.settings.pin){document.getElementById('lockScreen').style.display='none';pinBuffer='';}
-    else{document.getElementById('pinErr').textContent='Galat PIN, dobara try karen';setTimeout(()=>{pinBuffer='';for(let i=0;i<4;i++)document.getElementById('pd'+i).classList.remove('filled');document.getElementById('pinErr').textContent='';},700);}
+  if(n==='⌫') pinBuf=pinBuf.slice(0,-1);
+  else if(pinBuf.length<4) pinBuf+=n;
+  for(let i=0;i<4;i++) qs('#pd'+i).classList.toggle('on',i<pinBuf.length);
+  if(pinBuf.length===4){
+    if(pinBuf===DS.settings.pin){
+      qs('#lkscr').style.display='none';pinBuf='';
+      toast('Unlock hua! ✓','ok');
+    } else {
+      qs('#pinerr').textContent='Galat PIN, dobara try karein';
+      setTimeout(()=>{pinBuf='';for(let i=0;i<4;i++) qs('#pd'+i).classList.remove('on');qs('#pinerr').textContent='';},700);
+    }
   }
 }
 
-// ============================================================
+// ═══════════════════════════════════════════════════
 //  EXPORT
-// ============================================================
+// ═══════════════════════════════════════════════════
 function exportPDF(){
+  if(!window.jspdf){toast('PDF library load ho rahi hai...','warn');return;}
   try{
     const{jsPDF}=window.jspdf;const doc=new jsPDF();
-    doc.setFontSize(18);doc.setTextColor('#8b7fff');doc.text('MyKharcha – Expense Report',14,20);
-    doc.setFontSize(10);doc.setTextColor('#666');doc.text(`Generated: ${new Date().toLocaleDateString('en-IN')}  |  Total: ${DS.txns.length} transactions`,14,30);
-    let y=44;doc.setFontSize(9);doc.setTextColor('#333');
-    ['Date','Time','Type','Category','Amount','Payment','Note'].forEach((h,i)=>doc.text(h,[14,36,54,72,98,125,152][i],y));
-    y+=2;doc.setDrawColor('#8b7fff');doc.line(14,y,196,y);y+=6;
-    DS.txns.slice(0,60).forEach(t=>{if(y>275){doc.addPage();y=20;}const cats=t.type==='expense'?EXP_CATS:INC_CATS;const cat=cats.find(c=>c.id===t.cat)||{label:t.cat};doc.text(t.date,14,y);doc.text(t.time,36,y);doc.text(t.type,54,y);doc.text(cat.label,72,y);doc.text('Rs.'+t.amount,98,y);doc.text(t.pay||'-',125,y);doc.text((t.note||'-').slice(0,20),152,y);y+=6;});
-    doc.save('MyKharcha_Report.pdf');toast('PDF export hua!','ok');
-  }catch(e){toast('PDF export fail hua','err');}
+    doc.setFontSize(18);doc.setTextColor(139,127,255);doc.text('MyKharcha – Expense Report',14,20);
+    doc.setFontSize(10);doc.setTextColor(100,100,120);
+    doc.text(`Generated: ${new Date().toLocaleDateString('en-IN')} | Total: ${DS.txns.length} transactions`,14,30);
+    let y=44;doc.setFontSize(9);doc.setTextColor(50,50,60);
+    const hds=['Date','Time','Type','Category','Amount','Payment','Note'];
+    const xs=[14,36,54,72,100,127,154];
+    hds.forEach((h,i)=>doc.text(h,xs[i],y));
+    y+=2;doc.setDrawColor(139,127,255);doc.line(14,y,196,y);y+=6;
+    DS.txns.slice(0,80).forEach(t=>{
+      if(y>278){doc.addPage();y=20;}
+      const cats=t.type==='expense'?ECATS:ICATS;
+      const cat=cats.find(c=>c.id===t.cat)||{n:t.cat};
+      doc.text(t.date||'',xs[0],y);doc.text((t.time||'').slice(0,5),xs[1],y);
+      doc.text(t.type,xs[2],y);doc.text(cat.n,xs[3],y);
+      doc.text('Rs.'+t.amount,xs[4],y);doc.text(t.pay||'-',xs[5],y);
+      doc.text((t.note||'-').slice(0,18),xs[6],y);y+=6;
+    });
+    doc.save('MyKharcha_Report.pdf');toast('PDF export hua! ✓','ok');
+  }catch(e){console.error(e);toast('PDF export fail hua: '+e.message,'err');}
 }
 function exportXLSX(){
-  const rows=DS.txns.map(t=>({Date:t.date,Time:t.time,Type:t.type,Category:t.cat,Amount:t.amount,Payment:t.pay||'',Note:t.note||''}));
-  const ws=XLSX.utils.json_to_sheet(rows);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Transactions');XLSX.writeFile(wb,'MyKharcha.xlsx');toast('Excel export hua!','ok');
+  if(!window.XLSX){toast('Excel library load ho rahi hai...','warn');return;}
+  try{
+    const rows=DS.txns.map(t=>({Date:t.date,Time:t.time,Type:t.type,Category:t.cat,Amount:t.amount,Payment:t.pay||'',Note:t.note||''}));
+    const ws=XLSX.utils.json_to_sheet(rows);
+    const wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,ws,'Transactions');
+    XLSX.writeFile(wb,'MyKharcha.xlsx');
+    toast('Excel export hua! ✓','ok');
+  }catch(e){toast('Excel export fail: '+e.message,'err');}
 }
 function doBackup(){
   const data=JSON.stringify({txns:DS.txns,goals:DS.goals,bills:DS.bills,emis:DS.emis,settings:DS.settings,budgets:DS.budgets},null,2);
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type:'application/json'}));a.download=`MyKharcha_Backup_${toDateStr(new Date())}.json`;a.click();toast('Backup save hua!','ok');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([data],{type:'application/json'}));
+  a.download=`MyKharcha_Backup_${toDS(new Date())}.json`;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  toast('Backup save hua! ✓','ok');
 }
 function doRestore(e){
   const f=e.target.files[0];if(!f)return;
   const rd=new FileReader();
-  rd.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(d.txns)DS.txns=d.txns;if(d.goals)DS.goals=d.goals;if(d.bills)DS.bills=d.bills;if(d.emis)DS.emis=d.emis;if(d.settings)DS.settings={...DS.settings,...d.settings};if(d.budgets)DS.budgets=d.budgets;saveTxns();saveGoals();saveBills();saveEmis();saveSets();localStorage.setItem('mk_budgets',JSON.stringify(DS.budgets));renderDash();toast('Data restore hua!','ok');}catch{toast('Invalid backup file','err');}};
+  rd.onload=ev=>{
+    try{
+      const d=JSON.parse(ev.target.result);
+      if(d.txns) DS.txns=d.txns;
+      if(d.goals) DS.goals=d.goals;
+      if(d.bills) DS.bills=d.bills;
+      if(d.emis) DS.emis=d.emis;
+      if(d.settings) DS.settings=Object.assign({},DS.settings,d.settings);
+      if(d.budgets) DS.budgets=d.budgets;
+      sT();sG();sB();sE();sS();sBg();
+      renderDash();updNotif();
+      toast('Data restore hua! ✓','ok');
+    }catch(err){toast('Invalid backup file','err');}
+  };
   rd.readAsText(f);e.target.value='';
 }
 
-// ============================================================
-//  PWA INSTALL
-// ============================================================
-window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;document.getElementById('installBanner').style.display='flex';});
-function doInstall(){if(!deferredPrompt)return;deferredPrompt.prompt();deferredPrompt.userChoice.then(()=>{deferredPrompt=null;document.getElementById('installBanner').style.display='none';});}
-
-// ============================================================
+// ═══════════════════════════════════════════════════
 //  UTILS
-// ============================================================
+// ═══════════════════════════════════════════════════
+const qs=s=>document.querySelector(s);
 const r=n=>'₹'+(n||0).toLocaleString('en-IN',{maximumFractionDigits:0});
-const fmt=n=>(n||0).toLocaleString('en-IN');
-const sum=arr=>arr.reduce((s,t)=>s+t.amount,0);
-const toDateStr=d=>d.toISOString().split('T')[0];
-const sameMonth=(ds,m,y)=>{const d=new Date(ds);return d.getMonth()===m&&d.getFullYear()===y;};
-function fmtDate(ds){const d=new Date(ds+'T00:00:00');const t=new Date();t.setHours(0,0,0,0);const diff=(t-d)/86400000;if(diff===0)return 'Aaj';if(diff===1)return 'Kal';return d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'2-digit'});}
-let tTimer;
-function toast(msg,type='ok'){const T=document.getElementById('toast');document.getElementById('tMsg').textContent=msg;const ico={ok:'check_circle',err:'error',warn:'warning_amber'};document.getElementById('tIco').textContent=ico[type]||'info';T.className=`toast show ${type}`;clearTimeout(tTimer);tTimer=setTimeout(()=>T.classList.remove('show'),2800);}
+const rfmt=n=>(n||0).toLocaleString('en-IN');
+const sm=arr=>arr.reduce((s,t)=>s+t.amount,0);
+const toDS=d=>d.toISOString().split('T')[0];
+const smth=(ds,m,y)=>{try{const d=new Date(ds);return d.getMonth()===m&&d.getFullYear()===y;}catch{return false;}};
+function fmtDate(ds){
+  try{
+    const d=new Date(ds+'T00:00:00');const t=new Date();t.setHours(0,0,0,0);
+    const diff=Math.round((t-d)/86400000);
+    if(diff===0)return'Aaj';if(diff===1)return'Kal';
+    return d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'2-digit'});
+  }catch{return ds;}
+}
+let ttimer;
+function toast(msg,type='ok'){
+  const T=qs('#toast');
+  qs('#tMsg').textContent=msg;
+  qs('#tIco').textContent={ok:'check_circle',err:'error',warn:'warning_amber'}[type]||'info';
+  T.className=`${type} on`;
+  clearTimeout(ttimer);ttimer=setTimeout(()=>T.classList.remove('on'),3000);
+}
 
-// ============================================================
+// ═══════════════════════════════════════════════════
 //  INIT
-// ============================================================
+// ═══════════════════════════════════════════════════
 load();
-applyTheme();
+applyTheme(DS.settings.theme);
 injectManifest();
-registerSW();
-const _now=new Date();
-document.getElementById('hdrDate').textContent=_now.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'short'});
-document.getElementById('dateInp').value=toDateStr(_now);
-document.getElementById('timeInp').value=_now.toTimeString().slice(0,5);
-document.getElementById('bDueInp').value=toDateStr(_now);
-document.getElementById('eStartInp').value=toDateStr(_now);
+regSW();
+
+const _n=new Date();
+qs('#hdrDate').textContent=_n.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'short'});
+qs('#dateInp').value=toDS(_n);
+qs('#timeInp').value=_n.toTimeString().slice(0,5);
+qs('#bDueInp').value=toDS(_n);
+qs('#eStartInp').value=toDS(_n);
+
 buildCatChips();
 renderDash();
-updateNotifBadge();
+updNotif();
 initLock();
 </script>
 </body>
