@@ -340,20 +340,11 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 .lang-btn .lname{font-size:9px;text-transform:uppercase;letter-spacing:.5px}
 .lang-btn:hover{border-color:var(--purple);color:var(--purple);background:var(--pdim)}
 .lang-btn.sel{border-color:var(--purple);background:var(--pdim);color:var(--purple)}
-/* ── LOCK SCREEN ── */
+/* ── PIN LOCK SCREEN (no fingerprint) ── */
 #lkscr{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:30px 24px}
 .lklogo{font-family:'Outfit',sans-serif;font-size:26px;font-weight:900;background:var(--gm);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .lksub{font-size:12px;color:var(--txt3);margin-top:-14px}
 .lkmeths{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:260px}
-.fpbtn{width:76px;height:76px;border-radius:50%;background:var(--pdim);border:2px solid var(--purple);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--ts)}
-.fpbtn:hover{transform:scale(1.08);box-shadow:0 0 28px rgba(139,127,255,.4)}
-.fpbtn .material-icons-round{font-size:36px;color:var(--purple)}
-.fpbtn.scanning{animation:pulse 1s infinite}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(139,127,255,.4)}50%{box-shadow:0 0 0 18px transparent}}
-.fplbl{font-size:12px;color:var(--txt3);text-align:center}
-.lkor{font-size:11px;color:var(--txt3);width:100%;text-align:center;position:relative}
-.lkor::before,.lkor::after{content:'';position:absolute;top:50%;width:36%;height:1px;background:var(--bdr)}
-.lkor::before{left:0}.lkor::after{right:0}
 .pdots{display:flex;gap:13px;margin:3px 0}
 .pd{width:13px;height:13px;border-radius:50%;border:2px solid var(--purple);background:transparent;transition:var(--t)}
 .pd.on{background:var(--purple);box-shadow:0 0 10px rgba(139,127,255,.6)}
@@ -386,16 +377,11 @@ input[type=date],input[type=time]{color-scheme:dark}
 <!-- TOAST -->
 <div id="toast"><span class="material-icons-round" id="tIco">check_circle</span><span id="tMsg">Done!</span></div>
 
-<!-- LOCK SCREEN -->
+<!-- LOCK SCREEN (PIN only) -->
 <div id="lkscr" style="display:none">
   <div class="lklogo">MyKharcha</div>
-  <div class="lksub" id="lk-sub">Smart Expense Tracker</div>
+  <div class="lksub">🔒 Enter PIN to unlock</div>
   <div class="lkmeths">
-    <div style="text-align:center">
-      <div class="fpbtn" id="fpbtn" onclick="tryFP()"><span class="material-icons-round">fingerprint</span></div>
-      <div class="fplbl" id="fplbl" style="margin-top:8px">Fingerprint / Face ID tap karein</div>
-    </div>
-    <div class="lkor" id="lk-or">ya PIN use karein</div>
     <div class="pdots"><div class="pd" id="pd0"></div><div class="pd" id="pd1"></div><div class="pd" id="pd2"></div><div class="pd" id="pd3"></div></div>
     <div class="pinerr" id="pinerr"></div>
     <div class="numpad" id="numpad"></div>
@@ -478,11 +464,6 @@ input[type=date],input[type=time]{color-scheme:dark}
       <div id="dashBillsWrap" style="display:none">
         <div class="sh"><h2>📅 <span data-i18n="upcoming_bills">Aane Wale Bills</span></h2><span class="sa" onclick="switchPg('bills')" data-i18n="see_all">Sab Dekho →</span></div>
         <div id="dashBillsList"></div>
-      </div>
-      <!-- Native Ad after hero -->
-      <div id="nativeAd1">
-        <script async="async" data-cfasync="false" src="https://pl28816917.effectivegatecpm.com/1f4d23b9eb4fb3a22087dd4b8a3f182a/invoke.js"></script>
-        <div id="container-1f4d23b9eb4fb3a22087dd4b8a3f182a"></div>
       </div>
       <!-- Categories -->
       <div class="card cp">
@@ -631,13 +612,6 @@ input[type=date],input[type=time]{color-scheme:dark}
         </div>
       </div>
 
-      <div class="sgt" data-i18n="security">Security</div>
-      <div class="si" onclick="openM('pinModal')">
-        <div class="sico" style="background:var(--rdim)"><span class="material-icons-round" style="color:var(--red)">fingerprint</span></div>
-        <div class="sinf"><h4 data-i18n="pin_lock">Fingerprint / PIN Lock</h4><p id="pinStTxt">Disabled</p></div>
-        <button class="tgl" id="tglPin" onclick="event.stopPropagation();openM('pinModal')"></button>
-      </div>
-
       <div class="sgt" data-i18n="savings_goals">Savings Goals</div>
       <div id="goalsList"></div>
       <button class="agbtn" onclick="openM('goalModal')"><span class="material-icons-round">add_circle_outline</span><span data-i18n="add_new_goal">New Goal Add Karein</span></button>
@@ -708,25 +682,6 @@ input[type=date],input[type=time]{color-scheme:dark}
       </div>
       <div class="fg"><label class="fl" data-i18n="note_optional">Note (optional)</label><textarea class="fta" id="noteInp" placeholder="Kisliye kharch kiya?"></textarea></div>
       <button class="sbtn" onclick="submitTxn()"><span id="subBtnTxt" data-i18n="add_expense">Kharcha Add Karein</span></button>
-      <div class="mb"></div>
-    </div>
-  </div>
-</div>
-
-<!-- PIN / FINGERPRINT SETTINGS -->
-<div class="ov" id="pinModal">
-  <div class="modal">
-    <div class="mhdl"></div>
-    <div class="mhdr"><h2 data-i18n="app_lock">App Lock</h2><button class="mcls" onclick="closeM('pinModal')"><span class="material-icons-round">close</span></button></div>
-    <div class="mbody">
-      <div style="background:var(--pdim);border:1px solid var(--purple);border-radius:12px;padding:12px;margin-bottom:14px;display:flex;align-items:center;gap:10px">
-        <span class="material-icons-round" style="color:var(--purple);font-size:22px">fingerprint</span>
-        <div><div style="font-size:13px;font-weight:700" data-i18n="fp_face">Fingerprint / Face ID</div><div style="font-size:11px;color:var(--txt3);margin-top:2px" id="fpSupTxt">Check ho raha hai...</div></div>
-      </div>
-      <div class="fg"><label class="fl" data-i18n="new_pin">Naya 4-Digit PIN</label><input type="password" class="fi" id="pinA" maxlength="4" inputmode="numeric" placeholder="••••"></div>
-      <div class="fg"><label class="fl" data-i18n="confirm_pin">PIN Confirm Karein</label><input type="password" class="fi" id="pinB" maxlength="4" inputmode="numeric" placeholder="••••"></div>
-      <button class="sbtn" onclick="savePin()" data-i18n="enable_lock">Lock Enable Karein</button>
-      <div id="disablePinDiv" style="display:none;margin-top:10px"><button class="sbtn dng" onclick="disablePin()" data-i18n="disable_lock">Lock Disable Karein</button></div>
       <div class="mb"></div>
     </div>
   </div>
@@ -1719,8 +1674,6 @@ function renderSettings(){
   qs('#limitStTxt').textContent=s.limitEnabled&&s.dailyLimit?`₹${rfmt(s.dailyLimit)} active`:t('not_set');
   qs('#limitForm').style.display=s.limitEnabled?'':'none';
   if(s.dailyLimit) qs('#limitInp').value=s.dailyLimit;
-  qs('#tglPin').classList.toggle('on',!!s.pinEnabled);
-  qs('#pinStTxt').textContent=s.pinEnabled?'Enabled':'Disabled';
   document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('sel',b.getAttribute('data-lang')===curLang));
   const gl=qs('#goalsList');
   if(!DS.goals.length){gl.innerHTML=`<div style="color:var(--txt3);font-size:12px;padding:3px 2px 9px">No goals yet.</div>`;return;}
@@ -1741,24 +1694,6 @@ function saveLimit(){
   const v=parseFloat(qs('#limitInp').value);
   if(!v||v<=0){toast('Valid amount required','err');return;}
   DS.settings.dailyLimit=v;sS();renderSettings();renderDash();toast(t('save')+' ✓','ok');
-}
-async function checkFPSupport(){
-  const el=qs('#fpSupTxt');
-  if(window.PublicKeyCredential){
-    try{const a=await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();el.textContent=a?'✅ Fingerprint/Face ID available':'❌ Not supported on this device';}
-    catch{el.textContent='Check failed';}
-  } else el.textContent='❌ Browser not supported';
-}
-function savePin(){
-  const a=qs('#pinA').value, b=qs('#pinB').value;
-  if(a.length!==4||!/^\d+$/.test(a)){toast('PIN must be 4 digits','err');return;}
-  if(a!==b){toast('PINs do not match','err');return;}
-  DS.settings.pin=a;DS.settings.pinEnabled=true;sS();
-  closeM('pinModal');renderSettings();toast('PIN lock enabled! ✓','ok');
-}
-function disablePin(){
-  DS.settings.pin='';DS.settings.pinEnabled=false;sS();
-  closeM('pinModal');renderSettings();toast('Lock disabled','ok');
 }
 function saveGoal(){
   const n=(qs('#gNameInp').value||'').trim();
@@ -1781,28 +1716,12 @@ function clearAllData(){
 }
 
 // ═══════════════════════════════════════════════════
-//  LOCK SCREEN
+//  LOCK SCREEN (PIN only)
 // ═══════════════════════════════════════════════════
 function initLock(){
   if(!DS.settings.pinEnabled)return;
   qs('#lkscr').style.display='flex';
   qs('#numpad').innerHTML=[1,2,3,4,5,6,7,8,9,'','0','⌫'].map(n=>`<button class="nb" onclick="pinTap('${n}')">${n}</button>`).join('');
-  setTimeout(tryFP,600);
-}
-async function tryFP(){
-  const btn=qs('#fpbtn'), lbl=qs('#fplbl');
-  if(!window.PublicKeyCredential){lbl.textContent='Biometric not available';return;}
-  try{
-    const a=await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-    if(!a){lbl.textContent='No biometric on this device';return;}
-    btn.classList.add('scanning');lbl.textContent='Use fingerprint or Face ID...';
-    await navigator.credentials.get({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),allowCredentials:[],userVerification:'required',timeout:30000}});
-    btn.classList.remove('scanning');
-    qs('#lkscr').style.display='none';pinBuf='';
-    toast('Unlocked! ✓','ok');
-  }catch(e){
-    btn.classList.remove('scanning');lbl.textContent='Use PIN instead';
-  }
 }
 function pinTap(n){
   if(n==='') return;
