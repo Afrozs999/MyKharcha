@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#0c0c1a" id="metaTheme">
-<meta name="description" content="DailySpend – Smart Expense Tracker">
+<meta name="description" content="MyKharcha – Smart Expense Tracker">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="DailySpend">
-<title>DailySpend – Smart Expense Tracker</title>
+<meta name="apple-mobile-web-app-title" content="MyKharcha">
+<title>MyKharcha – Smart Expense Tracker</title>
 <link rel="manifest" id="manifestLink">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
@@ -736,7 +736,7 @@ input[type="date"], input[type="time"] { color-scheme: dark; }
 
 <!-- PIN LOCK SCREEN -->
 <div id="lockScreen" style="display:none">
-  <div class="lock-logo">DailySpend</div>
+  <div class="lock-logo">MyKharcha</div>
   <div class="lock-sub">Smart Expense Tracker</div>
   <div class="pin-row" id="pinDots">
     <div class="pd" id="pd0"></div><div class="pd" id="pd1"></div>
@@ -751,7 +751,7 @@ input[type="date"], input[type="time"] { color-scheme: dark; }
   <!-- HEADER -->
   <header class="app-header">
     <div class="header-brand">
-      <div class="logo">DailySpend</div>
+      <div class="logo">MyKharcha</div>
       <div class="tagline" id="hdrDate">Loading...</div>
     </div>
     <div class="header-actions">
@@ -771,7 +771,7 @@ input[type="date"], input[type="time"] { color-scheme: dark; }
       <!-- Install Banner -->
       <div id="installBanner" class="install-banner" style="display:none">
         <span class="material-icons-round">install_mobile</span>
-        <div class="ib-info"><h4>Install DailySpend</h4><p>Add to home screen for full app experience</p></div>
+        <div class="ib-info"><h4>Install MyKharcha</h4><p>Add to home screen for full app experience</p></div>
         <button class="ib-btn" onclick="doInstall()">Install</button>
       </div>
 
@@ -1105,25 +1105,25 @@ let pinBuffer = '';
 // ============================================================
 function load() {
   try {
-    const t = localStorage.getItem('ds2_txns');
-    const g = localStorage.getItem('ds2_goals');
-    const s = localStorage.getItem('ds2_settings');
+    const t = localStorage.getItem('mk_txns');
+    const g = localStorage.getItem('mk_goals');
+    const s = localStorage.getItem('mk_settings');
     if (t) DS.txns     = JSON.parse(t);
     if (g) DS.goals    = JSON.parse(g);
     if (s) DS.settings = {...DS.settings, ...JSON.parse(s)};
   } catch(e){}
 }
-const saveTxns = () => localStorage.setItem('ds2_txns', JSON.stringify(DS.txns));
-const saveGoals = () => localStorage.setItem('ds2_goals', JSON.stringify(DS.goals));
-const saveSets  = () => localStorage.setItem('ds2_settings', JSON.stringify(DS.settings));
+const saveTxns = () => localStorage.setItem('mk_txns', JSON.stringify(DS.txns));
+const saveGoals = () => localStorage.setItem('mk_goals', JSON.stringify(DS.goals));
+const saveSets  = () => localStorage.setItem('mk_settings', JSON.stringify(DS.settings));
 
 // ============================================================
 //  PWA MANIFEST (inline)
 // ============================================================
 function injectManifest() {
   const m = {
-    name:'DailySpend – Smart Expense Tracker',
-    short_name:'DailySpend',
+    name:'MyKharcha – Smart Expense Tracker',
+    short_name:'MyKharcha',
     description:'Track your daily expenses smartly',
     start_url:'./',
     display:'standalone',
@@ -1163,7 +1163,7 @@ function makeIcon(color, size) {
 function registerSW() {
   if (!('serviceWorker' in navigator)) return;
   const swCode = `
-const C='ds-v1';
+const C='mk-v1';
 self.addEventListener('install',e=>{self.skipWaiting();});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))));self.clients.claim();});
 self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>{if(r)return r;return fetch(e.request).then(res=>{if(res&&res.status===200){const cl=res.clone();caches.open(C).then(c=>c.put(e.request,cl));}return res;}).catch(()=>r);}));});`;
@@ -1481,7 +1481,7 @@ function exportPDF() {
   try {
     const {jsPDF}=window.jspdf; const doc=new jsPDF();
     doc.setFontSize(18); doc.setTextColor('#8b7fff');
-    doc.text('DailySpend – Expense Report',14,20);
+    doc.text('MyKharcha – Expense Report',14,20);
     doc.setFontSize(10); doc.setTextColor('#666');
     doc.text(`Generated: ${new Date().toLocaleDateString('en-IN')}  |  Total Transactions: ${DS.txns.length}`,14,30);
     let y=44;
@@ -1498,20 +1498,20 @@ function exportPDF() {
       doc.text(t.pay||'-',125,y); doc.text((t.note||'-').slice(0,20),152,y);
       y+=6;
     });
-    doc.save('DailySpend_Report.pdf'); toast('PDF exported!','ok');
+    doc.save('MyKharcha_Report.pdf'); toast('PDF exported!','ok');
   } catch(e){ toast('PDF export failed','err'); }
 }
 function exportXLSX() {
   const rows=DS.txns.map(t=>({Date:t.date,Time:t.time,Type:t.type,Category:t.cat,Amount:t.amount,Payment:t.pay||'',Note:t.note||''}));
   const ws=XLSX.utils.json_to_sheet(rows); const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,'Transactions'); XLSX.writeFile(wb,'DailySpend.xlsx');
+  XLSX.utils.book_append_sheet(wb,ws,'Transactions'); XLSX.writeFile(wb,'MyKharcha.xlsx');
   toast('Excel exported!','ok');
 }
 function doBackup() {
   const data=JSON.stringify({txns:DS.txns,goals:DS.goals,settings:DS.settings},null,2);
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([data],{type:'application/json'}));
-  a.download=`DailySpend_Backup_${toDateStr(new Date())}.json`; a.click();
+  a.download=`MyKharcha_Backup_${toDateStr(new Date())}.json`; a.click();
   toast('Backup saved!','ok');
 }
 function doRestore(e) {
