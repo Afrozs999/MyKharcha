@@ -12,6 +12,10 @@
 <link rel="manifest" id="manifestLink">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+<!-- ══ FIREBASE SDK ══ -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -370,12 +374,92 @@ input[type=date],input[type=time]{color-scheme:dark}
 [data-lang=ur] .tbody .tc, [data-lang=ur] .tbody .tn, [data-lang=ur] .binfo .bn {
   direction: rtl;
 }
+/* ══ FIREBASE AUTH SCREEN ══ */
+#authScreen{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+#authScreen .auth-logo{font-family:'Outfit',sans-serif;font-size:36px;font-weight:900;background:var(--gm);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px}
+#authScreen .auth-sub{font-size:13px;color:var(--txt3);margin-bottom:40px;text-align:center}
+.auth-card{width:100%;max-width:360px;background:var(--card);border:1px solid var(--bdr);border-radius:var(--r1);padding:26px;backdrop-filter:blur(10px)}
+.auth-card h2{font-family:'Outfit',sans-serif;font-size:22px;font-weight:900;margin-bottom:4px}
+.auth-card .auth-desc{font-size:12px;color:var(--txt3);margin-bottom:24px}
+.auth-tabs{display:flex;gap:0;margin-bottom:20px;background:var(--bg2);border-radius:12px;padding:3px}
+.auth-tab{flex:1;padding:8px;text-align:center;font-size:13px;font-weight:700;border-radius:10px;cursor:pointer;transition:var(--t);color:var(--txt3)}
+.auth-tab.on{background:var(--purple);color:#fff;box-shadow:0 4px 14px rgba(139,127,255,.4)}
+.auth-sep{display:flex;align-items:center;gap:10px;margin:18px 0}
+.auth-sep span{font-size:11px;color:var(--txt3);white-space:nowrap}
+.auth-sep::before,.auth-sep::after{content:'';flex:1;height:1px;background:var(--bdr)}
+.goog-btn{width:100%;padding:13px;border-radius:var(--r2);border:1px solid var(--bdr);background:var(--card);color:var(--txt);font-size:14px;font-weight:700;cursor:pointer;transition:var(--t);display:flex;align-items:center;justify-content:center;gap:10px}
+.goog-btn:hover{border-color:var(--purple);background:var(--pdim)}
+.goog-btn svg{width:20px;height:20px}
+.auth-err{font-size:12px;color:var(--red);font-weight:700;margin-top:-8px;margin-bottom:10px;min-height:16px}
+/* ══ SYNC INDICATOR ══ */
+.sync-badge{position:fixed;bottom:76px;left:max(14px,calc(50% - 215px + 14px));background:var(--bg2);border:1px solid var(--bdr);border-radius:20px;padding:5px 10px;font-size:10px;font-weight:700;color:var(--txt3);display:flex;align-items:center;gap:5px;z-index:200;opacity:0;transition:opacity .3s;pointer-events:none}
+.sync-badge.show{opacity:1}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
+.sync-dot.spin{background:var(--orange);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+/* ══ USER CHIP IN HEADER ══ */
+.user-chip{display:flex;align-items:center;gap:6px;padding:4px 8px 4px 4px;border-radius:20px;background:var(--pdim);border:1px solid rgba(139,127,255,.3);cursor:pointer;transition:var(--t)}
+.user-chip:hover{border-color:var(--purple)}
+.user-chip img{width:24px;height:24px;border-radius:50%;object-fit:cover}
+.user-chip .u-initial{width:24px;height:24px;border-radius:50%;background:var(--gm);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff}
+.user-chip .u-name{font-size:11px;font-weight:700;color:var(--purple);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* ══ CONFIG SCREEN ══ */
+#configScreen{position:fixed;inset:0;z-index:10000;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:flex-start;padding:40px 24px 24px;overflow-y:auto}
+#configScreen.show{display:flex}
+#configScreen h1{font-family:'Outfit',sans-serif;font-size:28px;font-weight:900;background:var(--gm);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px;text-align:center}
+#configScreen .cfg-sub{font-size:13px;color:var(--txt2);text-align:center;margin-bottom:28px;line-height:1.6}
+.cfg-card{width:100%;max-width:420px;background:var(--card);border:1px solid var(--bdr);border-radius:var(--r1);padding:22px;margin-bottom:14px}
+.cfg-card h3{font-size:14px;font-weight:800;margin-bottom:4px;color:var(--txt)}
+.cfg-card p{font-size:11px;color:var(--txt3);margin-bottom:16px;line-height:1.5}
+.cfg-step{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:12px;color:var(--txt2)}
+.cfg-step .sn{width:22px;height:22px;border-radius:50%;background:var(--gm);color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cfg-fields{display:grid;gap:10px;margin-top:14px}
+.cfg-fi{width:100%;background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r3);padding:10px 12px;color:var(--txt);font-size:12px;font-family:monospace;outline:none;transition:var(--t)}
+.cfg-fi:focus{border-color:var(--purple)}
+.cfg-fi::placeholder{color:var(--txt3);font-family:'Plus Jakarta Sans',sans-serif}
+.cfg-save-btn{width:100%;max-width:420px;padding:14px;background:var(--gm);border:none;border-radius:var(--r2);color:#fff;font-family:'Outfit',sans-serif;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 8px 28px rgba(139,127,255,.4);transition:var(--t)}
+.cfg-save-btn:hover{transform:translateY(-2px)}
+.cfg-link{font-size:12px;color:var(--purple);text-decoration:none;font-weight:700}
 </style>
 </head>
 <body>
 
 <!-- TOAST -->
 <div id="toast"><span class="material-icons-round" id="tIco">check_circle</span><span id="tMsg">Done!</span></div>
+
+<!-- ══ FIREBASE CONFIG SETUP SCREEN ══ -->
+<div id="configScreen" style="display:none!important"></div>
+
+<!-- ══ AUTH SCREEN ══ -->
+<div id="authScreen" style="display:none">
+  <div class="auth-logo">MyKharcha</div>
+  <div class="auth-sub">Smart Expense Tracker – Cloud Sync ke saath</div>
+  <div class="auth-card">
+    <h2>👋 Swagat Hai!</h2>
+    <div class="auth-desc">Login karein ya account banayein – data sab devices pe sync hoga</div>
+    <div class="auth-tabs">
+      <div class="auth-tab on" id="tabLogin" onclick="switchAuthTab('login')">Login</div>
+      <div class="auth-tab" id="tabSignup" onclick="switchAuthTab('signup')">Register</div>
+    </div>
+    <!-- Email/Password Form -->
+    <div class="fg"><label class="fl">Email</label><input type="email" class="fi" id="authEmail" placeholder="aap@example.com"></div>
+    <div class="fg" style="margin-top:10px"><label class="fl">Password</label><input type="password" class="fi" id="authPass" placeholder="••••••••"></div>
+    <div class="fg" style="margin-top:10px;display:none" id="authNameWrap"><label class="fl">Aapka Naam</label><input class="fi" id="authName" placeholder="Ram Kumar"></div>
+    <div class="auth-err" id="authErr"></div>
+    <button class="sbtn" id="authSubmitBtn" onclick="doEmailAuth()" style="margin-top:4px">Login</button>
+    <div class="auth-sep"><span>ya</span></div>
+    <button class="goog-btn" onclick="doGoogleLogin()">
+      <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Google se Login Karein
+    </button>
+  </div>
+</div>
+
+<!-- ══ SYNC BADGE ══ -->
+<div class="sync-badge" id="syncBadge">
+  <div class="sync-dot" id="syncDot"></div>
+  <span id="syncTxt">Synced</span>
+</div>
 
 <!-- LOCK SCREEN (PIN only) -->
 <div id="lkscr" style="display:none">
@@ -413,6 +497,10 @@ input[type=date],input[type=time]{color-scheme:dark}
       <div class="sub" id="hdrDate">Loading...</div>
     </div>
     <div class="hdr-acts">
+      <div class="user-chip" id="userChip" style="display:none" onclick="showUserMenu()">
+        <div class="u-initial" id="userInitial">U</div>
+        <span class="u-name" id="userName">User</span>
+      </div>
       <button class="hbtn" onclick="switchPg('bills')" title="Bill Reminders">
         <span class="material-icons-round">notifications</span>
         <span class="dot" id="notifDot"></span>
@@ -628,6 +716,19 @@ input[type=date],input[type=time]{color-scheme:dark}
         <div class="sico" style="background:var(--rdim)"><span class="material-icons-round" style="color:var(--red)">delete_forever</span></div>
         <div class="sinf"><h4 data-i18n="delete_all">Sab Data Delete Karein</h4><p data-i18n="delete_warning">Permanently remove karta hai</p></div>
         <span class="material-icons-round" style="color:var(--txt3);font-size:18px">chevron_right</span>
+      </div>
+
+      <!-- FIREBASE ACCOUNT -->
+      <div class="sgt" style="margin-top:14px">☁️ Cloud Account</div>
+      <div class="si" id="fbAccountRow">
+        <div class="sico" style="background:rgba(77,184,255,.12)"><span class="material-icons-round" style="color:var(--blue)">cloud</span></div>
+        <div class="sinf"><h4 id="fbAccName">Loading...</h4><p id="fbAccEmail">Firebase sync</p></div>
+        <button class="cbtn" id="fbLogoutBtn" onclick="doLogout()" style="font-size:11px;padding:6px 10px">Logout</button>
+      </div>
+      <div class="si" style="cursor:default;margin-top:8px">
+        <div class="sico" style="background:rgba(139,127,255,.12)"><span class="material-icons-round" style="color:var(--purple)">sync</span></div>
+        <div class="sinf"><h4>Manual Sync</h4><p>Data abhi Firestore se refresh karo</p></div>
+        <button class="cbtn" onclick="manualSync()" style="font-size:11px;padding:6px 10px">Sync</button>
       </div>
     </div>
   </div>
@@ -1119,7 +1220,166 @@ let deferredPrompt=null;
 let waType='single', waTxnId=null;
 
 // ═══════════════════════════════════════════════════
-//  STORAGE
+//  FIREBASE CONFIG & INIT
+// ═══════════════════════════════════════════════════
+let fbApp=null, fbAuth=null, fbDb=null, currentUser=null;
+let syncTimer=null, pendingSync=false;
+
+function saveFirebaseConfig(){
+  const apiKey=document.getElementById('cfgApiKey').value.trim();
+  const authDomain=document.getElementById('cfgAuthDomain').value.trim();
+  const projectId=document.getElementById('cfgProjectId').value.trim();
+  const appId=document.getElementById('cfgAppId').value.trim();
+  if(!apiKey||!authDomain||!projectId||!appId){
+    alert('Sab fields bharna zaroori hai!'); return;
+  }
+  const cfg={apiKey,authDomain,projectId,appId,storageBucket:projectId+'.appspot.com',messagingSenderId:'000000000000'};
+  localStorage.setItem('mk_fb_config',JSON.stringify(cfg));
+  document.getElementById('configScreen').classList.remove('show');
+  initFirebase(cfg);
+}
+
+function initFirebase(cfg){
+  try{
+    if(!firebase.apps.length) fbApp=firebase.initializeApp(cfg);
+    else fbApp=firebase.app();
+    fbAuth=firebase.auth();
+    fbDb=firebase.firestore();
+    fbDb.enablePersistence({synchronizeTabs:true}).catch(()=>{});
+    fbAuth.onAuthStateChanged(user=>{
+      if(user){
+        currentUser=user;
+        document.getElementById('authScreen').style.display='none';
+        document.getElementById('app').style.display='';
+        document.getElementById('userChip').style.display='flex';
+        const name=user.displayName||user.email.split('@')[0];
+        document.getElementById('userName').textContent=name;
+        document.getElementById('userInitial').textContent=name[0].toUpperCase();
+        document.getElementById('fbAccName').textContent=name;
+        document.getElementById('fbAccEmail').textContent=user.email;
+        loadFromFirestore();
+      } else {
+        currentUser=null;
+        document.getElementById('authScreen').style.display='flex';
+        document.getElementById('app').style.display='none';
+        document.getElementById('userChip').style.display='none';
+      }
+    });
+  } catch(e){
+    alert('Firebase init failed: '+e.message+'\nConfig dobara check karein.');
+    document.getElementById('configScreen').classList.add('show');
+  }
+}
+
+// ─── AUTH FUNCTIONS ───
+function switchAuthTab(tab){
+  document.getElementById('tabLogin').classList.toggle('on',tab==='login');
+  document.getElementById('tabSignup').classList.toggle('on',tab==='signup');
+  document.getElementById('authNameWrap').style.display=tab==='signup'?'':'none';
+  document.getElementById('authSubmitBtn').textContent=tab==='login'?'Login':'Register';
+  document.getElementById('authErr').textContent='';
+}
+async function doEmailAuth(){
+  const email=document.getElementById('authEmail').value.trim();
+  const pass=document.getElementById('authPass').value;
+  const isLogin=document.getElementById('tabLogin').classList.contains('on');
+  document.getElementById('authErr').textContent='';
+  if(!email||!pass){document.getElementById('authErr').textContent='Email aur password dono chahiye';return;}
+  try{
+    if(isLogin){
+      await fbAuth.signInWithEmailAndPassword(email,pass);
+    } else {
+      const name=document.getElementById('authName').value.trim()||email.split('@')[0];
+      const cred=await fbAuth.createUserWithEmailAndPassword(email,pass);
+      await cred.user.updateProfile({displayName:name});
+    }
+  } catch(e){
+    const msgs={'auth/user-not-found':'User nahi mila','auth/wrong-password':'Wrong password','auth/email-already-in-use':'Email already registered hai','auth/weak-password':'Password kam se kam 6 characters ka hona chahiye','auth/invalid-email':'Valid email darj karein'};
+    document.getElementById('authErr').textContent=msgs[e.code]||e.message;
+  }
+}
+async function doGoogleLogin(){
+  try{
+    const provider=new firebase.auth.GoogleAuthProvider();
+    await fbAuth.signInWithPopup(provider);
+  } catch(e){
+    document.getElementById('authErr').textContent='Google login failed: '+e.message;
+  }
+}
+async function doLogout(){
+  if(!confirm('Logout karna chahte hain?'))return;
+  await fbAuth.signOut();
+  DS={txns:[],goals:[],bills:[],emis:[],settings:{theme:'dark',limitEnabled:false,dailyLimit:0,lang:'en',pinEnabled:false,pin:''},budgets:{}};
+  toast('Logged out ✓','ok');
+}
+function showUserMenu(){
+  if(confirm('Logout karna chahte hain?')) doLogout();
+}
+
+// ─── FIRESTORE SYNC ───
+async function loadFromFirestore(){
+  if(!currentUser||!fbDb) return;
+  showSync('syncing');
+  try{
+    const uid=currentUser.uid;
+    const snap=await fbDb.collection('users').doc(uid).get();
+    if(snap.exists){
+      const d=snap.data();
+      if(d.txns)   DS.txns=d.txns;
+      if(d.goals)  DS.goals=d.goals;
+      if(d.bills)  DS.bills=d.bills;
+      if(d.emis)   DS.emis=d.emis;
+      if(d.budgets)DS.budgets=d.budgets;
+      if(d.settings)DS.settings=Object.assign({},DS.settings,d.settings);
+    }
+    showSync('synced');
+  } catch(e){
+    console.warn('Firestore load failed, using local',e);
+    showSync('');
+  }
+  renderDash(); updNotif();
+  applyTheme(DS.settings.theme);
+  applyLang();
+}
+
+async function saveToFirestore(){
+  if(!currentUser||!fbDb) return;
+  showSync('syncing');
+  try{
+    await fbDb.collection('users').doc(currentUser.uid).set({
+      txns:DS.txns, goals:DS.goals, bills:DS.bills, emis:DS.emis,
+      budgets:DS.budgets, settings:DS.settings,
+      lastUpdated:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showSync('synced');
+  } catch(e){
+    console.warn('Firestore save failed',e);
+    showSync('');
+  }
+}
+
+function debouncedSync(){
+  clearTimeout(syncTimer);
+  syncTimer=setTimeout(()=>saveToFirestore(),1500);
+}
+
+function showSync(state){
+  const badge=document.getElementById('syncBadge');
+  const dot=document.getElementById('syncDot');
+  const txt=document.getElementById('syncTxt');
+  if(state==='syncing'){badge.classList.add('show');dot.classList.add('spin');txt.textContent='Syncing...';}
+  else if(state==='synced'){badge.classList.add('show');dot.classList.remove('spin');txt.textContent='Synced ✓';setTimeout(()=>badge.classList.remove('show'),2500);}
+  else{badge.classList.remove('show');}
+}
+
+async function manualSync(){
+  await loadFromFirestore();
+  renderDash(); renderSettings();
+  toast('Data sync ho gaya! ✓','ok');
+}
+
+// ═══════════════════════════════════════════════════
+//  STORAGE (Firebase + localStorage fallback)
 // ═══════════════════════════════════════════════════
 function load(){
   try{
@@ -1134,12 +1394,12 @@ function load(){
     if(bg) DS.budgets=JSON.parse(bg);
   }catch(e){console.warn('Load error',e);}
 }
-const sT=()=>localStorage.setItem('mk_txns',JSON.stringify(DS.txns));
-const sG=()=>localStorage.setItem('mk_goals',JSON.stringify(DS.goals));
-const sS=()=>localStorage.setItem('mk_settings',JSON.stringify(DS.settings));
-const sB=()=>localStorage.setItem('mk_bills',JSON.stringify(DS.bills));
-const sE=()=>localStorage.setItem('mk_emis',JSON.stringify(DS.emis));
-const sBg=()=>localStorage.setItem('mk_budgets',JSON.stringify(DS.budgets));
+const sT=()=>{localStorage.setItem('mk_txns',JSON.stringify(DS.txns));debouncedSync();}
+const sG=()=>{localStorage.setItem('mk_goals',JSON.stringify(DS.goals));debouncedSync();}
+const sS=()=>{localStorage.setItem('mk_settings',JSON.stringify(DS.settings));debouncedSync();}
+const sB=()=>{localStorage.setItem('mk_bills',JSON.stringify(DS.bills));debouncedSync();}
+const sE=()=>{localStorage.setItem('mk_emis',JSON.stringify(DS.emis));debouncedSync();}
+const sBg=()=>{localStorage.setItem('mk_budgets',JSON.stringify(DS.budgets));debouncedSync();}
 
 // ═══════════════════════════════════════════════════
 //  PWA
@@ -1874,7 +2134,24 @@ function toast(msg,type='ok'){
 // ═══════════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════════
-load();
+
+// Firebase startup — hardcoded config
+(function startApp(){
+  const FIREBASE_CONFIG={
+    apiKey:"AIzaSyBVc4zFK6wbnVzU0hd2ttem7jdiydWksGU",
+    authDomain:"mykharcha-app.firebaseapp.com",
+    projectId:"mykharcha-app",
+    appId:"1:599548339400:web:d0a16d2b763e3bfde231fd",
+    storageBucket:"mykharcha-app.appspot.com",
+    messagingSenderId:"599548339400"
+  };
+  localStorage.setItem('mk_fb_config',JSON.stringify(FIREBASE_CONFIG));
+  document.getElementById('app').style.display='none';
+  document.getElementById('configScreen').classList.remove('show');
+  initFirebase(FIREBASE_CONFIG);
+})();
+
+load(); // local data as fallback while firebase loads
 curLang = DS.settings.lang || 'en';
 applyTheme(DS.settings.theme);
 injectManifest();
