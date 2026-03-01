@@ -49,6 +49,113 @@
   --gdim:rgba(77,255,184,.12); --rdim:rgba(255,95,126,.12); --odim:rgba(255,170,77,.12);
   --sh:0 4px 24px rgba(100,100,160,.15);
 }
+
+/* ══════════════════════════════════
+   COLOR THEMES — DARK VARIANTS
+══════════════════════════════════ */
+
+/* 🟣 PURPLE THEME (Default) */
+[data-color=purple]{
+  --purple:#8b7fff; --pdim:rgba(139,127,255,.15);
+  --gm:linear-gradient(135deg,#8b7fff,#4db8ff);
+  --bdr-h:rgba(139,127,255,.4);
+  --accent1:#8b7fff; --accent2:#4db8ff;
+}
+[data-color=purple][data-theme=dark] body::before{
+  background:radial-gradient(ellipse 60% 40% at 20% 10%,rgba(139,127,255,.07) 0%,transparent 60%),radial-gradient(ellipse 50% 35% at 80% 85%,rgba(77,184,255,.05) 0%,transparent 60%);
+}
+
+/* 🩷 PINK THEME */
+[data-color=pink]{
+  --purple:#ff6bda; --pdim:rgba(255,107,218,.15);
+  --gm:linear-gradient(135deg,#ff6bda,#ff8fab);
+  --bdr-h:rgba(255,107,218,.4);
+  --accent1:#ff6bda; --accent2:#ff8fab;
+}
+[data-color=pink][data-theme=dark]{
+  --bg:#1a0c1a; --bg2:#1f1025; --bg3:#261530;
+  --bdr:rgba(255,107,218,.08);
+}
+[data-color=pink][data-theme=dark] body::before{
+  background:radial-gradient(ellipse 60% 40% at 20% 10%,rgba(255,107,218,.08) 0%,transparent 60%),radial-gradient(ellipse 50% 35% at 80% 85%,rgba(255,143,171,.06) 0%,transparent 60%);
+}
+[data-color=pink][data-theme=light]{
+  --bdr-h:rgba(255,107,218,.4);
+  --pdim:rgba(255,107,218,.12);
+}
+
+/* 💙 BLUE THEME */
+[data-color=blue]{
+  --purple:#4db8ff; --pdim:rgba(77,184,255,.15);
+  --gm:linear-gradient(135deg,#4db8ff,#38f0e8);
+  --bdr-h:rgba(77,184,255,.4);
+  --accent1:#4db8ff; --accent2:#38f0e8;
+}
+[data-color=blue][data-theme=dark]{
+  --bg:#080e1a; --bg2:#0d1525; --bg3:#111e30;
+  --bdr:rgba(77,184,255,.08);
+}
+[data-color=blue][data-theme=dark] body::before{
+  background:radial-gradient(ellipse 60% 40% at 20% 10%,rgba(77,184,255,.08) 0%,transparent 60%),radial-gradient(ellipse 50% 35% at 80% 85%,rgba(56,240,232,.05) 0%,transparent 60%);
+}
+[data-color=blue][data-theme=light]{
+  --bdr-h:rgba(77,184,255,.4);
+  --pdim:rgba(77,184,255,.12);
+}
+
+/* 🌿 GREEN THEME */
+[data-color=green]{
+  --purple:#4dffb8; --pdim:rgba(77,255,184,.15);
+  --gm:linear-gradient(135deg,#4dffb8,#4db8ff);
+  --bdr-h:rgba(77,255,184,.4);
+  --accent1:#4dffb8; --accent2:#4db8ff;
+}
+[data-color=green][data-theme=dark]{
+  --bg:#080f0e; --bg2:#0d1715; --bg3:#11201e;
+  --bdr:rgba(77,255,184,.08);
+}
+[data-color=green][data-theme=dark] body::before{
+  background:radial-gradient(ellipse 60% 40% at 20% 10%,rgba(77,255,184,.08) 0%,transparent 60%),radial-gradient(ellipse 50% 35% at 80% 85%,rgba(77,184,255,.05) 0%,transparent 60%);
+}
+[data-color=green][data-theme=light]{
+  --bdr-h:rgba(77,255,184,.4);
+  --pdim:rgba(77,255,184,.12);
+}
+
+/* 🔥 ORANGE THEME */
+[data-color=orange]{
+  --purple:#ffaa4d; --pdim:rgba(255,170,77,.15);
+  --gm:linear-gradient(135deg,#ffaa4d,#ff6b6b);
+  --bdr-h:rgba(255,170,77,.4);
+  --accent1:#ffaa4d; --accent2:#ff6b6b;
+}
+[data-color=orange][data-theme=dark]{
+  --bg:#160d06; --bg2:#1e1208; --bg3:#26180b;
+  --bdr:rgba(255,170,77,.08);
+}
+[data-color=orange][data-theme=dark] body::before{
+  background:radial-gradient(ellipse 60% 40% at 20% 10%,rgba(255,170,77,.08) 0%,transparent 60%),radial-gradient(ellipse 50% 35% at 80% 85%,rgba(255,107,107,.06) 0%,transparent 60%);
+}
+[data-color=orange][data-theme=light]{
+  --bdr-h:rgba(255,170,77,.4);
+  --pdim:rgba(255,170,77,.12);
+}
+
+/* ══ COLOR THEME PICKER UI ══ */
+.color-theme-section{margin-top:2px}
+.color-themes-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:4px 2px}
+.ct-card{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;padding:10px 6px;border-radius:var(--r2);border:2px solid transparent;background:var(--card);transition:var(--t);position:relative}
+.ct-card:hover{border-color:var(--bdr-h);background:var(--card-h)}
+.ct-card.active{border-color:var(--purple);background:var(--pdim)}
+.ct-card.active::after{content:'✓';position:absolute;top:5px;right:6px;font-size:9px;font-weight:800;color:var(--purple)}
+.ct-swatch{width:36px;height:36px;border-radius:50%;box-shadow:0 4px 12px rgba(0,0,0,.3);flex-shrink:0}
+.ct-name{font-size:9px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.3px;text-align:center;line-height:1.2}
+/* Dark/Light mode row */
+.mode-row{display:flex;gap:8px;margin-top:2px}
+.mode-btn{flex:1;padding:11px 8px;border-radius:var(--r2);border:2px solid var(--bdr);background:var(--card);color:var(--txt3);font-size:12px;font-weight:700;cursor:pointer;transition:var(--t);display:flex;align-items:center;justify-content:center;gap:7px}
+.mode-btn:hover{border-color:var(--bdr-h);background:var(--card-h)}
+.mode-btn.active{border-color:var(--purple);background:var(--pdim);color:var(--purple)}
+.mode-btn .material-icons-round{font-size:18px}
 /* ── RESET ── */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{font-size:16px;height:100%}
@@ -680,10 +787,53 @@ input[type=date],input[type=time]{color-scheme:dark}
       </div>
 
       <div class="sgt" data-i18n="preferences">Preferences</div>
-      <div class="si" onclick="toggleTheme()">
-        <div class="sico" style="background:rgba(139,127,255,.12)"><span class="material-icons-round" style="color:var(--purple)">palette</span></div>
-        <div class="sinf"><h4 data-i18n="dark_light">Dark / Light Mode</h4><p data-i18n="change_theme">App ka theme badlein</p></div>
-        <button class="tgl" id="tglTheme" onclick="event.stopPropagation();toggleTheme()"></button>
+
+      <!-- ✨ COLOR THEME PICKER -->
+      <div class="card cp color-theme-section">
+        <div class="sh" style="margin-bottom:14px">
+          <h2 style="font-size:14px">🎨 App Theme Color</h2>
+          <span style="font-size:10px;color:var(--txt3)">Apna rang chunein</span>
+        </div>
+        <div class="color-themes-grid" id="colorThemeGrid">
+          <div class="ct-card" data-color="purple" onclick="applyColorTheme('purple')">
+            <div class="ct-swatch" style="background:linear-gradient(135deg,#8b7fff,#4db8ff)"></div>
+            <span class="ct-name">Purple</span>
+          </div>
+          <div class="ct-card" data-color="pink" onclick="applyColorTheme('pink')">
+            <div class="ct-swatch" style="background:linear-gradient(135deg,#ff6bda,#ff8fab)"></div>
+            <span class="ct-name">Pink</span>
+          </div>
+          <div class="ct-card" data-color="blue" onclick="applyColorTheme('blue')">
+            <div class="ct-swatch" style="background:linear-gradient(135deg,#4db8ff,#38f0e8)"></div>
+            <span class="ct-name">Blue</span>
+          </div>
+          <div class="ct-card" data-color="green" onclick="applyColorTheme('green')">
+            <div class="ct-swatch" style="background:linear-gradient(135deg,#4dffb8,#4db8ff)"></div>
+            <span class="ct-name">Green</span>
+          </div>
+          <div class="ct-card" data-color="orange" onclick="applyColorTheme('orange')">
+            <div class="ct-swatch" style="background:linear-gradient(135deg,#ffaa4d,#ff6b6b)"></div>
+            <span class="ct-name">Orange</span>
+          </div>
+        </div>
+
+        <!-- Dark / Light toggle -->
+        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--bdr)">
+          <div style="font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Mode</div>
+          <div class="mode-row">
+            <button class="mode-btn" id="modeDark" onclick="applyTheme('dark')">
+              <span class="material-icons-round">dark_mode</span> Dark
+            </button>
+            <button class="mode-btn" id="modeLight" onclick="applyTheme('light')">
+              <span class="material-icons-round">light_mode</span> Light
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Old dark/light toggle (hidden, kept for compatibility) -->
+      <div style="display:none">
+        <button class="tgl" id="tglTheme" onclick="toggleTheme()"></button>
       </div>
 
       <div class="sgt" data-i18n="daily_limit_setting">Daily Spending Limit</div>
@@ -1339,6 +1489,7 @@ async function loadFromFirestore(){
   }
   renderDash(); updNotif();
   applyTheme(DS.settings.theme);
+  applyColorTheme(DS.settings.colorTheme || 'purple');
   applyLang();
 }
 
@@ -1437,9 +1588,35 @@ function applyTheme(t){
   document.documentElement.setAttribute('data-theme',t);
   DS.settings.theme=t; sS();
   const isL=t==='light';
-  document.getElementById('thIco').textContent=isL?'dark_mode':'light_mode';
-  document.getElementById('tglTheme').classList.toggle('on',isL);
+  const thIco=document.getElementById('thIco');
+  if(thIco) thIco.textContent=isL?'dark_mode':'light_mode';
+  const tglTheme=document.getElementById('tglTheme');
+  if(tglTheme) tglTheme.classList.toggle('on',isL);
   document.getElementById('metaTheme').content=isL?'#f0f0f8':'#0c0c1a';
+  // update mode buttons
+  const md=document.getElementById('modeDark');
+  const ml=document.getElementById('modeLight');
+  if(md) md.classList.toggle('active',!isL);
+  if(ml) ml.classList.toggle('active',isL);
+}
+
+function applyColorTheme(color){
+  color = color || DS.settings.colorTheme || 'purple';
+  document.documentElement.setAttribute('data-color', color);
+  DS.settings.colorTheme = color;
+  sS();
+  // Update active state on cards
+  document.querySelectorAll('.ct-card').forEach(c=>{
+    c.classList.toggle('active', c.getAttribute('data-color')===color);
+  });
+  // Re-apply scrollbar color dynamically
+  const colors={
+    purple:'#8b7fff', pink:'#ff6bda', blue:'#4db8ff',
+    green:'#4dffb8', orange:'#ffaa4d'
+  };
+  // Update scrollbar via CSS variable trick
+  document.documentElement.style.setProperty('--scrollbar-color', colors[color]||'#8b7fff');
+  toast('Theme change ho gaya! ✓','ok');
 }
 
 // ═══════════════════════════════════════════════════
@@ -1958,7 +2135,7 @@ function buildBudgetChart(cd){
 // ═══════════════════════════════════════════════════
 function renderSettings(){
   const s=DS.settings;
-  qs('#tglTheme').classList.toggle('on',s.theme==='light');
+  if(document.getElementById('tglTheme')) document.getElementById('tglTheme').classList.toggle('on',s.theme==='light');
   qs('#tglLimit').classList.toggle('on',!!s.limitEnabled);
   qs('#limitStTxt').textContent=s.limitEnabled&&s.dailyLimit?`₹${rfmt(s.dailyLimit)} active`:t('not_set');
   qs('#limitForm').style.display=s.limitEnabled?'':'none';
@@ -1966,6 +2143,13 @@ function renderSettings(){
   qs('#tglPin').classList.toggle('on',!!s.pinEnabled);
   qs('#pinStTxt').textContent=s.pinEnabled?'Enabled – tap to change':'Disabled';
   document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('sel',b.getAttribute('data-lang')===curLang));
+  // Refresh color theme UI
+  const ct=s.colorTheme||'purple';
+  document.querySelectorAll('.ct-card').forEach(c=>c.classList.toggle('active',c.getAttribute('data-color')===ct));
+  const md=document.getElementById('modeDark');
+  const ml=document.getElementById('modeLight');
+  if(md) md.classList.toggle('active',s.theme!=='light');
+  if(ml) ml.classList.toggle('active',s.theme==='light');
   const gl=qs('#goalsList');
   if(!DS.goals.length){gl.innerHTML=`<div style="color:var(--txt3);font-size:12px;padding:3px 2px 9px">No goals yet.</div>`;return;}
   gl.innerHTML=DS.goals.map((g,i)=>{
@@ -2154,6 +2338,7 @@ function toast(msg,type='ok'){
 load(); // local data as fallback while firebase loads
 curLang = DS.settings.lang || 'en';
 applyTheme(DS.settings.theme);
+applyColorTheme(DS.settings.colorTheme || 'purple');
 injectManifest();
 regSW();
 applyLang();
